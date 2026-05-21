@@ -90,6 +90,25 @@ Hub's `LearnStack.Hub.SharedKernel` mirrors LearnStack core's `LearnStack.Shared
 
 The `learnstack-hub` realm export (`../learnstack/infra/keycloak/realms/learnstack-hub.json`) physically lives in the sibling repo because LearnStack core's compose stack imports both realms at first boot. See [`infra/keycloak/README.md`](infra/keycloak/README.md) for the operational topology.
 
+### Pre-commit Leakwatch is a repo-root scan, not a staged-files-only scan
+
+The pre-commit hook runs `leakwatch scan fs .` once per commit — the current Leakwatch CLI accepts a directory target, not per-file. The trade-off is intentional: it catches the **current state** of the tree, not only the staged delta. A pre-existing secret elsewhere in the tree will therefore fail the commit too, not just secrets introduced by your diff.
+
+**What this means in practice:** if you have local-only WIP (an experimental `*.key` or `*.pem` outside `.leakwatchignore`) sitting in the working tree, every commit will Leakwatch-fail until you remove or `.leakwatchignore` it. The hook stashes unstaged tracked changes via `--keep-index --include-untracked` so they're temporarily out of the working tree during the scan, but the scan window still sees everything that's tracked.
+
+### Dev cert / license fixtures: keep them OUTSIDE the repo tree
+
+`.gitignore` covers `*.pem` / `*.key` / `*.crt` / `*.lic` — and `.leakwatch.yaml` deliberately does **not** exclude those extensions (it's the safety net for the cert + license material that lands in P02c-5 / P02c-6 / Phase 09b). Combined, this means:
+
+1. If you accidentally commit a real key, `.gitignore` blocks the commit.
+2. If you stash a real key in the tree intending to commit later, Leakwatch flags it on every pre-commit until removed.
+
+The intended workflow for dev cert material is: keep it outside the repo (e.g. `~/dev-fixtures/learnstack-hub-mtls.pem`) and reference it via `.env` paths. Only check in **specific** dev fixture files (e.g. `tests/fixtures/dev-cert.pem`) and add their narrow paths to `.leakwatchignore` at the same time — never broaden the global glob.
+
+### `make e2e-up` is a no-op overlay today
+
+`infra/compose/e2e.yml` declares an empty `services: {}` mapping. The overlay parses cleanly and `make e2e-up` succeeds, but no service is overridden — Hub has no data-bearing service of its own to ephemeralise (Postgres / Valkey / Kafka all live in LearnStack core's compose, which has its own `e2e.yml` overlay). Real Hub-side e2e fixtures (seeded operator account, demo plans, demo tenant for the SaaS rehearsal scenario) land in P02c-7.
+
 ## Issue / PR templates
 
 `.github/pull_request_template.md` carries the canonical PR template. Reference the relevant LearnStack ADR or Phase 02c packet in every PR description.

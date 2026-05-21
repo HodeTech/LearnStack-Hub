@@ -44,7 +44,18 @@ services:
       - |
         set -eu
         echo "Waiting for shared Postgres on host.docker.internal:5432..."
+        # Bounded wait: 60 attempts × 2s = 120s ceiling. If shared Postgres is
+        # not reachable in that window the developer almost certainly forgot
+        # to start LearnStack core compose first; fail fast with an
+        # actionable message rather than block forever.
+        attempts=0
         until pg_isready -h host.docker.internal -p 5432 -U ${POSTGRES_USER:-learnstack} -d postgres > /dev/null 2>&1; do
+          attempts=$((attempts + 1))
+          if [ $attempts -ge 60 ]; then
+            echo "ERROR: shared Postgres not reachable on host.docker.internal:5432 after 120s." >&2
+            echo "       Start LearnStack core compose first: cd ../learnstack && make dev" >&2
+            exit 1
+          fi
           sleep 2
         done
         echo "Provisioning ${HUB_POSTGRES_DB:-learnstack_hub} database..."

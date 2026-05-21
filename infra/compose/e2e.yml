@@ -27,6 +27,12 @@
 
 name: learnstack-hub-e2e
 
-services:
-  # P02c-7 adds e2e-only overrides here. P02c-0 ships an empty overlay so
-  # `make e2e-up` works today.
+# P02c-7 adds e2e-only overrides under `services:` below. Until then the
+# overlay must declare `services` as an EMPTY MAPPING (`{}`) — not a null
+# block. Compose v2 rejects a `services:` key with only comment children
+# (parses as null) with `services must be a mapping`, which would break
+# `make e2e-up` in main. Confirmed by:
+#     docker compose -f infra/compose/dev.yml -f infra/compose/e2e.yml config
+# An empty mapping is a valid no-op overlay; the dev stack passes through
+# unchanged.
+services: {}
