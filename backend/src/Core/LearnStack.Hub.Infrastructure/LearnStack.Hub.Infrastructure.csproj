@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    EF Core DbContexts, provider adapters (Stripe / Iyzico land in Phase 09b),
+    and the outbound LearnStackApiClient (mTLS + JWT + HMAC chain — lands
+    P02c-2). P02c-0 ships an empty assembly.
+  -->
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Domain\LearnStack.Hub.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Application.Contracts\LearnStack.Hub.Application.Contracts.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Application\LearnStack.Hub.Application.csproj" />
+  </ItemGroup>
+
+</Project>

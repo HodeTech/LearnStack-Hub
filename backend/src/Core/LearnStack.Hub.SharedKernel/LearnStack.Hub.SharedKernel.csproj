@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Hub's own SharedKernel. Mirrors LearnStack core's pattern but DOES NOT
+    reference LearnStack assemblies. Result<T>, LocalizedMessage, Entity<TId>,
+    AuditableEntity<TId>, IClock, etc. land here in P02c-1 (mirror of
+    LearnStack core P02a-2 work).
+  -->
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.SharedKernel</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- P02c-1 wires Vogen and the strongly-typed ID pattern; P02c-0 ships an
+         empty assembly with just AssemblyMarker so the rest of the solution
+         can reference it. -->
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,27 @@
+{
+  "name": "@learnstack-hub/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint": "./eslint/index.cjs",
+    "./tsconfig/base.json": "./tsconfig/base.json",
+    "./tsconfig/next.json": "./tsconfig/next.json",
+    "./tailwind": "./tailwind/index.ts"
+  },
+  "files": [
+    "eslint",
+    "tsconfig",
+    "tailwind"
+  ],
+  "dependencies": {
+    "@typescript-eslint/eslint-plugin": "^8.18.0",
+    "@typescript-eslint/parser": "^8.18.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-plugin-import": "^2.31.0"
+  },
+  "peerDependencies": {
+    "eslint": "^9.0.0"
+  }
+}

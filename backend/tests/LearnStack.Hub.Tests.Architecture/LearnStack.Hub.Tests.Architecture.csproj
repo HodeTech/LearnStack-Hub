@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Non-skippable architecture rules. Mirror of LearnStack core's
+    LearnStack.Tests.Architecture project shape. P02c-0 ships:
+      - Meta-test (NetArchTest_DetectsAPlantedViolation) — proves the
+        scanner works; failure means every other test is vacuous.
+      - No_Source_Folder_Named_Verticals — same rule as LearnStack
+        (ADR-0018; tenant-shapes are data, not code).
+      - Hub_NeverStores_TenantData — placeholder (no tenant tables today;
+        rule becomes real once modules land in P02c-1).
+
+    Subsequent packets extend the suite:
+      - P02c-1: Hub_Modules_DoNotReference_LearnStack_Internals,
+                ModuleDependencyTests (per-module Domain isolation).
+      - P02c-2: Internal_API_Endpoints_AreNot_Public (integration test).
+      - P02c-6: LicenseKey_Validation_Is_Pinned_RSA2048.
+  -->
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Tests.Architecture</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Core projects -->
+    <ProjectReference Include="..\..\src\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Domain\LearnStack.Hub.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Application.Contracts\LearnStack.Hub.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Application\LearnStack.Hub.Application.csproj" />
+    <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Infrastructure\LearnStack.Hub.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Infrastructure.Audit\LearnStack.Hub.Infrastructure.Audit.csproj" />
+    <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Api\LearnStack.Hub.Api.csproj" />
+
+    <!-- Module references will be added as modules land in P02c-1+. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="NetArchTest.Rules" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+</Project>

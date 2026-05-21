@@ -1,0 +1,56 @@
+# Hub APISIX main config — file-driven standalone mode.
+# Mirrors LearnStack core's APISIX config shape per ADR-0015. The only
+# differences:
+#   - Prometheus export port is 9191 (LearnStack core uses 9091).
+#   - This APISIX instance fronts `hub.learnstack.dev` — the operator
+#     portal + the Hub-side internal endpoints (license verify, usage
+#     report). LearnStack core's APISIX fronts the tenant-facing surface.
+#
+# The Admin API is NOT available in standalone mode — `apisix.yaml` is the
+# only source of truth, hot-reloaded on file change.
+
+deployment:
+  role: data_plane
+  role_data_plane:
+    config_provider: yaml
+
+apisix:
+  enable_ipv6: false
+  proxy_mode: http
+  enable_dev_mode: false
+  # Listen on Hub's port to avoid collision with LearnStack APISIX.
+  node_listen: 9180
+  ssl:
+    enable: true
+    listen:
+      - port: 9543
+
+nginx_config:
+  error_log_level: info
+  worker_processes: auto
+  worker_rlimit_nofile: 20480
+
+# Plugin chain universe for Hub routes. mTLS lives on the SSL/SNI object,
+# not as a route plugin — same posture as LearnStack core.
+plugins:
+  - real-ip
+  - cors
+  - openid-connect       # Keycloak learnstack-hub realm JWT validation (P02c-4)
+  - jwt-auth
+  - limit-req
+  - limit-count
+  - request-id
+  - proxy-rewrite
+  - response-rewrite
+  - prometheus
+  - ip-restriction
+  - gzip
+
+plugin_attr:
+  prometheus:
+    enable_export_server: true
+    export_addr:
+      ip: "0.0.0.0"
+      port: 9191
+  request-id:
+    include_in_response: true

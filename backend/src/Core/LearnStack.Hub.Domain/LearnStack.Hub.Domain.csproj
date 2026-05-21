@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Cross-module domain marker project. Holds AssemblyMarker only; cross-module
+    domain interfaces (where needed) land in later packets.
+  -->
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

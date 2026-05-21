@@ -1,0 +1,139 @@
+# LearnStack Hub — local dev infrastructure.
+#
+# Scope of THIS file (P02c-0): the Hub-specific services that LearnStack core
+# does NOT provide — a dedicated Dapr sidecar (separate placement + sidecar
+# from LearnStack core's) and Hub's own APISIX gateway instance on a separate
+# port. Shared backends (Postgres, Valkey, Vault, Kafka, Keycloak, Mailpit)
+# live in the sibling LearnStack core compose stack; Hub services reach them
+# via `host.docker.internal`.
+#
+# PRE-REQUISITE: LearnStack core compose MUST be running before this stack
+# starts. Run `cd ../learnstack && make dev` first.
+#
+# Env vars (HUB_*, POSTGRES_*, VAULT_*) come from the repo-root `.env` file
+# (template: `.env.example`). Every `${VAR:-default}` reference falls back
+# to a dev-safe literal when `.env` is missing.
+
+name: learnstack-hub-dev
+
+# Host-gateway alias for the workstation-local Hub API (`dotnet run`) and the
+# shared LearnStack core services (Postgres, Valkey, Vault, Kafka, Keycloak).
+# Docker Desktop maps `host.docker.internal` automatically; Linux requires
+# this explicit `host-gateway` entry.
+x-host-gateway: &host-gateway
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+services:
+  # ─── Hub Postgres init (one-shot CREATE DATABASE learnstack_hub) ──────────
+  # Hub uses a separate database within LearnStack core's shared Postgres
+  # instance. This one-shot init container creates the database on first
+  # boot, then exits. Idempotent — runs `CREATE DATABASE IF NOT EXISTS` via
+  # the PL/pgSQL trick because Postgres lacks native IF NOT EXISTS for
+  # databases. Survives container restarts.
+  postgres-hub-init:
+    image: postgres:18.4-alpine
+    container_name: learnstack-hub-postgres-init
+    <<: *host-gateway
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD:-learnstack}
+    volumes:
+      - ../postgres/init:/init:ro
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -eu
+        echo "Waiting for shared Postgres on host.docker.internal:5432..."
+        until pg_isready -h host.docker.internal -p 5432 -U ${POSTGRES_USER:-learnstack} -d postgres > /dev/null 2>&1; do
+          sleep 2
+        done
+        echo "Provisioning ${HUB_POSTGRES_DB:-learnstack_hub} database..."
+        psql -h host.docker.internal -p 5432 -U ${POSTGRES_USER:-learnstack} -d postgres \
+          -v "hub_db=${HUB_POSTGRES_DB:-learnstack_hub}" \
+          -f /init/01-create-hub-database.sql
+        echo "Hub database ready."
+    restart: "no"
+
+  # ─── Hub Dapr placement (separate from LearnStack core's) ─────────────────
+  # Hub has its own Dapr sidecar so topic ACL and component config can evolve
+  # independently. Placement uses port 50006 to avoid collision with
+  # LearnStack core's 50005.
+  dapr-placement-hub:
+    image: daprio/placement:1.17.7
+    container_name: learnstack-hub-dapr-placement
+    restart: unless-stopped
+    command: ["./placement", "-log-level", "info", "-port", "50006"]
+    ports:
+      - "50006:50006"
+
+  # ─── Hub Dapr sidecar ─────────────────────────────────────────────────────
+  # Bound to app id `learnstack-hub-api`. The Hub .NET host runs OUTSIDE
+  # compose during active dev (`dotnet run` on the workstation); the sidecar
+  # talks to it via host.docker.internal:5181. Hub Dapr ports differ from
+  # LearnStack core: HTTP 3501 (vs 3500), gRPC 50002 (vs 50001).
+  dapr-sidecar-hub:
+    image: daprio/daprd:1.17.7
+    container_name: learnstack-hub-dapr-sidecar
+    restart: unless-stopped
+    <<: *host-gateway
+    command:
+      - ./daprd
+      - -app-id
+      - learnstack-hub-api
+      - -app-port
+      - "5181"
+      - -app-channel-address
+      - host.docker.internal
+      - -dapr-http-port
+      - "3501"
+      - -dapr-grpc-port
+      - "50002"
+      - -placement-host-address
+      - dapr-placement-hub:50006
+      - -resources-path
+      - /components
+      - -config
+      - /config/dapr-config.yaml
+      - -log-level
+      - info
+    environment:
+      # Same indirection chain as LearnStack core: `secretstore-vault.yaml`
+      # resolves `vaultToken` via `secretKeyRef` against the local-env secret
+      # store (`secretstore-envvar.yaml`); passing the env var here is what
+      # makes that lookup find the token in daprd's process env.
+      VAULT_ROOT_TOKEN: ${VAULT_ROOT_TOKEN:-learnstack-dev-root-token}
+    volumes:
+      - ../dapr/components:/components:ro
+      - ../dapr/config:/config:ro
+    ports:
+      - "3501:3501"       # HTTP API
+      - "50002:50002"     # gRPC API
+    depends_on:
+      dapr-placement-hub:
+        condition: service_started
+
+  # ─── Hub APISIX gateway ───────────────────────────────────────────────────
+  # APISIX in file-driven standalone mode per ADR-0015 — no etcd. Hub uses
+  # different ports from LearnStack core (HTTP 9180 / HTTPS 9543 / Prometheus
+  # 9191) so both gateways can run concurrently on the same workstation.
+  apisix-hub:
+    image: apache/apisix:3.16.0-debian
+    container_name: learnstack-hub-apisix
+    restart: unless-stopped
+    <<: *host-gateway
+    volumes:
+      - ../apisix/config.yaml:/usr/local/apisix/conf/config.yaml:ro
+      - ../apisix/apisix.yaml:/usr/local/apisix/conf/apisix.yaml:ro
+    ports:
+      - "9180:9180"       # HTTP gateway
+      - "9543:9543"       # HTTPS gateway (no cert in dev)
+      - "9191:9191"       # Prometheus metrics
+    healthcheck:
+      # apache/apisix:3.16.0-debian ships bash but neither curl nor wget;
+      # /dev/tcp pseudo-device opens a TCP connection. `127.0.0.1` avoids
+      # the IPv6 `::1` detour.
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/9180"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Api</RootNamespace>
+    <UserSecretsId>learnstack-hub-api-dev-secrets</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Domain\LearnStack.Hub.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Application.Contracts\LearnStack.Hub.Application.Contracts.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Application\LearnStack.Hub.Application.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Infrastructure\LearnStack.Hub.Infrastructure.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Infrastructure.Audit\LearnStack.Hub.Infrastructure.Audit.csproj" />
+  </ItemGroup>
+
+</Project>

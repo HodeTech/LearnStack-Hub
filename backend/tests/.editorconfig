@@ -1,0 +1,8 @@
+[*.cs]
+# Test fixtures + theory data classes follow xunit conventions; allow public
+# nested types and Method_When_Returns naming. Same posture as LearnStack core.
+dotnet_diagnostic.CA1707.severity = none
+dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.CA1515.severity = none
+dotnet_diagnostic.CA1034.severity = none
+dotnet_diagnostic.CA2234.severity = none

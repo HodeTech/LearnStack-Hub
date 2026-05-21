@@ -1,0 +1,109 @@
+# Hub APISIX route table — hot-reloaded on file change.
+#
+# Hub gateway fronts:
+#   - `/healthz` (priority 1, public, GET only) — proxies to the Hub API
+#   - `/api/v1/internal/license/verify` (P02c-2) — LearnStack → Hub
+#   - `/api/v1/usage/report` (P02c-2) — LearnStack → Hub
+#   - `/api/v1/operator/**` (P02c-4) — operator portal BFF calls (Keycloak
+#     learnstack-hub realm JWT)
+#
+# This route table is INTENTIONALLY MINIMAL in P02c-0 — only the healthz
+# route is wired. The internal license-verify + usage-report routes land in
+# P02c-2 with the actual handlers; the operator routes land in P02c-4.
+#
+# IMPORTANT: Hub APISIX is a SEPARATE INSTANCE from LearnStack core's
+# APISIX. LearnStack core's APISIX (port 9080) fronts `/api/internal/*`
+# from Hub → LearnStack. Hub APISIX (port 9180) fronts the LearnStack →
+# Hub direction. The two flows never share a gateway.
+
+routes:
+  - id: 1
+    uri: /healthz
+    methods: [GET]
+    priority: 1
+    plugins:
+      cors: {}
+      limit-req:
+        rate: 10
+        burst: 5
+        key: remote_addr
+        rejected_code: 429
+      prometheus: {}
+    upstream:
+      type: roundrobin
+      nodes:
+        # The Hub .NET API runs OUTSIDE compose during active dev
+        # (`dotnet run` on the workstation, port 5181).
+        "host.docker.internal:5181": 1
+
+  # ---- P02c-2 placeholders --------------------------------------------------
+  # The following routes are RESERVED for P02c-2 (Hub-side internal API).
+  # Uncommenting requires the LearnStackApiClient call-back chain to be in
+  # place — mTLS client cert validation, API-key auth, rate limiting per
+  # LearnStack instance, HMAC body verification.
+  #
+  # - id: 10
+  #   uri: /api/v1/internal/license/verify
+  #   methods: [POST]
+  #   priority: 50
+  #   plugins:
+  #     key-auth:
+  #       key: ${HUB_API_KEY}      # per-LearnStack-instance API key
+  #     limit-req:
+  #       rate: 100                # 100 req/min per ADR-0019
+  #       burst: 20
+  #       key: consumer_name
+  #       rejected_code: 429
+  #     prometheus: {}
+  #   upstream:
+  #     type: roundrobin
+  #     nodes:
+  #       "host.docker.internal:5181": 1
+  #
+  # - id: 11
+  #   uri: /api/v1/usage/report
+  #   methods: [POST]
+  #   priority: 50
+  #   plugins:
+  #     key-auth:
+  #       key: ${HUB_API_KEY}
+  #     limit-req:
+  #       rate: 100
+  #       burst: 20
+  #       key: consumer_name
+  #       rejected_code: 429
+  #     prometheus: {}
+  #   upstream:
+  #     type: roundrobin
+  #     nodes:
+  #       "host.docker.internal:5181": 1
+
+  # ---- P02c-4 placeholders --------------------------------------------------
+  # Operator-portal BFF routes (Keycloak learnstack-hub realm JWT validation
+  # via openid-connect plugin).
+  #
+  # - id: 20
+  #   uri: /api/v1/operator/*
+  #   methods: [GET, POST, PUT, PATCH, DELETE]
+  #   priority: 100
+  #   plugins:
+  #     cors: {}
+  #     openid-connect:
+  #       discovery: http://host.docker.internal:8080/realms/learnstack-hub/.well-known/openid-configuration
+  #       bearer_only: true
+  #       realm: learnstack-hub
+  #       # Reject ANY token whose `iss` does not match the learnstack-hub realm.
+  #     limit-req:
+  #       rate: 100
+  #       burst: 20
+  #       key: remote_addr
+  #       rejected_code: 429
+  #     request-id:
+  #       include_in_response: true
+  #     prometheus: {}
+  #   upstream:
+  #     type: roundrobin
+  #     nodes:
+  #       "host.docker.internal:5181": 1
+
+#END

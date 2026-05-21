@@ -1,0 +1,64 @@
+# Contributing to LearnStack Hub
+
+LearnStack Hub follows the same engineering rigour as [LearnStack core](../learnstack). Most engineering standards are defined once in LearnStack's [Standards corpus](../learnstack/docs/standards/) and apply here by reference.
+
+## Branch protection
+
+Required status checks on `main`:
+
+- `backend` — `dotnet build` + format verify + unit + architecture + contract tests
+- `frontend` — pnpm install + typecheck + lint + build + Vitest
+- `meta` — `make lint`-style format verification + Markdown link audit
+- `secret-scan` — Leakwatch scan (gates per LearnStack Standards 12 § Secrets Management)
+
+`backend-integration` is **deferred** with `if: false` until P02c-2 lands the first Testcontainers-backed test.
+
+## Commit conventions
+
+- Conventional Commits format: `type(scope): subject`
+- Subject in imperative mood; ≤ 72 characters
+- Hub-specific scopes:
+  - `hub` — cross-cutting Hub changes
+  - `hub-portal` — operator portal (Next.js)
+  - `hub-domain` — Hub domain model
+  - `hub-infra` — Hub infrastructure (compose, APISIX, Dapr, Vault)
+  - `hub-docs` — Hub documentation
+- AI co-author trailer (per [LearnStack AGENTS.md § Trailers](../learnstack/AGENTS.md)):
+  - Claude Code: `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`
+  - Codex: `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
+
+Example commit message:
+
+```
+feat(hub-domain): scaffold LearnStackTenant mirror aggregate
+
+P02c-1 brings the Hub-side mirror of LearnStack's Tenant aggregate.
+Hub holds only metadata fields (id, slug, display_name, status,
+deployment_mode, created_at, last_phone_home_at).
+
+Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+```
+
+## Cross-repo PRs
+
+When a packet changes both `learnstack` and `learnstack-hub` (e.g. P02c-3 lands `HubEntitlementProvider` on the LearnStack side + Hub-side internal-API endpoints), the two PRs **must be coordinated**:
+
+1. Open the Hub-side PR first; it carries the canonical contract shape.
+2. Open the LearnStack-side PR referencing the Hub PR's commit hash.
+3. Merge both in the same session — either-side merge alone leaves the contract dangling.
+
+Adding or changing a cross-repo contract endpoint requires a **new ADR in `learnstack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](../learnstack/docs/standards/20-infrastructure-stack.md).
+
+## Pre-commit hook
+
+```bash
+make install   # activates .githooks/pre-commit
+```
+
+The hook runs `dotnet format` on staged `.cs` files, `prettier --write` + `eslint --fix` on staged frontend files, and `leakwatch scan fs <file>` on every staged path (if Leakwatch is on PATH; CI re-runs the scan as a hard gate).
+
+To bypass locally for an emergency fix: `git commit --no-verify`. CI re-runs every check the hook runs, so a bypassed commit will fail the PR build.
+
+## Issue / PR templates
+
+`.github/pull_request_template.md` carries the canonical PR template. Reference the relevant LearnStack ADR or Phase 02c packet in every PR description.

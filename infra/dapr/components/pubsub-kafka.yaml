@@ -1,0 +1,31 @@
+# Hub Dapr pub/sub component — Kafka backend.
+# Hub publishes integration events on the `learnstack.hub.*` topic prefix
+# (entitlement projection updates, custom-domain lifecycle events). Topic
+# names follow the same `learnstack.{module}.{aggregate}` convention as
+# LearnStack core but rooted under the `learnstack.hub` namespace.
+#
+# IMPORTANT: `consumerGroup` is pinned to the Hub app id (`learnstack-hub-api`)
+# — NOT the LearnStack core `learnstack-api`. The two consumer groups must
+# stay distinct so Kafka partition assignment for `learnstack.hub.*` topics
+# remains exclusive to Hub. Sharing a consumer group across distinct apps
+# silently splits partitions and breaks at-least-once semantics.
+#
+# Brokers point at `host.docker.internal:9092` because the Kafka broker lives
+# in LearnStack core's compose stack — Hub does not run its own Kafka.
+
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: pubsub
+spec:
+  type: pubsub.kafka
+  version: v1
+  metadata:
+    - name: brokers
+      value: host.docker.internal:9092
+    - name: consumerGroup
+      value: learnstack-hub-api
+    - name: authType
+      value: none
+    - name: disableTls
+      value: "true"

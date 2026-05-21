@@ -1,0 +1,58 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+*.swp
+
+# .NET
+bin/
+obj/
+TestResults/
+*.user
+*.suo
+*.rsuser
+
+# Node
+node_modules/
+.next/
+dist/
+build/
+coverage/
+
+# Environment — track only the explicitly-listed *.example templates.
+.env
+.env.*
+!.env.example
+!frontend/apps/operator-portal/.env.local.example
+
+# Logs
+*.log
+logs/
+
+# Local infrastructure data
+.data/
+postgres-data/
+valkey-data/
+
+# Hub-specific local artifacts
+# *.lic carries operator-issued license keys generated during Phase 02c P6+
+# integration tests; never commit one. Production license keys are issued by
+# the production Hub and downloaded out-of-band.
+*.lic
+# *.pem / *.key carry TLS material from Phase 02c P5 (custom-domain DNS-01 /
+# HTTP-01 challenges) and from the mTLS chain used by /api/internal/*. Both
+# live in Vault in production.
+*.pem
+*.key
+*.crt
+
+# Multi-root workspace files (per-developer; never committed)
+*.code-workspace
+
+# Local-only research (gitignored anyway; mirrored from learnstack convention)
+docs/analysis/

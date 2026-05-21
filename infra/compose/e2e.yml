@@ -1,0 +1,22 @@
+# LearnStack Hub — end-to-end test compose overlay.
+#
+# Layered on top of `dev.yml`:
+#     docker compose -f infra/compose/dev.yml -f infra/compose/e2e.yml up
+# (the canonical `make` target is `make e2e-up`.)
+#
+# Hub's e2e overlay is minimal because Hub doesn't run its own data services
+# in dev (Postgres / Valkey / Kafka live in LearnStack core's compose).
+# Hub-side e2e ephemerality is achieved via:
+#   1. Re-running the postgres-hub-init script (it drops + recreates the
+#      learnstack_hub database).
+#   2. Restarting the Dapr sidecar (clears any in-memory subscription state).
+# Both happen automatically on `docker compose down + up`.
+#
+# P02c-7 will extend this overlay with Hub-specific test fixtures (seeded
+# operator account, demo plans, demo tenant for the SaaS rehearsal scenario).
+
+name: learnstack-hub-e2e
+
+services:
+  # P02c-7 adds e2e-only overrides here. P02c-0 ships an empty overlay so
+  # `make e2e-up` works today.

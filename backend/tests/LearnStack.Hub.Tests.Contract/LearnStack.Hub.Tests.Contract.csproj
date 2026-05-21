@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    OpenAPI contract assertions for the Hub-side internal API surface
+    (lands in P02c-2). P02c-0 ships an empty project so CI can register the
+    job target; the first contract test arrives with the first endpoint.
+  -->
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Tests.Contract</RootNamespace>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Api\LearnStack.Hub.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="coverlet.collector" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    CQRS command + query DTOs that cross module boundaries inside Hub.
+    Mirrors LearnStack core's Application.Contracts pattern. P02c-1 fills it
+    with the first contracts (CreateTenantCommand, GetEntitlementQuery, etc.).
+  -->
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Application.Contracts</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>

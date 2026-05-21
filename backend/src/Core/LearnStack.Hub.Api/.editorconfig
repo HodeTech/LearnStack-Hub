@@ -1,0 +1,6 @@
+[*.cs]
+# WebApplicationFactory<Program> in tests reflectively discovers the public
+# partial Program class declared at the bottom of Program.cs. CA1515 (sealed
+# / internal class preference) would force that class to be internal; we keep
+# it public for the test harness — same posture as LearnStack core.
+dotnet_diagnostic.CA1515.severity = none

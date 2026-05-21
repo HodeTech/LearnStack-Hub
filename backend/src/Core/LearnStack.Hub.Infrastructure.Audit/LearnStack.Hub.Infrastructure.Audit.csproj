@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Hub's operator audit infrastructure. Separate from LearnStack core's
+    tenant audit pipeline — Hub audit logs every operator action against
+    plans, tenants, entitlements, custom-domain approvals, license issuance.
+    P02c-4 wires the pipeline against the Operators module.
+  -->
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Infrastructure.Audit</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Domain\LearnStack.Hub.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

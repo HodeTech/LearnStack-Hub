@@ -1,0 +1,75 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!--
+    Packages actively referenced by Phase-02c-0 scaffolding.
+    Versions tracked against LearnStack core's Directory.Packages.props so the
+    two repos stay in lock-step on the shared stack (.NET 10, Vogen 7, MediatR
+    12, FluentValidation 11, EF Core 10, xunit 2.9). Drift is intentional only
+    where Hub omits LearnStack-only adapters (LiveKit / FluentEmail /
+    Meilisearch / AWSSDK.S3) — those packages do not exist in this Hub
+    DirectoryPackages.props on purpose.
+  -->
+  <ItemGroup Label="Phase-02c-0 (in use)">
+    <!-- ASP.NET / hosting (Api host) -->
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+
+    <!-- EF Core (per-module Infrastructure projects — used from P02c-1) -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
+    <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+
+    <!-- Application infrastructure (per-module Application projects) -->
+    <PackageVersion Include="MediatR" Version="12.4.1" />
+    <PackageVersion Include="FluentValidation" Version="11.10.0" />
+
+    <!-- Strongly-typed ID + value object source generator (ADR-0023 mirror) -->
+    <PackageVersion Include="Vogen" Version="7.0.0" />
+
+    <!-- Test stack -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageVersion Include="xunit" Version="2.9.2" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageVersion Include="FluentAssertions" Version="6.12.2" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.2" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.0" />
+
+    <!-- Architecture tests -->
+    <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
+
+    <!-- Integration test infrastructure (declared; lights up P02c-2) -->
+    <PackageVersion Include="Testcontainers" Version="3.10.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="3.10.0" />
+    <PackageVersion Include="Testcontainers.Redis" Version="3.10.0" />
+    <PackageVersion Include="Respawn" Version="6.2.1" />
+  </ItemGroup>
+
+  <!--
+    Reserved for later Phase 02c packets (P02c-1 cross-cutting foundation;
+    P02c-2 outbound HTTP client; P02c-5 cert provisioning). Declared centrally
+    so the version matrix is consistent the moment they are pulled in.
+  -->
+  <ItemGroup Label="Reserved for later P02c packets">
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
+    <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.10.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.10.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
+  </ItemGroup>
+
+  <!--
+    Stripe + Iyzico SDKs are NOT declared here. Phase 09b (Hub Billing)
+    introduces them inside dedicated adapter projects
+    (LearnStack.Hub.Infrastructure.Stripe / .Iyzico). Adding either here
+    pre-09b risks accidental pull-in from a non-adapter module.
+  -->
+
+</Project>

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    MediatR handlers for cross-module application work. P02c-1 wires MediatR;
+    P02c-0 ships an empty assembly so the host can reference it.
+  -->
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Domain\LearnStack.Hub.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Application.Contracts\LearnStack.Hub.Application.Contracts.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Hub operator-portal default token values. Unlike LearnStack core's tenant-
+ * facing app these are NOT tenant-themable — the operator portal is single-
+ * brand. */
+:root {
+  --hub-primary: #3b82f6;
+  --hub-bg: #f8fafc;
+  --hub-surface: #ffffff;
+  --hub-fg: #0f172a;
+  --hub-muted: #64748b;
+  --hub-warning: #f59e0b;
+  --hub-danger: #ef4444;
+  --hub-font-sans: ui-sans-serif, system-ui, sans-serif;
+}

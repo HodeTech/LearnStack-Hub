@@ -1,0 +1,78 @@
+# LearnStack Hub — Leakwatch configuration.
+#
+# Active hygiene mirrors LearnStack core: every commit is scanned by
+# `leakwatch scan fs <staged>` in the pre-commit hook (when the binary is on
+# PATH) + `leakwatch scan fs .` in CI. Per LearnStack Standards 12 § Secrets
+# Management (which Hub inherits by reference).
+#
+# The intentional dev credentials in this repo (Vault root token in .env.example,
+# HMAC dev shared secret) are filtered out by:
+#   1. `detection.entropy.threshold: 4.2` — short low-entropy literals fall
+#      below the threshold.
+#   2. `.leakwatchignore` — env templates excluded by path.
+#   3. Inline `# leakwatch:ignore` for single high-entropy literals.
+
+# ── Scan Engine ─────────────────────────────────────────────────────────
+scan:
+  concurrency: 4
+  max-file-size: 10485760 # 10 MB
+
+# ── Detection ───────────────────────────────────────────────────────────
+detection:
+  entropy:
+    enabled: true
+    threshold: 4.2
+
+# ── Verification ────────────────────────────────────────────────────────
+# CI must stay hermetic (no outbound API calls to vendor verifier endpoints
+# for dev tokens). Local developers can override with `--verify`.
+verification:
+  enabled: false
+
+# ── Filter ──────────────────────────────────────────────────────────────
+filter:
+  exclude-paths:
+    # Build / generated artifacts. Use `**/path/**` so the glob matches nested
+    # paths like `frontend/node_modules/...`. `node_modules/**` alone matches
+    # only top-level `node_modules/`.
+    - "**/node_modules/**"
+    - "**/dist/**"
+    - "**/build/**"
+    - "**/.next/**"
+    - "**/bin/**"
+    - "**/obj/**"
+    - "**/coverage/**"
+    # Lock files
+    - "**/*.lock"
+    - "**/package-lock.json"
+    - "**/yarn.lock"
+    - "**/pnpm-lock.yaml"
+    - "**/go.sum"
+    # Minified assets
+    - "**/*.min.js"
+    - "**/*.min.css"
+    - "**/*.map"
+    # Binary assets
+    - "**/*.png"
+    - "**/*.jpg"
+    - "**/*.jpeg"
+    - "**/*.gif"
+    - "**/*.ico"
+    - "**/*.woff"
+    - "**/*.woff2"
+    - "**/*.ttf"
+    # Test / dev license + cert material (regenerated per run; never real)
+    - "**/*.lic"
+    - "**/*.pem"
+    - "**/*.key"
+    - "**/*.crt"
+    # Local-only research (gitignored anyway)
+    - "docs/analysis/**"
+  exclude-detectors: []
+
+# ── Output ──────────────────────────────────────────────────────────────
+output:
+  format: table
+  file: ""
+  show-raw: false
+  severity-threshold: medium
