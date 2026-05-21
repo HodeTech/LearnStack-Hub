@@ -30,7 +30,13 @@ app.MapGet("/healthz", () => Results.Ok(new { status = "healthy", service = "lea
 
 app.Run();
 
-// `public partial class Program` is the top-level-statements escape hatch
-// that lets WebApplicationFactory<Program> in the test assemblies resolve
-// the entry-point type.
+// `public partial class Program` serves two purposes:
+//   1. Entry-point escape hatch: WebApplicationFactory<Program> in the test
+//      assemblies resolves the entry-point type via this declaration.
+//   2. Assembly marker: this is the intentional public type that pins the
+//      LearnStack.Hub.Api assembly's IL TypeRef surface for NetArchTest
+//      scanning. The other six core projects ship a separate `AssemblyMarker`
+//      class because they have no entry point; the Api project does not need
+//      a duplicate marker — `Program` already plays that role. Same posture
+//      as LearnStack core's `LearnStack.Api/Program.cs`.
 public partial class Program;

@@ -18,18 +18,8 @@ learnstack-hub/
 │   │   │   ├── LearnStack.Hub.Infrastructure/       # EF Core DbContexts, provider adapters, LearnStackApiClient
 │   │   │   ├── LearnStack.Hub.Infrastructure.Audit/ # Hub operator audit pipeline
 │   │   │   └── LearnStack.Hub.Api/                  # ASP.NET Core host
-│   │   └── Modules/                                 # Hub modules (P02c-1+)
-│   │       ├── TenantLifecycle/                     # P02c-1
-│   │       ├── Plans/                               # P02c-1
-│   │       ├── Subscriptions/                       # P02c-1
-│   │       ├── Entitlements/                        # P02c-1
-│   │       ├── CustomDomains/                       # P02c-5
-│   │       ├── Compliance/                          # P02c-5
-│   │       ├── Usage/                               # P02c-2
-│   │       ├── LicenseKeys/                         # P02c-6
-│   │       ├── Invoicing/                           # Phase 09b
-│   │       ├── Audit/                               # P02c-4
-│   │       └── Operators/                           # P02c-4
+│   │   └── Modules/                                 # Hub modules — DIRECTORY EXISTS, contents PLANNED (see below)
+│   │       └── README.md                            # only file on disk today; describes planned topology
 │   └── tests/
 │       ├── LearnStack.Hub.Tests.Unit/               # domain + application unit tests
 │       ├── LearnStack.Hub.Tests.Integration/        # Testcontainers (P02c-2+)
@@ -38,7 +28,7 @@ learnstack-hub/
 ├── frontend/
 │   ├── pnpm-workspace.yaml
 │   ├── apps/
-│   │   └── operator-portal/             # Next.js 16 App Router (P02c-0 scaffold; P02c-4 content)
+│   │   └── operator-portal/             # Next.js 15.5 App Router (P02c-0 scaffold; P02c-4 content; flat-config + Next 16 migration tracked in P02c-4)
 │   └── packages/
 │       ├── config/                      # shared ESLint, TypeScript, Tailwind config
 │       ├── sdk/                         # generated Hub API client (P02c-2)
@@ -87,6 +77,26 @@ learnstack-hub/
 ├── .leakwatch.yaml
 └── .leakwatchignore
 ```
+
+## Planned module topology (NOT YET ON DISK)
+
+P02c-0 ships **zero** module subdirectories under `backend/src/Modules/`. The 11 modules below land across later Phase 02c + Phase 09b packets. Until then `backend/src/Modules/` contains only its own `README.md` documenting this plan.
+
+| Module subdirectory under `backend/src/Modules/` | Lands in  | Aggregates                                      |
+| ------------------------------------------------ | --------- | ----------------------------------------------- |
+| `TenantLifecycle/`                               | P02c-1    | `LearnStackTenant` (mirror)                     |
+| `Plans/`                                         | P02c-1    | `Plan`, `PlanTier`                              |
+| `Subscriptions/`                                 | P02c-1    | `HubSubscription`                               |
+| `Entitlements/`                                  | P02c-1    | `Entitlement` (projection)                      |
+| `CustomDomains/`                                 | P02c-5    | `CustomDomain`                                  |
+| `Compliance/`                                    | P02c-5    | `CompliancePolicy`                              |
+| `Usage/`                                         | P02c-2    | `UsageAggregate`                                |
+| `LicenseKeys/`                                   | P02c-6    | `LicenseKey`                                    |
+| `Invoicing/`                                     | Phase 09b | `HubInvoice`, `HubInvoiceLine`, `WebhookLedger` |
+| `Audit/`                                         | P02c-4    | `AuditEntry` (operator audit)                   |
+| `Operators/`                                     | P02c-4    | Operator role + permission mapping              |
+
+Each module follows the same four-layer pattern as LearnStack core (`Application.Contracts`, `Application`, `Domain`, `Infrastructure`). See [`backend/src/Modules/README.md`](../../backend/src/Modules/README.md) for the same table maintained co-located with the code.
 
 ## Comparison with LearnStack core
 

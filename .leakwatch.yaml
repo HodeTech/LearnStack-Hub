@@ -1,9 +1,12 @@
 # LearnStack Hub — Leakwatch configuration.
 #
-# Active hygiene mirrors LearnStack core: every commit is scanned by
-# `leakwatch scan fs <staged>` in the pre-commit hook (when the binary is on
-# PATH) + `leakwatch scan fs .` in CI. Per LearnStack Standards 12 § Secrets
-# Management (which Hub inherits by reference).
+# Active hygiene: every commit triggers a single repo-root scan
+# (`leakwatch scan fs .`) from the pre-commit hook when the binary is on
+# PATH, plus the same `leakwatch scan fs .` invocation in CI. (The current
+# Leakwatch CLI takes a directory target, not per-file; LearnStack core's
+# hook attempts per-file invocation and fails — Hub uses repo-root scan.)
+# Per LearnStack Standards 12 § Secrets Management (which Hub inherits by
+# reference).
 #
 # The intentional dev credentials in this repo (Vault root token in .env.example,
 # HMAC dev shared secret) are filtered out by:
@@ -61,11 +64,14 @@ filter:
     - "**/*.woff"
     - "**/*.woff2"
     - "**/*.ttf"
-    # Test / dev license + cert material (regenerated per run; never real)
-    - "**/*.lic"
-    - "**/*.pem"
-    - "**/*.key"
-    - "**/*.crt"
+    # NOTE: `**/*.lic` / `**/*.pem` / `**/*.key` / `**/*.crt` are deliberately
+    # NOT excluded here. Excluding them globally would hide exactly the
+    # license + cert material P02c-5 / P02c-6 will introduce — including any
+    # accidental production secret in those file extensions. Per Standards 20
+    # § Secrets Management production secrets must never reach the repo;
+    # Leakwatch is the safety net that catches violations. When P02c-5 / P02c-6
+    # land specific dev fixture files, add a narrow path-level allowlist
+    # (e.g. `tests/fixtures/dev-cert.pem`) instead of broadening this glob.
     # Local-only research (gitignored anyway)
     - "docs/analysis/**"
   exclude-detectors: []

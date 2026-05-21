@@ -6,11 +6,21 @@
 #
 # Hub's e2e overlay is minimal because Hub doesn't run its own data services
 # in dev (Postgres / Valkey / Kafka live in LearnStack core's compose).
-# Hub-side e2e ephemerality is achieved via:
-#   1. Re-running the postgres-hub-init script (it drops + recreates the
-#      learnstack_hub database).
-#   2. Restarting the Dapr sidecar (clears any in-memory subscription state).
-# Both happen automatically on `docker compose down + up`.
+# Hub-side ephemerality must therefore come from LearnStack core's e2e
+# overlay (which `tmpfs`-mounts Postgres' data directory) — when LearnStack
+# core's compose is started with its `e2e.yml` overlay, the shared Postgres
+# loses the `learnstack_hub` database on every restart, and Hub's
+# `postgres-hub-init` recreates it on the next boot via the idempotent
+# `IF NOT EXISTS`-guarded SQL at `infra/postgres/init/01-create-hub-database.sql`.
+#
+# What this file does NOT do today:
+#   - It does NOT drop or recreate the `learnstack_hub` database on its own —
+#     the init script is one-shot + idempotent and never drops.
+#   - It does NOT clear Hub Dapr sidecar state — Dapr has no persistent state
+#     for the pub/sub building block (consumer offsets live in Kafka).
+#
+# P02c-7 may add a drop-and-recreate variant of the init script via this
+# overlay if the SaaS e2e rehearsal needs strict per-run isolation.
 #
 # P02c-7 will extend this overlay with Hub-specific test fixtures (seeded
 # operator account, demo plans, demo tenant for the SaaS rehearsal scenario).

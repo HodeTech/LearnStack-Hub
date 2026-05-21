@@ -65,7 +65,7 @@ In production, the two repos deploy independently — the shared compose is a de
 - **Database:** PostgreSQL 18 (shared instance in dev under `learnstack_hub` database; separate instance in prod). Hub does **not** use Row-Level Security — Hub data is operator-administered, not tenant-isolated.
 - **Cache / Pub-Sub / Secrets:** Valkey 8 (shared instance, `hub:*` namespace), Kafka (shared cluster, `learnstack.hub.*` topic prefix), Vault (shared instance, `learnstack-hub/*` path prefix) — all accessed via **Hub's own Dapr sidecar**.
 - **API Gateway:** APISIX in standalone YAML mode on its own port (9180 / 9543); separate instance from LearnStack core's APISIX.
-- **Frontend:** Next.js 16 (App Router) operator portal under `frontend/apps/operator-portal`. Authenticates against the `learnstack-hub` Keycloak realm with MFA required.
+- **Frontend:** Next.js 15.5 (App Router) operator portal under `frontend/apps/operator-portal`; flat-config + Next 16 migration tracked in P02c-4 (`apps/operator-portal/.eslintrc.cjs` TODO). Authenticates against the `learnstack-hub` Keycloak realm with MFA required.
 - **Identity:** Keycloak `learnstack-hub` realm (separate from `learnstack` tenant-facing realm). The realm export lives in the sibling repo at `learnstack/infra/keycloak/realms/learnstack-hub.json` because LearnStack core's compose imports both realms at first boot.
 - **Architecture:** Modular monolith (mirrors LearnStack's pattern) with explicit module contracts.
 

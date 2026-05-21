@@ -8,7 +8,10 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "echo '@learnstack-hub/ui: skeleton — lint replaced in P02c-4 once operator-portal primitives land'",
+    "build": "echo '@learnstack-hub/ui: skeleton — build replaced in P02c-4 once primitives are extracted from apps/operator-portal'",
+    "test": "echo '@learnstack-hub/ui: skeleton — test replaced in P02c-4 with primitive snapshot + a11y tests'"
   },
   "peerDependencies": {
     "react": "^19.0.0",

@@ -54,5 +54,8 @@ valkey-data/
 # Multi-root workspace files (per-developer; never committed)
 *.code-workspace
 
+# Claude Code per-repo session state (lock files, transcripts caches, etc.)
+.claude/
+
 # Local-only research (gitignored anyway; mirrored from learnstack convention)
 docs/analysis/

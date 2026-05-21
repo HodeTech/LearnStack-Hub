@@ -197,8 +197,20 @@ jobs:
               while IFS= read -r link; do
                   case "$link" in
                       http://*|https://*|mailto:*|tel:*|ftp://*) continue ;;
-                      ../learnstack/*) continue ;;  # cross-repo sibling link (validated locally only)
                   esac
+                  # Sibling-relative LearnStack link at any `../` depth.
+                  # Hub docs reference LearnStack core at varying depths
+                  # depending on the source file's own location:
+                  #   - root files (README, CLAUDE.md):       ../learnstack/...
+                  #   - docs/*.md:                            ../../learnstack/...
+                  #   - docs/{architecture,decisions}/*.md:   ../../../learnstack/...
+                  #   - backend/src/Modules/README.md:        ../../../../learnstack/...
+                  # CI cannot reach the sibling repo, so skip the file-existence
+                  # check for any `(../)+learnstack/...` link. The links are
+                  # validated locally on the developer's workstation.
+                  if [[ "$link" =~ ^(\.\./)+learnstack/ ]]; then
+                      continue
+                  fi
                   link_path="${link%%#*}"
                   link_path="${link_path%%\?*}"
                   [[ -z "$link_path" ]] && continue

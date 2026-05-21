@@ -1,45 +1,31 @@
 # Contract with LearnStack core
 
-Hub's boundary with LearnStack core is defined by a **closed four-endpoint HTTPS contract surface**. Adding a fifth endpoint requires a new ADR. This file is a pointer to the authoritative LearnStack-side documents — duplication is **deliberately avoided**.
+Hub's boundary with LearnStack core is a **closed four-endpoint HTTPS contract surface**. This file is **pointer-only**: every load-bearing rule (endpoint list, auth chain, what Hub MUST NOT do) lives in LearnStack-side documents. Read those — do not duplicate their content here.
 
 ## Authoritative source documents
 
-| Source                                | Location                                                                                                                       |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| **Decision rationale**                | [ADR-0019 LearnStack Hub](../../../learnstack/docs/decisions/0019-learnstack-hub.md)                                           |
-| **Architecture deep dive**            | [Architecture 24 LearnStack Hub](../../../learnstack/docs/architecture/24-learnstack-hub.md)                                   |
-| **Closed surface rule**               | [Standards 20 § Hub HTTPS Contract Surface](../../../learnstack/docs/standards/20-infrastructure-stack.md)                     |
-| **Auth strategy (realm boundary)**    | [ADR-0004 Amendment 1](../../../learnstack/docs/decisions/0004-authentication-strategy.md)                                     |
-| **Triple deployment model + license** | [ADR-0020](../../../learnstack/docs/decisions/0020-triple-deployment-hybrid-license.md)                                        |
-| **Feature-based entitlement**         | [ADR-0021](../../../learnstack/docs/decisions/0021-feature-based-entitlement.md)                                               |
-| **Custom-domain + TLS lifecycle**     | [ADR-0022](../../../learnstack/docs/decisions/0022-custom-domain-tls.md) (Amendment 1 — Hub never writes LearnStack K8s state) |
+Each link below is the **single source of truth** for the topic. If you find anything in this Hub repo that contradicts the linked source, fix the Hub repo — never mirror or "extend" the source-side rule here.
 
-## The four endpoints (quick reference)
-
-| Direction        | Method + Path                                 | Purpose                                          | Hosted in           |
-| ---------------- | --------------------------------------------- | ------------------------------------------------ | ------------------- |
-| Hub → LearnStack | `POST /api/internal/tenants`                  | Create tenant + default org                      | **LearnStack core** |
-| Hub → LearnStack | `PUT /api/internal/tenants/{id}/entitlements` | Push entitlement projection (incl. host mapping) | **LearnStack core** |
-| LearnStack → Hub | `POST /api/v1/internal/license/verify`        | License verify                                   | **Hub**             |
-| LearnStack → Hub | `POST /api/v1/usage/report`                   | Usage telemetry                                  | **Hub**             |
-
-Every call carries:
-
-- **mTLS** — LearnStack-internal CA-signed client cert
-- **RS256 JWT** — `aud=learnstack-internal`, `exp ≤ 5min`, signed by the `learnstack-hub` Keycloak realm service account
-- **HMAC-SHA256** body signature in `X-Signature` header — per-deployment shared secret from Vault
-
-## What Hub MUST NOT do
-
-- Add a fifth endpoint without a new ADR (filed in `../../../learnstack/docs/decisions/`).
-- Hold Kubernetes credentials on the LearnStack cluster. Cert + route propagation flows through Dapr pub/sub events + the entitlement push (ADR-0022 Amendment 1).
-- Trust `learnstack` realm JWTs on Hub endpoints, or expect LearnStack to trust `learnstack-hub` realm JWTs on tenant-facing endpoints.
-- Store tenant content (courses, lessons, learners, enrollments, classroom sessions). Hub holds metadata only.
+| Topic                                                                                                                                                                                                                                                                      | Source                                                                                                                                                                                                         |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **The four endpoints + auth chain (mTLS + RS256 JWT + HMAC body sig)**                                                                                                                                                                                                     | [ADR-0019 § Inter-system contracts](../../../learnstack/docs/decisions/0019-learnstack-hub.md), [Standards 20 § Hub HTTPS Contract Surface](../../../learnstack/docs/standards/20-infrastructure-stack.md)     |
+| **The closed-list invariant (no fifth endpoint without an ADR)**                                                                                                                                                                                                           | [Standards 20 § Hub HTTPS Contract Surface](../../../learnstack/docs/standards/20-infrastructure-stack.md), [ADR-0019 § Architecture tests](../../../learnstack/docs/decisions/0019-learnstack-hub.md)         |
+| **Architecture deep dive (Hub data model, sequence diagrams)**                                                                                                                                                                                                             | [Architecture 24 LearnStack Hub](../../../learnstack/docs/architecture/24-learnstack-hub.md)                                                                                                                   |
+| **Triple deployment model + license (`IEntitlementProvider` impls)**                                                                                                                                                                                                       | [ADR-0020 Triple Deployment + Hybrid License](../../../learnstack/docs/decisions/0020-triple-deployment-hybrid-license.md)                                                                                     |
+| **Feature-based entitlement projection shape**                                                                                                                                                                                                                             | [ADR-0021 Feature-Based Entitlement](../../../learnstack/docs/decisions/0021-feature-based-entitlement.md)                                                                                                     |
+| **Custom-domain + TLS lifecycle (Hub never writes LearnStack K8s state)**                                                                                                                                                                                                  | [ADR-0022 Custom Domain + TLS](../../../learnstack/docs/decisions/0022-custom-domain-tls.md) (Amendment 1)                                                                                                     |
+| **Two-realm Keycloak boundary** (`learnstack-hub` realm rejected on tenant routes; `learnstack` realm rejected on `/api/internal/*`)                                                                                                                                       | [ADR-0004 Authentication Strategy](../../../learnstack/docs/decisions/0004-authentication-strategy.md) (Amendment 1)                                                                                           |
+| **Architecture tests that enforce the boundary** (`LearnStack_Modules_DoNotReference_Hub`, `Hub_Modules_DoNotReference_LearnStack_Internals`, `Internal_API_Endpoints_AreNot_Public`, `Hub_NeverStores_TenantData`, `Hub_Operator_JWT_NeverAccepted_On_LearnStack_Routes`) | [Standards 21 Architecture Tests Catalogue](../../../learnstack/docs/standards/21-architecture-tests-catalogue.md), [ADR-0019 § Architecture tests](../../../learnstack/docs/decisions/0019-learnstack-hub.md) |
 
 ## Phase 02c packet ownership
 
-| Packet | Endpoint work                                                                                                                                                             |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| P02c-2 | Hub-side: `POST /api/v1/internal/license/verify` + `POST /api/v1/usage/report` handlers. Outbound `LearnStackApiClient` with mTLS + JWT + HMAC chain.                     |
-| P02c-3 | LearnStack-side (paired PR): `POST /api/internal/tenants` + `PUT /api/internal/tenants/{id}/entitlements` handlers. `HubEntitlementProvider` + `IUsageReporter` adapters. |
-| P02c-5 | LearnStack-side custom-domain handler reacts to `learnstack.hub.custom-domain.activated/.deactivated/.renewed` Dapr events.                                               |
+| Packet     | Endpoint work (cross-references the authoritative spec above)                                                                                                                           |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **P02c-2** | Hub-side handlers for the two LearnStack → Hub endpoints. Outbound `LearnStackApiClient` for the two Hub → LearnStack endpoints (mTLS + JWT + HMAC chain).                              |
+| **P02c-3** | LearnStack-side handlers for the two Hub → LearnStack endpoints (paired PR into the LearnStack core repo). `HubEntitlementProvider` + `IUsageReporter` adapters on the LearnStack side. |
+| **P02c-5** | LearnStack-side custom-domain handler reacts to `learnstack.hub.custom-domain.activated/.deactivated/.renewed` Dapr events (per ADR-0022 Amendment 1).                                  |
+
+## What this file is NOT
+
+- **Not a quick-reference cheat sheet.** Duplicating the four-endpoint table here breaks single-source-of-truth: if the LearnStack-side spec evolves, the cheat sheet ages out silently. Use the links above.
+- **Not a place to add Hub-internal rules.** Hub-internal-only decisions live in [docs/decisions/](../decisions/) under the `HUB-NNNN` series.

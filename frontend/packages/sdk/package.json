@@ -11,6 +11,9 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
+    "lint": "echo '@learnstack-hub/sdk: skeleton — lint replaced in P02c-2 once SDK is generated from /openapi/v1.json'",
+    "build": "echo '@learnstack-hub/sdk: skeleton — build replaced in P02c-2 once SDK is generated'",
+    "test": "echo '@learnstack-hub/sdk: skeleton — test replaced in P02c-2 with SDK contract tests'",
     "generate": "echo 'Hub API SDK generation from Hub /openapi/v1.json wires up in P02c-2' && exit 0"
   },
   "devDependencies": {

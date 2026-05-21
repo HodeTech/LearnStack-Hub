@@ -20,4 +20,5 @@
 *.ttf      binary
 *.pem      binary
 *.key      binary
+*.crt      binary
 *.lic      binary

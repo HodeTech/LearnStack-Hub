@@ -17,10 +17,12 @@
 # are comment-heavy and prettier reflows them in a way that hurts review
 # readability. CI runs `yamllint` on those files separately.
 #
-# Secret scanning runs Leakwatch (`leakwatch scan fs <staged-file>` per file)
-# when the binary is on PATH. If not installed, the hook warns once and
-# continues — CI re-runs the same scan as a hard gate. Config lives at
-# `.leakwatch.yaml` + `.leakwatchignore`.
+# Secret scanning runs Leakwatch as a single repo-root scan
+# (`leakwatch scan fs .`) whenever any file is staged. The current Leakwatch
+# CLI takes a directory target, not per-file (LearnStack core's hook attempts
+# per-file invocation and fails — Hub corrected this). If the binary is not
+# on PATH, the hook warns once and continues — CI re-runs the same scan as
+# a hard gate. Config lives at `.leakwatch.yaml` + `.leakwatchignore`.
 #
 # WIP isolation: formatters mutate the working tree, then we re-stage the
 # changed paths. Without isolation that re-stage would silently capture any
