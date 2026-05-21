@@ -205,10 +205,14 @@ jobs:
                   #   - docs/*.md:                            ../../learnstack/...
                   #   - docs/{architecture,decisions}/*.md:   ../../../learnstack/...
                   #   - backend/src/Modules/README.md:        ../../../../learnstack/...
-                  # CI cannot reach the sibling repo, so skip the file-existence
-                  # check for any `(../)+learnstack/...` link. The links are
-                  # validated locally on the developer's workstation.
-                  if [[ "$link" =~ ^(\.\./)+learnstack/ ]]; then
+                  # The trailing piece is optional — `../learnstack` (a bare
+                  # directory link to the sibling repo's root) is just as
+                  # legitimate as `../learnstack/docs/...`. CI cannot reach
+                  # the sibling repo, so skip the file-existence check for
+                  # any `(../)+learnstack` link, with or without a trailing
+                  # path. The links are validated locally on the developer's
+                  # workstation.
+                  if [[ "$link" =~ ^(\.\./)+learnstack(/|$) ]]; then
                       continue
                   fi
                   link_path="${link%%#*}"
