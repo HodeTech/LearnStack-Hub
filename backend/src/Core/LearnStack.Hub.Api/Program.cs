@@ -2,7 +2,9 @@ using LearnStack.Hub.Api.Common;
 using LearnStack.Hub.Api.Composition;
 using LearnStack.Hub.Application.Pipeline;
 using LearnStack.Hub.Infrastructure.Composition;
+using LearnStack.Hub.Modules.Entitlements.Infrastructure;
 using LearnStack.Hub.Modules.Plans.Infrastructure;
+using LearnStack.Hub.Modules.Subscriptions.Infrastructure;
 using LearnStack.Hub.Modules.TenantLifecycle.Infrastructure;
 using LearnStack.Hub.SharedKernel.Hosting;
 
@@ -37,16 +39,19 @@ builder.Services.AddProblemDetails();
 // unit of work the live TransactionBehavior drives.
 builder.Services.AddHubFoundation(builder.Configuration, deploymentMode);
 
-// The 6-step MediatR pipeline + module handler scanning. The Subscriptions +
-// Entitlements module assemblies are appended in P02c-1d.
+// The 6-step MediatR pipeline + every module's handler assembly.
 builder.Services.AddHubMediatRPipeline(
     typeof(LearnStack.Hub.Application.AssemblyMarker).Assembly,
     typeof(LearnStack.Hub.Modules.TenantLifecycle.Application.AssemblyMarker).Assembly,
-    typeof(LearnStack.Hub.Modules.Plans.Application.AssemblyMarker).Assembly);
+    typeof(LearnStack.Hub.Modules.Plans.Application.AssemblyMarker).Assembly,
+    typeof(LearnStack.Hub.Modules.Subscriptions.Application.AssemblyMarker).Assembly,
+    typeof(LearnStack.Hub.Modules.Entitlements.Application.AssemblyMarker).Assembly);
 
-// Domain modules. Subscriptions + Entitlements are registered in P02c-1d.
+// The four domain modules.
 builder.Services.AddTenantLifecycleModule(builder.Configuration);
 builder.Services.AddPlansModule(builder.Configuration);
+builder.Services.AddSubscriptionsModule(builder.Configuration);
+builder.Services.AddEntitlementsModule(builder.Configuration);
 
 var app = builder.Build();
 

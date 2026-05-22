@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Modules.Entitlements.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.Entitlements.Domain\LearnStack.Hub.Modules.Entitlements.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.Entitlements.Application.Contracts\LearnStack.Hub.Modules.Entitlements.Application.Contracts.csproj" />
+
+    <!-- Reads Plan + Subscription via Application.Contracts queries (never their Domain). -->
+    <ProjectReference Include="..\..\Plans\LearnStack.Hub.Modules.Plans.Application.Contracts\LearnStack.Hub.Modules.Plans.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Application.Contracts\LearnStack.Hub.Modules.Subscriptions.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+  </ItemGroup>
+
+</Project>

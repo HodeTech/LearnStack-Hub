@@ -1,6 +1,8 @@
+using LearnStack.Hub.Modules.Entitlements.Application.Contracts;
 using LearnStack.Hub.Modules.Plans.Application.Abstractions;
 using LearnStack.Hub.Modules.Plans.Application.Contracts;
 using LearnStack.Hub.Modules.Plans.Domain;
+using LearnStack.Hub.Modules.Subscriptions.Application.Contracts;
 using LearnStack.Hub.SharedKernel.Identifiers;
 using LearnStack.Hub.SharedKernel.Localization;
 using LearnStack.Hub.SharedKernel.Results;
@@ -11,6 +13,7 @@ namespace LearnStack.Hub.Modules.Plans.Application.Handlers;
 
 public sealed class UpdatePlanCommandHandler(
     IPlanRepository repository,
+    IMediator mediator,
     IClock clock)
     : IRequestHandler<UpdatePlanCommand, Result<Unit>>
 {
@@ -43,10 +46,26 @@ public sealed class UpdatePlanCommandHandler(
 
         await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        // TODO(P02c-1d): fan out an entitlement recompute to every subscription
-        // bound to this plan — ask Subscriptions for the tenant ids
-        // (GetSubscriptionsByPlanQuery) then send RecomputeEntitlementCommand
-        // per tenant. Wired once the Subscriptions + Entitlements contracts land.
+        // Fan out an entitlement recompute to every subscription bound to this
+        // plan. P02c-1 runs an in-process loop (tenant volume is tiny); a
+        // background job (Hangfire) replaces it when volume warrants (Phase 09b/11).
+        var boundTenants = await mediator.Send(new GetSubscriptionsByPlanQuery(request.PlanId), cancellationToken)
+            .ConfigureAwait(false);
+        if (boundTenants.IsFailure)
+        {
+            return Result<Unit>.Fail(boundTenants.Error!);
+        }
+
+        foreach (var tenantId in boundTenants.Value!)
+        {
+            var recompute = await mediator.Send(new RecomputeEntitlementCommand(tenantId), cancellationToken)
+                .ConfigureAwait(false);
+            if (recompute.IsFailure)
+            {
+                return Result<Unit>.Fail(recompute.Error!);
+            }
+        }
+
         return Result<Unit>.Ok(Unit.Value);
     }
 }

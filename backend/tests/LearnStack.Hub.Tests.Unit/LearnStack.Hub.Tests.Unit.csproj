@@ -15,6 +15,8 @@
     <!-- Module Domain projects for aggregate state-machine unit tests. -->
     <ProjectReference Include="..\..\src\Modules\TenantLifecycle\LearnStack.Hub.Modules.TenantLifecycle.Domain\LearnStack.Hub.Modules.TenantLifecycle.Domain.csproj" />
     <ProjectReference Include="..\..\src\Modules\Plans\LearnStack.Hub.Modules.Plans.Domain\LearnStack.Hub.Modules.Plans.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Domain\LearnStack.Hub.Modules.Subscriptions.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Entitlements\LearnStack.Hub.Modules.Entitlements.Domain\LearnStack.Hub.Modules.Entitlements.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

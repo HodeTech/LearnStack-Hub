@@ -1,3 +1,4 @@
+using LearnStack.Hub.Modules.Subscriptions.Application.Contracts;
 using LearnStack.Hub.Modules.TenantLifecycle.Application.Abstractions;
 using LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts;
 using LearnStack.Hub.Modules.TenantLifecycle.Domain;
@@ -11,17 +12,21 @@ using MediatR;
 namespace LearnStack.Hub.Modules.TenantLifecycle.Application.Handlers;
 
 /// <summary>
-/// Provisions a tenant. P02c-1c creates the <see cref="LearnStackTenant"/>
-/// (Trial). The trial-subscription + initial-entitlement orchestration is wired
-/// in P02c-1d once the Subscriptions + Entitlements contracts exist; the
+/// Provisions a tenant: creates the <see cref="LearnStackTenant"/> (Trial), then
+/// orchestrates the initial trial subscription (StartTrialCommand into the
+/// Subscriptions module), which in turn triggers the first entitlement recompute
+/// (generation 1). All within the one outer transaction. The
 /// <c>POST /api/internal/tenants</c> push to LearnStack core is P02c-3.
 /// </summary>
 public sealed class CreateTenantCommandHandler(
     ITenantRepository repository,
+    IMediator mediator,
     IClock clock,
     IGuidFactory guids)
     : IRequestHandler<CreateTenantCommand, Result<TenantCreatedDto>>
 {
+    private const int TrialDays = 14;
+
     public async Task<Result<TenantCreatedDto>> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
@@ -44,9 +49,16 @@ public sealed class CreateTenantCommandHandler(
         await repository.AddAsync(tenant, cancellationToken).ConfigureAwait(false);
         await repository.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        // TODO(P02c-1d): orchestrate the trial subscription + initial entitlement
-        // recompute (generation 1) by sending StartTrialCommand (Subscriptions),
-        // which triggers RecomputeEntitlementCommand (Entitlements).
+        // Start the trial subscription; the Subscriptions handler triggers the
+        // initial entitlement recompute (generation 1). A failure rolls back the
+        // whole outer transaction (the tenant insert included).
+        var trial = await mediator.Send(
+            new StartTrialCommand(tenant.Id.Value, request.InitialPlanId, TrialDays),
+            cancellationToken).ConfigureAwait(false);
+        if (trial.IsFailure)
+        {
+            return Result<TenantCreatedDto>.Fail(trial.Error!);
+        }
 
         return Result<TenantCreatedDto>.Ok(
             new TenantCreatedDto(tenant.Id.Value, tenant.Slug, tenant.Status.ToString()));
