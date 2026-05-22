@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Modules.Plans.Domain</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <!-- Vogen + EF Core (for the emitted EfCoreValueConverter) come from
+       src/Modules/Directory.Build.props for every *.Domain project. -->
+
+</Project>

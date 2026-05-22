@@ -31,6 +31,10 @@
     <ProjectReference Include="..\LearnStack.Hub.Application\LearnStack.Hub.Application.csproj" />
     <ProjectReference Include="..\LearnStack.Hub.Infrastructure\LearnStack.Hub.Infrastructure.csproj" />
     <ProjectReference Include="..\LearnStack.Hub.Infrastructure.Audit\LearnStack.Hub.Infrastructure.Audit.csproj" />
+
+    <!-- Domain modules (Infrastructure brings Application + Domain + Contracts transitively). -->
+    <ProjectReference Include="..\..\Modules\TenantLifecycle\LearnStack.Hub.Modules.TenantLifecycle.Infrastructure\LearnStack.Hub.Modules.TenantLifecycle.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Plans\LearnStack.Hub.Modules.Plans.Infrastructure\LearnStack.Hub.Modules.Plans.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

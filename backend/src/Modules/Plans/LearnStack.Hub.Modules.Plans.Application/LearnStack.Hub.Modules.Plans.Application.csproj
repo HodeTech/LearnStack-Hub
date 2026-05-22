@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Modules.Plans.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.Plans.Domain\LearnStack.Hub.Modules.Plans.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.Plans.Application.Contracts\LearnStack.Hub.Modules.Plans.Application.Contracts.csproj" />
+    <!-- Cross-module fan-out recompute (GetSubscriptionsByPlanQuery +
+         RecomputeEntitlementCommand) is wired in P02c-1d once the Subscriptions
+         and Entitlements contracts exist. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Modules.TenantLifecycle.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.TenantLifecycle.Domain\LearnStack.Hub.Modules.TenantLifecycle.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts\LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts.csproj" />
+    <!-- CreateTenant's trial-subscription + initial-recompute orchestration adds
+         references to the Subscriptions + Entitlements contracts in P02c-1d. -->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+</Project>

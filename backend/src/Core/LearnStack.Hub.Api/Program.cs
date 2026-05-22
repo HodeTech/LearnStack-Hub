@@ -2,6 +2,8 @@ using LearnStack.Hub.Api.Common;
 using LearnStack.Hub.Api.Composition;
 using LearnStack.Hub.Application.Pipeline;
 using LearnStack.Hub.Infrastructure.Composition;
+using LearnStack.Hub.Modules.Plans.Infrastructure;
+using LearnStack.Hub.Modules.TenantLifecycle.Infrastructure;
 using LearnStack.Hub.SharedKernel.Hosting;
 
 // TODO(P02c-2): wire the four-endpoint Hub HTTPS contract surface —
@@ -35,18 +37,16 @@ builder.Services.AddProblemDetails();
 // unit of work the live TransactionBehavior drives.
 builder.Services.AddHubFoundation(builder.Configuration, deploymentMode);
 
-// The 6-step MediatR pipeline + module handler scanning. Module marker
-// assemblies are appended as modules land (P02c-1c/d); for now the core
-// Application assembly carries the behaviors.
+// The 6-step MediatR pipeline + module handler scanning. The Subscriptions +
+// Entitlements module assemblies are appended in P02c-1d.
 builder.Services.AddHubMediatRPipeline(
-    typeof(LearnStack.Hub.Application.AssemblyMarker).Assembly);
+    typeof(LearnStack.Hub.Application.AssemblyMarker).Assembly,
+    typeof(LearnStack.Hub.Modules.TenantLifecycle.Application.AssemblyMarker).Assembly,
+    typeof(LearnStack.Hub.Modules.Plans.Application.AssemblyMarker).Assembly);
 
-// TODO(P02c-1c/d): register the four domain modules:
-//   builder.Services.AddTenantLifecycleModule(builder.Configuration);
-//   builder.Services.AddPlansModule(builder.Configuration);
-//   builder.Services.AddSubscriptionsModule(builder.Configuration);
-//   builder.Services.AddEntitlementsModule(builder.Configuration);
-// and append their AssemblyMarker assemblies to AddHubMediatRPipeline above.
+// Domain modules. Subscriptions + Entitlements are registered in P02c-1d.
+builder.Services.AddTenantLifecycleModule(builder.Configuration);
+builder.Services.AddPlansModule(builder.Configuration);
 
 var app = builder.Build();
 

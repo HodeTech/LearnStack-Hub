@@ -21,10 +21,12 @@
     <!-- Domain-event marker: IDomainEvent : INotification dispatches in-process via MediatR. -->
     <PackageReference Include="MediatR" />
 
-    <!-- ADR-0023 mirror: Vogen emits the strongly-typed ID pipeline
-         (record struct + EF converter + JSON converter + TypeConverter).
-         PrivateAssets="all" keeps the generator build-time only. -->
-    <PackageReference Include="Vogen" PrivateAssets="all" />
+    <!-- ADR-0023 mirror: Vogen emits the strongly-typed ID pipeline (record
+         struct + EF converter + JSON converter + TypeConverter). PrivateAssets
+         keeps the generator/analyzer build-time only, but the `runtime` asset
+         (Vogen.SharedTypes.dll, referenced by the emitted EfCoreValueConverter
+         at run time + design time) flows to consumers and to output. -->
+    <PackageReference Include="Vogen" PrivateAssets="analyzers;build;buildtransitive;compile;contentfiles" />
 
     <!-- LearnStackHubVogenDefaults.IdMask includes Conversions.EfCoreValueConverter,
          so Vogen emits an EF-Core-aware converter per ID that references
