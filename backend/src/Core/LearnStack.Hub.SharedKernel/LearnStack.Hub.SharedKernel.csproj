@@ -1,10 +1,16 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Hub's own SharedKernel. Mirrors LearnStack core's pattern but DOES NOT
-    reference LearnStack assemblies. Result<T>, LocalizedMessage, Entity<TId>,
-    AuditableEntity<TId>, IClock, etc. land here in P02c-1 (mirror of
-    LearnStack core P02a-2 work).
+    Hub's own SharedKernel. Mirrors LearnStack core's LearnStack.SharedKernel
+    pattern (P02a-2) but DOES NOT reference LearnStack assemblies — the two
+    repos release independently. Substitutions vs LearnStack core:
+      - namespace LearnStack.SharedKernel.*  ->  LearnStack.Hub.SharedKernel.*
+      - UserId                               ->  OperatorId (Hub actors are operators)
+      - LearnStackException                  ->  HubException
+      - LearnStackVogenDefaults              ->  LearnStackHubVogenDefaults
+    Plus Hub-only additions: FeatureFlags (FeatureKey / LimitKey registries)
+    and Persistence.IUnitOfWork (the shared-connection transaction seam the
+    6-step pipeline's live TransactionBehavior commits/rolls back).
   -->
 
   <PropertyGroup>
@@ -12,9 +18,25 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- P02c-1 wires Vogen and the strongly-typed ID pattern; P02c-0 ships an
-         empty assembly with just AssemblyMarker so the rest of the solution
-         can reference it. -->
+    <!-- Domain-event marker: IDomainEvent : INotification dispatches in-process via MediatR. -->
+    <PackageReference Include="MediatR" />
+
+    <!-- ADR-0023 mirror: Vogen emits the strongly-typed ID pipeline
+         (record struct + EF converter + JSON converter + TypeConverter).
+         PrivateAssets="all" keeps the generator build-time only. -->
+    <PackageReference Include="Vogen" PrivateAssets="all" />
+
+    <!-- LearnStackHubVogenDefaults.IdMask includes Conversions.EfCoreValueConverter,
+         so Vogen emits an EF-Core-aware converter per ID that references
+         Microsoft.EntityFrameworkCore at compile time. IUnitOfWork.Enlist also
+         takes a DbContext. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+
+    <!-- IProviderResilience<TPort> exposes the Polly v8 ResiliencePipeline. -->
+    <PackageReference Include="Polly" />
+
+    <!-- ConfigurationSecretProvider delegates to IConfiguration. -->
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
   </ItemGroup>
 
 </Project>
