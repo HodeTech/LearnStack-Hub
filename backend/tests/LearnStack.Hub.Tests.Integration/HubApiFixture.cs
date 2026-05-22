@@ -103,7 +103,7 @@ public sealed class HubApiFixture : IAsyncLifetime
 
 /// <summary>xUnit collection so the container + host are shared across the flow tests.</summary>
 [CollectionDefinition(Name)]
-public sealed class HubApiCollection : ICollectionFixture<HubApiFixture>
+public sealed class HubApiCollectionDefinition : ICollectionFixture<HubApiFixture>
 {
     public const string Name = "hub-api";
 }

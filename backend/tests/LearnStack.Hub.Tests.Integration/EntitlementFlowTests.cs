@@ -13,7 +13,7 @@ namespace LearnStack.Hub.Tests.Integration;
 /// (generation 2). Exercises the 6-step pipeline, the shared-connection
 /// cross-module transaction, and the projection service.
 /// </summary>
-[Collection(HubApiCollection.Name)]
+[Collection(HubApiCollectionDefinition.Name)]
 public sealed class EntitlementFlowTests(HubApiFixture fixture)
 {
     private static IReadOnlyDictionary<string, bool> GrowthFeatures => new Dictionary<string, bool>
