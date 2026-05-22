@@ -40,32 +40,43 @@ ok()    { printf "${GREEN}[seed] %s${RESET}\n" "$*"; }
 fail()  { printf "${RED}[seed] %s${RESET}\n" "$*" >&2; exit 1; }
 
 # ─── Pre-flight checks ──────────────────────────────────────────────────
+# The P02c-1 seed is DB-only (plans + demo tenant via the in-process seeder),
+# so it needs only Postgres. Keycloak / APISIX are informational here; they
+# become hard requirements once the operator-portal + API-bound seed steps land.
 info "Pre-flight checks..."
 
-# 1. LearnStack compose Keycloak reachable?
-if ! curl -fsS http://localhost:8080/realms/learnstack-hub/.well-known/openid-configuration > /dev/null 2>&1; then
-    fail "Keycloak learnstack-hub realm not reachable at http://localhost:8080. \
-Start LearnStack core compose first: cd ../learnstack && make dev"
-fi
-ok "  Keycloak learnstack-hub realm: OK"
-
-# 2. Hub APISIX reachable?
-if ! curl -fsS http://localhost:9180/healthz > /dev/null 2>&1; then
-    fail "Hub APISIX not reachable at http://localhost:9180. \
-Start Hub compose: make dev"
-fi
-ok "  Hub APISIX: OK"
-
-# 3. Hub API reachable? (informational — not required for the static seed
-#    P02c-0 ships; P02c-1+ flows hit the API.)
-if curl -fsS http://localhost:5181/healthz > /dev/null 2>&1; then
-    ok "  Hub API: OK"
+if curl -fsS http://localhost:8080/realms/learnstack-hub/.well-known/openid-configuration > /dev/null 2>&1; then
+    ok "  Keycloak learnstack-hub realm: OK"
 else
-    info "  Hub API not reachable at http://localhost:5181 (skip API-bound steps)"
+    info "  Keycloak learnstack-hub realm not reachable (not required for the P02c-1 DB seed)"
 fi
 
-# ─── Seed data (placeholder until P02c-1) ───────────────────────────────
-info "Seed data: placeholder. P02c-1 adds real plan + tenant seeding."
+if curl -fsS http://localhost:9180/healthz > /dev/null 2>&1; then
+    ok "  Hub APISIX: OK"
+else
+    info "  Hub APISIX not reachable (not required for the P02c-1 DB seed)"
+fi
+
+# ─── Seed data (P02c-1: 4 plan tiers + demo tenant) ─────────────────────
+# Load .env so POSTGRES_* (incl. the password) come from the dev environment,
+# never a literal here. The in-process seeder (dotnet run -- --seed) applies
+# migrations then provisions the catalogue idempotently. Host-run reaches
+# Postgres on localhost rather than the container's host.docker.internal.
+if [[ -f .env ]]; then
+    set -a
+    # shellcheck disable=SC1091
+    . ./.env
+    set +a
+fi
+export POSTGRES_HOST=localhost
+
+info "Seeding plan catalogue + demo tenant (dotnet run -- --seed)..."
+if command -v dotnet > /dev/null 2>&1; then
+    dotnet run --project backend/src/Core/LearnStack.Hub.Api/LearnStack.Hub.Api.csproj -- --seed
+    ok "  Plan catalogue + demo tenant seeded."
+else
+    info "  dotnet not on PATH — run manually: dotnet run --project backend/src/Core/LearnStack.Hub.Api -- --seed"
+fi
 
 # Demo credentials printed for the operator:
 cat <<EOF

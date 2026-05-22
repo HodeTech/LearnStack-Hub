@@ -10,18 +10,18 @@ Hub **never** stores tenant content. Hub holds tenant _metadata_ (plan, subscrip
 
 ## What state this is in
 
-**Phase 02c — Repository Bootstrap (P02c-0)** ✅. Solution scaffold + frontend monorepo + compose stack + CI + docs skeleton are in place. No Hub domain code yet — that lands in P02c-1 (Hub Domain Core).
+**Phase 02c — Hub Domain Core (P02c-1)** ✅. The SharedKernel, the 6-step cross-cutting foundation, and the four domain modules (`TenantLifecycle`, `Plans`, `Subscriptions`, `Entitlements`) with their DbContexts, migrations, and the entitlement projection are in place. Next is P02c-2 (Hub-side internal API + outbound `LearnStackApiClient`).
 
-| Packet                                                                                                                                   | State          |
-| ---------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| P02c-0 — Repository bootstrap                                                                                                            | ✅ this commit |
-| P02c-1 — Hub Domain Core (`LearnStackTenant`, `Plan`, `HubSubscription`, `Entitlement`)                                                  | ⏳ next        |
-| P02c-2 — Hub-side internal API + outbound `LearnStackApiClient`                                                                          | ⏳             |
-| P02c-3 — LearnStack core PR (`HubEntitlementProvider`, `IUsageReporter`, internal-API handlers) — **blocked on LearnStack P02a-5/6/7/9** | ⏳             |
-| P02c-4 — Operator portal MVP                                                                                                             | ⏳             |
-| P02c-5 — Custom domain lifecycle                                                                                                         | ⏳             |
-| P02c-6 — License key skeleton                                                                                                            | ⏳             |
-| P02c-7 — End-to-end exit gate                                                                                                            | ⏳             |
+| Packet                                                                                                                                   | State   |
+| ---------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| P02c-0 — Repository bootstrap                                                                                                            | ✅      |
+| P02c-1 — Hub Domain Core (`LearnStackTenant`, `Plan`, `HubSubscription`, `Entitlement`)                                                  | ✅      |
+| P02c-2 — Hub-side internal API + outbound `LearnStackApiClient`                                                                          | ⏳ next |
+| P02c-3 — LearnStack core PR (`HubEntitlementProvider`, `IUsageReporter`, internal-API handlers) — **blocked on LearnStack P02a-5/6/7/9** | ⏳      |
+| P02c-4 — Operator portal MVP                                                                                                             | ⏳      |
+| P02c-5 — Custom domain lifecycle                                                                                                         | ⏳      |
+| P02c-6 — License key skeleton                                                                                                            | ⏳      |
+| P02c-7 — End-to-end exit gate                                                                                                            | ⏳      |
 
 ## Where to start
 

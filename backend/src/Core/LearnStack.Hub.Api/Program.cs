@@ -55,6 +55,14 @@ builder.Services.AddEntitlementsModule(builder.Configuration);
 
 var app = builder.Build();
 
+// `dotnet run -- --seed` (make seed): apply migrations + seed the plan catalogue
+// and a demo tenant idempotently, then exit without starting the web host.
+if (args.Contains("--seed", StringComparer.Ordinal))
+{
+    await LearnStack.Hub.Api.Composition.HubSeeder.SeedAsync(app.Services);
+    return;
+}
+
 app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
