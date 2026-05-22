@@ -33,7 +33,19 @@
     <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Infrastructure.Audit\LearnStack.Hub.Infrastructure.Audit.csproj" />
     <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Api\LearnStack.Hub.Api.csproj" />
 
-    <!-- Module references will be added as modules land in P02c-1+. -->
+    <!-- Module projects (each layer referenced so NetArchTest can scan its assembly). -->
+    <ProjectReference Include="..\..\src\Modules\TenantLifecycle\LearnStack.Hub.Modules.TenantLifecycle.Domain\LearnStack.Hub.Modules.TenantLifecycle.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\TenantLifecycle\LearnStack.Hub.Modules.TenantLifecycle.Application\LearnStack.Hub.Modules.TenantLifecycle.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\TenantLifecycle\LearnStack.Hub.Modules.TenantLifecycle.Infrastructure\LearnStack.Hub.Modules.TenantLifecycle.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Plans\LearnStack.Hub.Modules.Plans.Domain\LearnStack.Hub.Modules.Plans.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Plans\LearnStack.Hub.Modules.Plans.Application\LearnStack.Hub.Modules.Plans.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Plans\LearnStack.Hub.Modules.Plans.Infrastructure\LearnStack.Hub.Modules.Plans.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Domain\LearnStack.Hub.Modules.Subscriptions.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Application\LearnStack.Hub.Modules.Subscriptions.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Infrastructure\LearnStack.Hub.Modules.Subscriptions.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Entitlements\LearnStack.Hub.Modules.Entitlements.Domain\LearnStack.Hub.Modules.Entitlements.Domain.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Entitlements\LearnStack.Hub.Modules.Entitlements.Application\LearnStack.Hub.Modules.Entitlements.Application.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Entitlements\LearnStack.Hub.Modules.Entitlements.Infrastructure\LearnStack.Hub.Modules.Entitlements.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>

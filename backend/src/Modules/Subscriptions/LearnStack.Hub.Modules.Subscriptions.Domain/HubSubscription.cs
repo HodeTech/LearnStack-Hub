@@ -108,12 +108,16 @@ public sealed class HubSubscription : AuditableEntity<HubSubscriptionId>
         return Result<Unit>.Ok(Unit.Value);
     }
 
-    /// <summary>Rebinds an active subscription to a new plan (proration is Phase 09b).</summary>
+    /// <summary>
+    /// Rebinds the subscription to a new plan (proration is Phase 09b). Allowed
+    /// while <c>Trial</c> (a tenant switching their selected plan before
+    /// activation) or <c>Active</c> (an upgrade/downgrade).
+    /// </summary>
     public Result<Unit> ChangePlan(Guid newPlanId, DateTimeOffset periodStart, DateTimeOffset periodEnd, IClock clock, OperatorId by)
     {
         ArgumentNullException.ThrowIfNull(clock);
 
-        if (Status is not SubscriptionStatus.Active)
+        if (Status is not (SubscriptionStatus.Trial or SubscriptionStatus.Active))
         {
             return InvalidTransition();
         }

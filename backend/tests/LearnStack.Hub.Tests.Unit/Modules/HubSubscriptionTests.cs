@@ -42,17 +42,30 @@ public sealed class HubSubscriptionTests
     }
 
     [Fact]
-    public void ChangePlan_RequiresActive_AndRebinds()
+    public void ChangePlan_FromTrialOrActive_Rebinds()
     {
         var sub = NewTrial();
 
+        // Allowed during Trial (switching the selected plan before activation).
+        var trialPlan = Guid.CreateVersion7();
+        sub.ChangePlan(trialPlan, Clock.UtcNow, Clock.UtcNow.AddMonths(1), Clock, Actor).IsSuccess.Should().BeTrue();
+        sub.PlanId.Should().Be(trialPlan);
+
+        // And during Active (an upgrade/downgrade).
+        sub.Activate(Clock.UtcNow, Clock.UtcNow.AddMonths(1), Clock, Actor);
+        var activePlan = Guid.CreateVersion7();
+        sub.ChangePlan(activePlan, Clock.UtcNow, Clock.UtcNow.AddMonths(1), Clock, Actor).IsSuccess.Should().BeTrue();
+        sub.PlanId.Should().Be(activePlan);
+    }
+
+    [Fact]
+    public void ChangePlan_FromTerminalState_Fails()
+    {
+        var sub = NewTrial();
+        sub.Expire(Clock, Actor);
+
         sub.ChangePlan(Guid.CreateVersion7(), Clock.UtcNow, Clock.UtcNow.AddMonths(1), Clock, Actor)
             .IsFailure.Should().BeTrue();
-
-        sub.Activate(Clock.UtcNow, Clock.UtcNow.AddMonths(1), Clock, Actor);
-        var newPlan = Guid.CreateVersion7();
-        sub.ChangePlan(newPlan, Clock.UtcNow, Clock.UtcNow.AddMonths(1), Clock, Actor).IsSuccess.Should().BeTrue();
-        sub.PlanId.Should().Be(newPlan);
     }
 
     [Fact]
