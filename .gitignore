@@ -54,8 +54,10 @@ valkey-data/
 # Multi-root workspace files (per-developer; never committed)
 *.code-workspace
 
-# Claude Code per-repo session state (lock files, transcripts caches, etc.)
-.claude/
+# Claude Code per-repo runtime state (lock files, transcript caches, etc.)
+# — but TRACK the agent skills catalogue under .claude/skills/.
+.claude/*
+!.claude/skills/
 
 # Local-only research (gitignored anyway; mirrored from learnstack convention)
 docs/analysis/
