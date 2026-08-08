@@ -40,20 +40,20 @@ Walk these against the diff. Each item is pass/fail; a fail blocks merge until f
 - [ ] **`hub` schema.** Every DbContext `HasDefaultSchema("hub")`; tables at `learnstack_hub.hub.<table>`.
 - [ ] **No tenant content.** No `Course`/`Lesson`/`Enrollment`/`LiveSession`/`LessonItem`/`MediaAsset`/tenant-`User` types or tables (`Hub_NeverStores_TenantData`).
 
-### Module + dependency structure ([01-architecture-standards.md](../../../../learnstack/docs/standards/01-architecture-standards.md))
+### Module + dependency structure ([01-architecture-standards.md](../../../../LearnStack/docs/standards/01-architecture-standards.md))
 
 - [ ] Module `Domain` references only `LearnStack.Hub.SharedKernel` (+ analyzer); no cross-module `Domain` refs; no `Application`/`Infrastructure` refs from `Domain`.
 - [ ] No imports of `LearnStack.SharedKernel` / `LearnStack.Domain` / `LearnStack.Infrastructure` / `LearnStack.Modules.*` from the sibling repo.
 - [ ] Cross-module reads go through `Application.Contracts`, not another module's `Domain` / DbContext.
 - [ ] One DbContext per module; cross-module FKs are plain `uuid` columns + index, not EF navigations.
 
-### Backend coding ([02-backend-coding.md](../../../../learnstack/docs/standards/02-backend-coding.md))
+### Backend coding ([02-backend-coding.md](../../../../LearnStack/docs/standards/02-backend-coding.md))
 
 - [ ] Strongly-typed IDs via Vogen (`[ValueObject<Guid>(LearnStackHubVogenDefaults.IdMask)]`); no raw `Guid` on entity surfaces.
 - [ ] Handlers return `Result<T>`; business-rule violations → `Result.Fail(...)`, never `throw DomainException`.
 - [ ] FluentValidation validators for every command; file-scoped namespaces; records where idiomatic.
 
-### Database ([05-database.md](../../../../learnstack/docs/standards/05-database.md), Hub-adjusted)
+### Database ([05-database.md](../../../../LearnStack/docs/standards/05-database.md), Hub-adjusted)
 
 - [ ] `snake_case` plural tables, `snake_case` columns, `id` PK, `<entity>_id` FKs, `ix_`/`ux_` indexes.
 - [ ] Migrations forward-only after merge; destructive changes follow the two-step deprecation.
@@ -61,7 +61,7 @@ Walk these against the diff. Each item is pass/fail; a fail blocks merge until f
 
 ### Contract surface + boundary ([CLAUDE.md hard rules](../../../CLAUDE.md))
 
-- [ ] No fifth Hub HTTPS endpoint without an ADR in `../learnstack/docs/decisions/`.
+- [ ] No fifth Hub HTTPS endpoint without an ADR in `../LearnStack/docs/decisions/`.
 - [ ] `/api/internal/*` not internet-exposed (when those endpoints land).
 - [ ] No Kubernetes-credential / K8s-state writes to LearnStack's cluster.
 - [ ] `learnstack-hub` realm boundary respected.

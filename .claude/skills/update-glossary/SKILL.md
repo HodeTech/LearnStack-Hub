@@ -6,7 +6,7 @@ description: >
   Hub APISIX, learnstack-hub realm, etc.) that other Hub docs cite; fixing a stale
   entry; removing a deprecated term. DO NOT USE FOR: cross-cutting terms shared with
   LearnStack core (Tenant, Organization, IModule, DeploymentMode — those live in
-  ../learnstack/docs/glossary.md; link to them), general programming terms, or terms
+  ../LearnStack/docs/glossary.md; link to them), general programming terms, or terms
   only used inside docs/analysis/ (gitignored).
 ---
 
@@ -23,7 +23,7 @@ Keep `docs/glossary.md` the single source of truth for Hub-specific terminology.
 
 ## When not to use
 
-- The term is cross-cutting (shared with LearnStack core) → it lives in `../learnstack/docs/glossary.md`; link to it, don't duplicate.
+- The term is cross-cutting (shared with LearnStack core) → it lives in `../LearnStack/docs/glossary.md`; link to it, don't duplicate.
 - General programming term → link to its canonical source.
 - Term used only in `docs/analysis/` → not glossary-worthy.
 

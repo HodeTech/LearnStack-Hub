@@ -24,13 +24,13 @@ Hub is the **authoring** side of entitlements: operators build plans whose `feat
 
 - Reading a flag at runtime → that's LearnStack core's `IFeatureFlags.IsEnabledAsync`, not Hub. Hub never _reads_ entitlements for gating; it _authors_ them.
 - Per-request toggling → forbidden; entitlements are plan-projected.
-- A domain-flavoured key (`english.placement`, `yoga.asana`) → forbidden; keys are generic platform capabilities ([ADR-0021](../../../../learnstack/docs/decisions/0021-feature-based-entitlement.md)).
+- A domain-flavoured key (`english.placement`, `yoga.asana`) → forbidden; keys are generic platform capabilities ([ADR-0021](../../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md)).
 
 ## Workflow
 
 ### Step 1 — Confirm shape + naming
 
-Per [ADR-0021 Amendment 1](../../../../learnstack/docs/decisions/0021-feature-based-entitlement.md) + [entitlement-projection.md § key-shape rules](../../../docs/architecture/entitlement-projection.md):
+Per [ADR-0021 Amendment 1](../../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md) + [entitlement-projection.md § key-shape rules](../../../docs/architecture/entitlement-projection.md):
 
 - `FeatureKey` value: dotted snake_case, **no `.enabled` suffix** (every feature is implicitly boolean). e.g. `classroom.recording`, `tenancy.custom_domain`, `identity.sso.saml`.
 - `LimitKey` value: `limits.` prefix. e.g. `limits.max_users`. `-1` = unlimited, `0` = unavailable.
@@ -46,7 +46,7 @@ public static readonly LimitKey <Name>   = new("limits.<dotted.snake_case>");
 
 ### Step 3 — Keep it aligned with LearnStack core
 
-The wire-format string **must** match LearnStack core's `FeatureKeys`/`LimitKeys` registry (`../learnstack/backend/src/LearnStack.SharedKernel/FeatureFlags/`) exactly — LearnStack core reads the key from the projection by string. A mismatch means LearnStack silently never sees the feature. If you add a key Hub authors but LearnStack core doesn't yet read, note the pending LearnStack-side addition (a cross-repo registry-sync follow-up; the durable fix is a shared `LearnStack.Contracts` package, Phase 11 — see [plans.md § Registry sync](../../../docs/modules/plans.md)).
+The wire-format string **must** match LearnStack core's `FeatureKeys`/`LimitKeys` registry (`../LearnStack/backend/src/LearnStack.SharedKernel/FeatureFlags/`) exactly — LearnStack core reads the key from the projection by string. A mismatch means LearnStack silently never sees the feature. If you add a key Hub authors but LearnStack core doesn't yet read, note the pending LearnStack-side addition (a cross-repo registry-sync follow-up; the durable fix is a shared `LearnStack.Contracts` package, Phase 11 — see [plans.md § Registry sync](../../../docs/modules/plans.md)).
 
 ### Step 4 — Plan validator
 

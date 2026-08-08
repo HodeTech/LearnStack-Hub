@@ -1,6 +1,6 @@
 # Hub Glossary
 
-Hub-specific terms. Cross-cutting glossary terms (`Tenant`, `Organization`, `IModule`, `Entitlement`, etc.) live in the [LearnStack core glossary](../../learnstack/docs/glossary.md) — not duplicated here.
+Hub-specific terms. Cross-cutting glossary terms (`Tenant`, `Organization`, `IModule`, `Entitlement`, etc.) live in the [LearnStack core glossary](../../LearnStack/docs/glossary.md) — not duplicated here.
 
 ## Hub aggregates
 
@@ -37,13 +37,13 @@ Rolled-up monthly tenant usage metric — `tenant_id`, `metric_key`, `period` (`
 ## Hub infrastructure terms
 
 **`learnstack-hub` realm**
-The Keycloak realm that authenticates LearnStack operators. Separate from the `learnstack` realm (which authenticates tenant users). MFA (TOTP) is required for every operator account. Tokens from this realm are rejected on tenant-facing endpoints; tokens from the `learnstack` realm are rejected on `/api/internal/*` Hub endpoints. The realm export lives in `../learnstack/infra/keycloak/realms/learnstack-hub.json` because LearnStack core's compose stack imports both realms at first boot.
+The Keycloak realm that authenticates LearnStack operators. Separate from the `learnstack` realm (which authenticates tenant users). MFA (TOTP) is required for every operator account. Tokens from this realm are rejected on tenant-facing endpoints; tokens from the `learnstack` realm are rejected on `/api/internal/*` Hub endpoints. The realm export lives in `../LearnStack/infra/keycloak/realms/learnstack-hub.json` because LearnStack core's compose stack imports both realms at first boot.
 
 **`LearnStackApiClient`**
 The Hub-internal typed `HttpClient` wrapper that calls into LearnStack core's `/api/internal/*` endpoints. Carries the mTLS + RS256 JWT + HMAC-SHA256 body-signature chain. The **only** sanctioned outbound path from Hub to LearnStack — no module is allowed to call LearnStack core directly. Lands in P02c-2.
 
 **Hub HTTPS Contract Surface**
-The **closed four-endpoint** boundary between Hub and LearnStack core: `POST /api/internal/tenants`, `PUT /api/internal/tenants/{id}/entitlements`, `POST /api/v1/internal/license/verify`, `POST /api/v1/usage/report`. Adding a fifth endpoint requires a new ADR in `../learnstack/docs/decisions/`.
+The **closed four-endpoint** boundary between Hub and LearnStack core: `POST /api/internal/tenants`, `PUT /api/internal/tenants/{id}/entitlements`, `POST /api/v1/internal/license/verify`, `POST /api/v1/usage/report`. Adding a fifth endpoint requires a new ADR in `../LearnStack/docs/decisions/`.
 
 **Operator portal**
 The Next.js single-page application (`apps/operator-portal`) deployed at `hub.learnstack.dev`. Tenant list, plan editor, custom-domain admin, license-key issuance UI, operator audit log. Single-brand (no tenant theming); accessed only via the `learnstack-hub` Keycloak realm with MFA. Lands in P02c-4.

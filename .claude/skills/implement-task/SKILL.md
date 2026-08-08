@@ -45,15 +45,15 @@ The ten steps are mandatory; skipping any is the bug this skill prevents.
 
 ### Step 1 — Scope and alignment
 
-Run [start-task](../start-task/SKILL.md): read the right docs in order (Hub docs under `docs/`, then LearnStack authority under `../learnstack/docs/`), confirm phase fit against `docs/roadmap/README.md`, walk the [CLAUDE.md hard rules](../../../CLAUDE.md), and pick the specific workflow skill(s) you'll invoke ([add-hub-module](../add-hub-module/SKILL.md), [add-hub-aggregate](../add-hub-aggregate/SKILL.md), [add-mediatr-handler](../add-mediatr-handler/SKILL.md), [wire-cross-cutting-foundation](../wire-cross-cutting-foundation/SKILL.md), …). Output: a one-paragraph problem statement in your own words, the packet it belongs to, the standards that govern it, the skill(s) you'll use.
+Run [start-task](../start-task/SKILL.md): read the right docs in order (Hub docs under `docs/`, then LearnStack authority under `../LearnStack/docs/`), confirm phase fit against `docs/roadmap/README.md`, walk the [CLAUDE.md hard rules](../../../CLAUDE.md), and pick the specific workflow skill(s) you'll invoke ([add-hub-module](../add-hub-module/SKILL.md), [add-hub-aggregate](../add-hub-aggregate/SKILL.md), [add-mediatr-handler](../add-mediatr-handler/SKILL.md), [wire-cross-cutting-foundation](../wire-cross-cutting-foundation/SKILL.md), …). Output: a one-paragraph problem statement in your own words, the packet it belongs to, the standards that govern it, the skill(s) you'll use.
 
 ### Step 2 — Inspect and understand
 
-Read every file the change touches **before** editing. Trace one hop out (who calls this, who reads this table, what events flow). Read the relevant Hub design spec (`docs/architecture/*.md`, `docs/modules/*.md`) and the LearnStack-side ADR/standard it derives from. If `git log` shows recent edits, read the commit messages for direction. **Mirror, don't invent:** if a pattern exists in `../learnstack/backend/src/`, open it and reproduce it (adjusting for the Hub deltas), rather than improvising.
+Read every file the change touches **before** editing. Trace one hop out (who calls this, who reads this table, what events flow). Read the relevant Hub design spec (`docs/architecture/*.md`, `docs/modules/*.md`) and the LearnStack-side ADR/standard it derives from. If `git log` shows recent edits, read the commit messages for direction. **Mirror, don't invent:** if a pattern exists in `../LearnStack/backend/src/`, open it and reproduce it (adjusting for the Hub deltas), rather than improvising.
 
 ### Step 3 — Plan
 
-State the plan briefly: (1) what you'll do in 1-3 sentences; (2) which files/dirs (paths only); (3) which validation you'll run; (4) any assumption that, if wrong, invalidates the plan. Ask for confirmation **only** when the plan touches: more than one module's `Domain`; an Accepted ADR (either repo); the Hub HTTPS contract surface; a destructive migration; or anything in `../learnstack`. For routine Hub work, state the plan and continue.
+State the plan briefly: (1) what you'll do in 1-3 sentences; (2) which files/dirs (paths only); (3) which validation you'll run; (4) any assumption that, if wrong, invalidates the plan. Ask for confirmation **only** when the plan touches: more than one module's `Domain`; an Accepted ADR (either repo); the Hub HTTPS contract surface; a destructive migration; or anything in `../LearnStack`. For routine Hub work, state the plan and continue.
 
 ### Step 4 — Implement
 
@@ -99,5 +99,5 @@ Compose the review prompt per [code-review § review-agent prompt](../code-revie
 - **Rushing Step 2.** The next eight steps cost an order of magnitude more when inspect is sloppy.
 - **Forgetting the Hub deltas.** Copying a LearnStack pattern verbatim drags in RLS / `UserId` / `TenantContextBehavior` that Hub must not have. Adjust as you mirror.
 - **Skipping the dotnet PATH fix.** `dotnet` is .NET 9; use `~/.dotnet/dotnet`. #1 time-sink.
-- **Touching `../learnstack` without coordination.** Hub-side packets are Hub-only; LearnStack-side work is a separate coordinated packet.
+- **Touching `../LearnStack` without coordination.** Hub-side packets are Hub-only; LearnStack-side work is a separate coordinated packet.
 - **Stale docs / dropped Turkish summary / missing review prompt.** All three are part of "done."

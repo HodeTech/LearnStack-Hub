@@ -1,6 +1,6 @@
 # Contributing to LearnStack Hub
 
-LearnStack Hub follows the same engineering rigour as [LearnStack core](../learnstack). Most engineering standards are defined once in LearnStack's [Standards corpus](../learnstack/docs/standards/) and apply here by reference.
+LearnStack Hub follows the same engineering rigour as [LearnStack core](../LearnStack). Most engineering standards are defined once in LearnStack's [Standards corpus](../LearnStack/docs/standards/) and apply here by reference.
 
 ## Branch protection
 
@@ -23,7 +23,7 @@ Required status checks on `main`:
   - `hub-domain` — Hub domain model
   - `hub-infra` — Hub infrastructure (compose, APISIX, Dapr, Vault)
   - `hub-docs` — Hub documentation
-- AI co-author trailer (per [LearnStack AGENTS.md § Trailers](../learnstack/AGENTS.md)):
+- AI co-author trailer (per [LearnStack AGENTS.md § Trailers](../LearnStack/AGENTS.md)):
   - Claude Code: `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`
   - Codex: `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
 
@@ -47,7 +47,7 @@ When a packet changes both `learnstack` and `learnstack-hub` (e.g. P02c-3 lands 
 2. Open the LearnStack-side PR referencing the Hub PR's commit hash.
 3. Merge both in the same session — either-side merge alone leaves the contract dangling.
 
-Adding or changing a cross-repo contract endpoint requires a **new ADR in `learnstack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](../learnstack/docs/standards/20-infrastructure-stack.md).
+Adding or changing a cross-repo contract endpoint requires a **new ADR in `learnstack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](../LearnStack/docs/standards/20-infrastructure-stack.md).
 
 ## Pre-commit hook
 
@@ -88,7 +88,7 @@ Hub's `LearnStack.Hub.SharedKernel` mirrors LearnStack core's `LearnStack.Shared
 
 ### Hub Keycloak realm JSON lives in the LearnStack core repo
 
-The `learnstack-hub` realm export (`../learnstack/infra/keycloak/realms/learnstack-hub.json`) physically lives in the sibling repo because LearnStack core's compose stack imports both realms at first boot. See [`infra/keycloak/README.md`](infra/keycloak/README.md) for the operational topology.
+The `learnstack-hub` realm export (`../LearnStack/infra/keycloak/realms/learnstack-hub.json`) physically lives in the sibling repo because LearnStack core's compose stack imports both realms at first boot. See [`infra/keycloak/README.md`](infra/keycloak/README.md) for the operational topology.
 
 ### Pre-commit Leakwatch is a repo-root scan, not a staged-files-only scan
 

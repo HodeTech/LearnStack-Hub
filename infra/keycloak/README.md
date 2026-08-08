@@ -3,13 +3,13 @@
 Hub does **not** run its own Keycloak instance. The `learnstack-hub` realm is imported by LearnStack core's compose stack at first boot from:
 
 ```
-../learnstack/infra/keycloak/realms/learnstack-hub.json
+../LearnStack/infra/keycloak/realms/learnstack-hub.json
 ```
 
-This shared-instance + two-realm topology is the dev-time convenience documented in [ADR-0004 Amendment 1](../../../learnstack/docs/decisions/0004-authentication-strategy.md):
+This shared-instance + two-realm topology is the dev-time convenience documented in [ADR-0004 Amendment 1](../../../LearnStack/docs/decisions/0004-authentication-strategy.md):
 
-- **`learnstack` realm** — tenant users (admins, instructors, learners). Lives in `../learnstack/infra/keycloak/realms/learnstack.json`.
-- **`learnstack-hub` realm** — LearnStack operators. Lives in `../learnstack/infra/keycloak/realms/learnstack-hub.json`. MFA (TOTP) required for every operator account.
+- **`learnstack` realm** — tenant users (admins, instructors, learners). Lives in `../LearnStack/infra/keycloak/realms/learnstack.json`.
+- **`learnstack-hub` realm** — LearnStack operators. Lives in `../LearnStack/infra/keycloak/realms/learnstack-hub.json`. MFA (TOTP) required for every operator account.
 
 The realm boundary is **non-negotiable**:
 
@@ -42,4 +42,4 @@ Phase 11 revisits whether Hub deploys its own Keycloak instance or continues to 
 
 ## Ownership of the realm JSON
 
-The realm JSON (`learnstack-hub.json`) physically lives in the LearnStack core repo because LearnStack's compose stack imports both realms at first boot. Phase 11 may move authoritative ownership to this repo (with LearnStack's compose mounting from `../learnstack-hub/infra/keycloak/realms/`) — but as long as the dev-time shared Keycloak holds both realms, single-source-of-truth keeps the file in LearnStack core.
+The realm JSON (`learnstack-hub.json`) physically lives in the LearnStack core repo because LearnStack's compose stack imports both realms at first boot. Phase 11 may move authoritative ownership to this repo (with LearnStack's compose mounting from `../LearnStack-Hub/infra/keycloak/realms/`) — but as long as the dev-time shared Keycloak holds both realms, single-source-of-truth keeps the file in LearnStack core.

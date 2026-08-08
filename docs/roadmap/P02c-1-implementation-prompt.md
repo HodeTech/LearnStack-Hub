@@ -3,7 +3,7 @@
 > **Purpose.** A copy-paste kickoff prompt for the agent that implements Phase 02c
 > Packet 1 (Hub Domain Core). Hand this whole file to the agent at session start.
 >
-> **The agent runs from `learnstack-hub` root.** Sibling LearnStack core repo is at `../learnstack/`.
+> **The agent runs from `learnstack-hub` root.** Sibling LearnStack core repo is at `../LearnStack/`.
 >
 > **Use the project's own workflow skills.** This repo carries a Hub-tailored
 > `.claude/skills/` catalogue (see [`.claude/skills/README.md`](../../.claude/skills/README.md)).
@@ -20,9 +20,9 @@
 ## 0. Environment (read first — these will bite otherwise)
 
 - **.NET 10 SDK is NOT on the default PATH.** The system `dotnet` (`/usr/local/bin/dotnet`) is .NET 9; the project pins `10.0.100` in `backend/global.json`. The real SDK is at `~/.dotnet/dotnet` (10.0.101, rolls forward from the pin). Run `export PATH="$HOME/.dotnet:$PATH"` once at the start of each shell, or prefix every command.
-- **Sibling layout is assumed.** Cross-repo references use `../learnstack/...`. If `../learnstack/` is missing, stop and report — you cannot mirror the SharedKernel patterns without it.
+- **Sibling layout is assumed.** Cross-repo references use `../LearnStack/...`. If `../LearnStack/` is missing, stop and report — you cannot mirror the SharedKernel patterns without it.
 - **Pre-commit hook.** `make install` activates `.githooks/pre-commit` (Leakwatch repo-root scan + `dotnet format` + prettier + ESLint). Backend-only commits don't trip the ESLint step. `.claude/*` is gitignored except `.claude/skills/`, so runtime lock files don't corrupt staged content.
-- **Branch.** Work on `feat/phase-02c-packet-1-hub-domain-core`. **Do not touch the `../learnstack` repo** — another agent may be active there. P02c-1 is entirely Hub-side; LearnStack-side coordination is P02c-3.
+- **Branch.** Work on `feat/phase-02c-packet-1-hub-domain-core`. **Do not touch the `../LearnStack` repo** — another agent may be active there. P02c-1 is entirely Hub-side; LearnStack-side coordination is P02c-3.
 
 ## 1. What P02c-1 delivers
 
@@ -50,21 +50,21 @@ The Hub repo currently (commit `784a5ca`) has empty scaffold projects (AssemblyM
 
 ### LearnStack-side authority (the cross-cutting decisions — do not contradict)
 
-6. `../learnstack/docs/decisions/0019-learnstack-hub.md` — Hub data model, boundary.
-7. `../learnstack/docs/decisions/0021-feature-based-entitlement.md` (incl. Amendment 1) — `FeatureKey`/`LimitKey`, projection shape.
-8. `../learnstack/docs/decisions/0020-triple-deployment-hybrid-license.md` — `DeploymentMode`, entitlement consumption.
-9. `../learnstack/docs/decisions/0023-strongly-typed-id-source-generator.md` — Vogen pattern, `IdMask`.
-10. `../learnstack/docs/decisions/0032-exception-handling-logging-and-observability.md` — the cross-cutting architecture you mirror.
-11. `../learnstack/docs/architecture/24-learnstack-hub.md` — the full Hub ERD + projection + module list.
-12. `../learnstack/docs/standards/02-backend-coding.md` + `05-database.md` — coding + DB conventions. **Ignore Standards 05's RLS / tenant-isolation rows** — they don't apply to Hub.
+6. `../LearnStack/docs/decisions/0019-learnstack-hub.md` — Hub data model, boundary.
+7. `../LearnStack/docs/decisions/0021-feature-based-entitlement.md` (incl. Amendment 1) — `FeatureKey`/`LimitKey`, projection shape.
+8. `../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md` — `DeploymentMode`, entitlement consumption.
+9. `../LearnStack/docs/decisions/0023-strongly-typed-id-source-generator.md` — Vogen pattern, `IdMask`.
+10. `../LearnStack/docs/decisions/0032-exception-handling-logging-and-observability.md` — the cross-cutting architecture you mirror.
+11. `../LearnStack/docs/architecture/24-learnstack-hub.md` — the full Hub ERD + projection + module list.
+12. `../LearnStack/docs/standards/02-backend-coding.md` + `05-database.md` — coding + DB conventions. **Ignore Standards 05's RLS / tenant-isolation rows** — they don't apply to Hub.
 
 ### LearnStack-side CODE to mirror verbatim
 
-13. `../learnstack/backend/src/LearnStack.SharedKernel/` — the **canonical source** for every type to reproduce in `backend/src/Core/LearnStack.Hub.SharedKernel/` with the `LearnStack.Hub.SharedKernel.*` namespace and the `OperatorId`-for-`UserId` substitution.
-14. `../learnstack/backend/src/LearnStack.Api/Common/` — `LearnStackExceptionHandler`, `ResultExtensions`, `ProblemDetailsFactory`, `HttpStatusMap`. Mirror as `HubExceptionHandler` etc.
-15. `../learnstack/backend/src/LearnStack.Application/Pipeline/` — the MediatR behaviors. Mirror the 6 Hub keeps (drop `TenantContextBehavior`).
-16. `../learnstack/backend/src/Modules/<Module>/` — a representative four-project layout, aggregate shape, DbContext, handler.
-17. `../learnstack/backend/Directory.Packages.props` — current package versions.
+13. `../LearnStack/backend/src/LearnStack.SharedKernel/` — the **canonical source** for every type to reproduce in `backend/src/Core/LearnStack.Hub.SharedKernel/` with the `LearnStack.Hub.SharedKernel.*` namespace and the `OperatorId`-for-`UserId` substitution.
+14. `../LearnStack/backend/src/LearnStack.Api/Common/` — `LearnStackExceptionHandler`, `ResultExtensions`, `ProblemDetailsFactory`, `HttpStatusMap`. Mirror as `HubExceptionHandler` etc.
+15. `../LearnStack/backend/src/LearnStack.Application/Pipeline/` — the MediatR behaviors. Mirror the 6 Hub keeps (drop `TenantContextBehavior`).
+16. `../LearnStack/backend/src/Modules/<Module>/` — a representative four-project layout, aggregate shape, DbContext, handler.
+17. `../LearnStack/backend/Directory.Packages.props` — current package versions.
 
 ## 3. dotnet tooling for migrations
 
@@ -94,7 +94,7 @@ Build bottom-up so each layer compiles before the next depends on it. Commit at 
 ### Step A — Hub SharedKernel
 
 → [`wire-cross-cutting-foundation`](../../.claude/skills/wire-cross-cutting-foundation/SKILL.md) § Step 1.
-Mirror `../learnstack/backend/src/LearnStack.SharedKernel/` folder-for-folder with namespace `LearnStack.Hub.SharedKernel.*` and **two substitutions**: `OperatorId` for `UserId`; `HubException` for `LearnStackException`. Add `FeatureFlags/` with `FeatureKey`/`LimitKey` value objects + initial registries seeded from ADR-0021 Amendment 1 + Architecture 24 § 4. Unit-test the load-bearing types (Result, LocalizedMessage prefix invariant, Entity equality, FixedClock, AuditableEntity audit columns).
+Mirror `../LearnStack/backend/src/LearnStack.SharedKernel/` folder-for-folder with namespace `LearnStack.Hub.SharedKernel.*` and **two substitutions**: `OperatorId` for `UserId`; `HubException` for `LearnStackException`. Add `FeatureFlags/` with `FeatureKey`/`LimitKey` value objects + initial registries seeded from ADR-0021 Amendment 1 + Architecture 24 § 4. Unit-test the load-bearing types (Result, LocalizedMessage prefix invariant, Entity equality, FixedClock, AuditableEntity audit columns).
 
 ### Step B — Cross-cutting foundation
 
@@ -186,7 +186,7 @@ Each commit must independently build + pass the non-integration tests. Push the 
 - `CustomDomains` + `Compliance` modules (the projection's `compliance_caps` stays empty `{}`) → **P02c-5**.
 - `LicenseKeys` + `.lic` + `grace_until` → **P02c-6**.
 - Stripe / Iyzico / Invoicing / dunning (`payment_provider` stays null, `MarkPastDue`/`Cure` stay shells) → **Phase 09b**.
-- Any change to the `../learnstack` repo → **P02c-3** (a separate, coordinated packet).
+- Any change to the `../LearnStack` repo → **P02c-3** (a separate, coordinated packet).
 
 ## 10. Definition of done
 

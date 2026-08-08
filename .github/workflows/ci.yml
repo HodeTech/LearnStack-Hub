@@ -171,11 +171,11 @@ jobs:
 
       - name: Markdown link audit (changed docs)
         # Mirror of LearnStack core's link audit. Skips externals + anchors.
-        # Hub's docs cross-link to LearnStack core via `../learnstack/...`
+        # Hub's docs cross-link to LearnStack core via `../LearnStack/...`
         # relative paths — those links resolve only on the developer's
         # workstation (sibling layout). CI can't validate them because the
         # LearnStack core repo isn't checked out alongside; the audit skips
-        # `../learnstack/` paths explicitly.
+        # `../LearnStack/` paths explicitly.
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
@@ -201,13 +201,13 @@ jobs:
                   # Sibling-relative LearnStack link at any `../` depth.
                   # Hub docs reference LearnStack core at varying depths
                   # depending on the source file's own location:
-                  #   - root files (README, CLAUDE.md):       ../learnstack/...
-                  #   - docs/*.md:                            ../../learnstack/...
-                  #   - docs/{architecture,decisions}/*.md:   ../../../learnstack/...
-                  #   - backend/src/Modules/README.md:        ../../../../learnstack/...
-                  # The trailing piece is optional — `../learnstack` (a bare
+                  #   - root files (README, CLAUDE.md):       ../LearnStack/...
+                  #   - docs/*.md:                            ../../LearnStack/...
+                  #   - docs/{architecture,decisions}/*.md:   ../../../LearnStack/...
+                  #   - backend/src/Modules/README.md:        ../../../../LearnStack/...
+                  # The trailing piece is optional — `../LearnStack` (a bare
                   # directory link to the sibling repo's root) is just as
-                  # legitimate as `../learnstack/docs/...`. CI cannot reach
+                  # legitimate as `../LearnStack/docs/...`. CI cannot reach
                   # the sibling repo, so skip the file-existence check for
                   # any `(../)+learnstack` link, with or without a trailing
                   # path. The links are validated locally on the developer's

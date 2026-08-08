@@ -33,7 +33,7 @@ Orient correctly before writing code: read the right docs, confirm the work fits
 
 1. [README.md](../../../README.md) — direction at a glance.
 2. The relevant Hub design spec: `docs/architecture/module-topology.md`, `docs/architecture/cross-cutting-foundation.md`, `docs/architecture/entitlement-projection.md`, and the `docs/modules/<name>.md` for the module(s) in scope.
-3. The LearnStack-side authority the spec derives from: the cited ADR(s) under `../learnstack/docs/decisions/` and standard(s) under `../learnstack/docs/standards/`.
+3. The LearnStack-side authority the spec derives from: the cited ADR(s) under `../LearnStack/docs/decisions/` and standard(s) under `../LearnStack/docs/standards/`.
 4. [docs/roadmap/README.md](../../../docs/roadmap/README.md) — which packet owns this work.
 5. [docs/glossary.md](../../../docs/glossary.md) — terms.
 
@@ -49,7 +49,7 @@ Confirm the planned change honours [the Hub deltas](../README.md) and [CLAUDE.md
 
 ### Step 4 — Name the workflow skill(s)
 
-Identify which `add-*` / `wire-*` skill the implementation will invoke (e.g. [add-hub-aggregate](../add-hub-aggregate/SKILL.md) + [add-ef-migration](../add-ef-migration/SKILL.md) + [add-mediatr-handler](../add-mediatr-handler/SKILL.md)). If none fits, fall back to LearnStack's [Standards index](../../../../learnstack/docs/standards/README.md) + the relevant Hub architecture doc.
+Identify which `add-*` / `wire-*` skill the implementation will invoke (e.g. [add-hub-aggregate](../add-hub-aggregate/SKILL.md) + [add-ef-migration](../add-ef-migration/SKILL.md) + [add-mediatr-handler](../add-mediatr-handler/SKILL.md)). If none fits, fall back to LearnStack's [Standards index](../../../../LearnStack/docs/standards/README.md) + the relevant Hub architecture doc.
 
 ### Step 5 — Produce the plan
 
@@ -64,4 +64,4 @@ A short plan: problem statement (your words), the packet, the governing standard
 
 - **Skimming instead of reading.** The implementation cost of a sloppy scope is paid back tenfold.
 - **Pulling future-packet work forward.** Respect the packet boundary.
-- **Missing the cross-repo flag.** A task that needs `../learnstack` changes is not a Hub-only packet.
+- **Missing the cross-repo flag.** A task that needs `../LearnStack` changes is not a Hub-only packet.

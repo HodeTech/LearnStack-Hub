@@ -63,18 +63,18 @@ Feature branch `feat/phase-02c-packet-N-<slug>`. Push with `-u` only when the us
 
 ### Step 5 — Cross-repo coordination (if the packet spans both repos)
 
-Per [CLAUDE.md § Cross-repo coordination](../../../CLAUDE.md): the Hub-side PR opens first (it carries the canonical contract shape); the LearnStack-side PR references the Hub PR's commit hash; both merge in the same session. Adding/changing a contract endpoint requires a new ADR in `../learnstack/docs/decisions/` first. **Do not** push or merge anything in `../learnstack` without explicit user permission — another agent may be active there.
+Per [CLAUDE.md § Cross-repo coordination](../../../CLAUDE.md): the Hub-side PR opens first (it carries the canonical contract shape); the LearnStack-side PR references the Hub PR's commit hash; both merge in the same session. Adding/changing a contract endpoint requires a new ADR in `../LearnStack/docs/decisions/` first. **Do not** push or merge anything in `../LearnStack` without explicit user permission — another agent may be active there.
 
 ## Validation
 
 - Commit subject imperative ≤ 72 chars with a valid Hub scope.
 - Body explains _why_; AI co-author trailer present.
 - Multi-line message via HEREDOC.
-- Cross-repo packets: paired-PR plan stated; no unilateral `../learnstack` push.
+- Cross-repo packets: paired-PR plan stated; no unilateral `../LearnStack` push.
 
 ## Common pitfalls
 
 - **Pushing without being asked.** Default is local commit.
 - **Amending / force-pushing `main`.** Forbidden — new commits only.
-- **A contract change without an ADR.** The four-endpoint surface is closed; a fifth needs an ADR in `../learnstack/docs/decisions/`.
-- **Touching `../learnstack` branch state from a Hub session.** Coordinate; don't interfere with a parallel agent.
+- **A contract change without an ADR.** The four-endpoint surface is closed; a fifth needs an ADR in `../LearnStack/docs/decisions/`.
+- **Touching `../LearnStack` branch state from a Hub session.** Coordinate; don't interfere with a parallel agent.

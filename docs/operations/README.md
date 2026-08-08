@@ -16,5 +16,5 @@ Hub-specific operational runbooks. Phase 11 fills this directory with the produc
 
 ## Out of scope here
 
-- LearnStack core operational runbooks (those live in `../../../learnstack/docs/operations/` once Phase 11 adds them).
+- LearnStack core operational runbooks (those live in `../../../LearnStack/docs/operations/` once Phase 11 adds them).
 - Local-dev setup (see [../../README.md § Dev Workflow](../../README.md#dev-workflow) and [../../infra/compose/README.md](../../infra/compose/README.md)).

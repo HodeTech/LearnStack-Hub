@@ -45,7 +45,7 @@ info "Pre-flight checks..."
 # 1. LearnStack compose Keycloak reachable?
 if ! curl -fsS http://localhost:8080/realms/learnstack-hub/.well-known/openid-configuration > /dev/null 2>&1; then
     fail "Keycloak learnstack-hub realm not reachable at http://localhost:8080. \
-Start LearnStack core compose first: cd ../learnstack && make dev"
+Start LearnStack core compose first: cd ../LearnStack && make dev"
 fi
 ok "  Keycloak learnstack-hub realm: OK"
 

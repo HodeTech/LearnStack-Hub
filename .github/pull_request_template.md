@@ -2,7 +2,7 @@
 
 <!--
 What does this PR change? Link the relevant Phase 02c packet
-(P02c-0..P02c-7) or LearnStack ADR (../learnstack/docs/decisions/NNNN-*).
+(P02c-0..P02c-7) or LearnStack ADR (../LearnStack/docs/decisions/NNNN-*).
 For cross-repo work, link the paired LearnStack core PR.
 -->
 
@@ -27,7 +27,7 @@ Which packet does this PR advance? Pick one:
 Any LearnStack ADR or Hub-internal ADR (HUB-NNNN) cited or amended? Any
 Hub HTTPS Contract Surface change (new endpoint)? Adding a fifth endpoint
 to the Hub HTTPS Contract Surface requires a new ADR in
-../learnstack/docs/decisions/ FIRST.
+../LearnStack/docs/decisions/ FIRST.
 -->
 
 ## Cross-repo coordination
