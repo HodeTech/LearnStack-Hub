@@ -134,7 +134,7 @@ Every skill repeats these; they are listed here as the kickoff checklist.
 - **FeatureKey/LimitKey wire-strings match LearnStack core's registry exactly.**
 - **`hub` schema, `learnstack_hub` database.** Every DbContext `HasDefaultSchema("hub")`.
 - **One DbContext per module.** Cross-module FKs are plain `uuid` + index, not EF navigations.
-- **English docs; Conventional Commits; AI co-author trailer** (`Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`).
+- **English docs; Conventional Commits; AI co-author trailer** (`Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`).
 
 ## 6. Verification
 

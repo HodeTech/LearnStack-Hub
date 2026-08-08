@@ -25,8 +25,8 @@ Which packet does this PR advance? Pick one:
 
 <!--
 Any LearnStack ADR or Hub-internal ADR (HUB-NNNN) cited or amended? Any
-Hub HTTPS Contract Surface change (new endpoint)? Adding a fifth endpoint
-to the Hub HTTPS Contract Surface requires a new ADR in
+Hub HTTPS Contract Surface change (new endpoint, or a change that touches
+either ADR-0034 invariant)? Adding an endpoint requires a new ADR in
 ../LearnStack/docs/decisions/ FIRST.
 -->
 

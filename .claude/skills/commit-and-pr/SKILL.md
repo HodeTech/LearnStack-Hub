@@ -40,7 +40,7 @@ Conventional Commits `type(scope): subject`:
 - **Hub scopes:** `hub` (cross-cutting), `hub-domain` (aggregates / modules), `hub-infra` (compose / APISIX / Dapr / Vault / EF), `hub-portal` (operator portal), `hub-docs` (documentation).
 - **subject:** imperative, ≤ 72 chars.
 - **body:** one short paragraph saying _why_ (the diff is _what_). For a packet, name the packet (`P02c-1`).
-- **trailer:** `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` (or `Codex …` for Codex sessions). HEREDOC every multi-line message.
+- **trailer:** `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>` (or `Codex …` for Codex sessions). HEREDOC every multi-line message.
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -48,7 +48,7 @@ feat(hub-domain): P02c-1 — LearnStackTenant aggregate + DbContext + migration
 
 <why, 1-3 sentences>
 
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 EOF
 )"
 ```
@@ -76,5 +76,5 @@ Per [CLAUDE.md § Cross-repo coordination](../../../CLAUDE.md): the Hub-side PR 
 
 - **Pushing without being asked.** Default is local commit.
 - **Amending / force-pushing `main`.** Forbidden — new commits only.
-- **A contract change without an ADR.** The four-endpoint surface is closed; a fifth needs an ADR in `../LearnStack/docs/decisions/`.
+- **A contract change without an ADR.** Adding or reshaping an endpoint on the contract surface needs an ADR in `../LearnStack/docs/decisions/` first — it is a cross-repository agreement (ADR-0034).
 - **Touching `../LearnStack` branch state from a Hub session.** Coordinate; don't interfere with a parallel agent.

@@ -45,7 +45,7 @@ Confirm the task belongs to the current/next packet (`docs/roadmap/README.md`). 
 
 ### Step 3 — Walk the Hub deltas + hard rules
 
-Confirm the planned change honours [the Hub deltas](../README.md) and [CLAUDE.md § Hard rules](../../../CLAUDE.md): no RLS, `OperatorId` not `UserId`, 6-step pipeline, `hub` schema, no tenant content, no LearnStack-core imports, the closed four-endpoint surface. Name any rule the change brushes against.
+Confirm the planned change honours [the Hub deltas](../README.md) and [CLAUDE.md § Hard rules](../../../CLAUDE.md): no RLS, `OperatorId` not `UserId`, 6-step pipeline, `hub` schema, no tenant content, no LearnStack-core imports, the two ADR-0034 contract invariants. Name any rule the change brushes against.
 
 ### Step 4 — Name the workflow skill(s)
 

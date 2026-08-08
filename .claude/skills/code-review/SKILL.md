@@ -63,7 +63,7 @@ Walk all five. Cite `file:line` for every finding; classify Blocker / Major / Mi
 
 ### 5. Hub-structural (the delta lens)
 
-- Run the full [standards-check](../standards-check/SKILL.md) checklist as the structural backbone: no RLS, `OperatorId` not `UserId`, 6-step pipeline, `hub` schema, no tenant content, no LearnStack-core imports, closed four-endpoint surface.
+- Run the full [standards-check](../standards-check/SKILL.md) checklist as the structural backbone: no RLS, `OperatorId` not `UserId`, 6-step pipeline, `hub` schema, no tenant content, no LearnStack-core imports, and the two ADR-0034 contract invariants (Hub stores no tenant content; every crossing goes through a named adapter).
 - Architecture tests cover the new structure (`Hub_NeverStores_TenantData` scans the new module; dependency-direction test includes it).
 - Adjacent docs updated (module deep dive, glossary, roadmap, ADR).
 

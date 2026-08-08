@@ -24,7 +24,7 @@ Required status checks on `main`:
   - `hub-infra` — Hub infrastructure (compose, APISIX, Dapr, Vault)
   - `hub-docs` — Hub documentation
 - AI co-author trailer (per [LearnStack AGENTS.md § Trailers](../LearnStack/AGENTS.md)):
-  - Claude Code: `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`
+  - Claude Code: `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
   - Codex: `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
 
 Example commit message:
@@ -36,7 +36,7 @@ P02c-1 brings the Hub-side mirror of LearnStack's Tenant aggregate.
 Hub holds only metadata fields (id, slug, display_name, status,
 deployment_mode, created_at, last_phone_home_at).
 
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ```
 
 ## Cross-repo PRs
