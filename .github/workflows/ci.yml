@@ -209,10 +209,19 @@ jobs:
                   # directory link to the sibling repo's root) is just as
                   # legitimate as `../LearnStack/docs/...`. CI cannot reach
                   # the sibling repo, so skip the file-existence check for
-                  # any `(../)+learnstack` link, with or without a trailing
+                  # any `(../)+LearnStack` link, with or without a trailing
                   # path. The links are validated locally on the developer's
                   # workstation.
-                  if [[ "$link" =~ ^(\.\./)+learnstack(/|$) ]]; then
+                  #
+                  # The directory is spelled `LearnStack` on disk and every link
+                  # in this repository uses that capitalisation. Bash `=~` is
+                  # case-sensitive and this workflow sets no `nocasematch`, so
+                  # the pattern matches both cases explicitly rather than
+                  # depending on a shell option set somewhere else. The trailing
+                  # `(/|$)` is what keeps a hypothetical `../LearnStack-Hub/...`
+                  # self-reference OUT of the skip: it would have to be followed
+                  # by `/` or end-of-string, and `-` is neither.
+                  if [[ "$link" =~ ^(\.\./)+[Ll]earn[Ss]tack(/|$) ]]; then
                       continue
                   fi
                   link_path="${link%%#*}"

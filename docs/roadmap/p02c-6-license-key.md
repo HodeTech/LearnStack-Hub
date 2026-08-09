@@ -183,7 +183,13 @@ doing the work that cannot be faked:
 - validate the payload against `license-payload-v1.schema.json`;
 - read the embedded projection and serve feature and limit lookups from it;
 - honour `exp` and `grace_until` — functional before `exp`, degraded within grace,
-  read-only past it.
+  read-only past it. This is the **licence-expiry** ladder and it is deliberately not
+  the same as the Hub-outage ladder that
+  [ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+  defines. An outage is a control-plane failure the tenant did not cause, so ADR-0034
+  answers it with a durable grace window plus a per-key fail-open / fail-closed class;
+  an expired licence is the licence working as intended, so it degrades to read-only and
+  stays there. Do not sweep this paragraph to match the ADR-0034 wording.
 
 **Production hardening is [LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md)**,
 per [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md):

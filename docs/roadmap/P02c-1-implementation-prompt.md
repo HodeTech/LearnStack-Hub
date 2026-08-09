@@ -179,7 +179,7 @@ Each commit must independently build + pass the non-integration tests. Push the 
 
 ## 9. Out of scope (do NOT build — later packets)
 
-- The four HTTPS contract endpoints + outbound `LearnStackApiClient` + mTLS/JWT/HMAC chain → **P02c-2**.
+- The Hub HTTPS contract endpoints + outbound `LearnStackApiClient` + mTLS/JWT/HMAC chain → **P02c-2**.
 - `learnstack.hub.entitlement` Dapr publish + real `IOutbox` → **P02c-2** (ship the OutboxFlush shell only).
 - `Usage` module + `POST /api/v1/usage/report` → **P02c-2**.
 - Operator portal UI, Operators module, Audit module + live audit writer, `AuthorizationBehavior` real logic → **P02c-4**.

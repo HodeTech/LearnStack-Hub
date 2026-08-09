@@ -112,8 +112,8 @@ names:
 
 | Topic | Emitted when | LearnStack-side effect |
 |---|---|---|
-| `learnstack.hub.custom-domain.activated` | `MarkVerified` succeeds | Insert / update the `platform_host_to_tenant` row |
-| `learnstack.hub.custom-domain.deactivated` | `Revoke` succeeds | Delete the row and invalidate the resolver cache |
+| `learnstack.hub.custom-domain.activated` | `MarkVerified` succeeds | **Invalidate** the resolver cache entry for the host. The mapping itself arrives over `PUT /api/internal/tenants/{id}/host-mappings` — see § Propagation below |
+| `learnstack.hub.custom-domain.deactivated` | `Revoke` succeeds | **Invalidate** the resolver cache entry for the host. The row is removed by the same push endpoint |
 | `learnstack.hub.custom-domain.renewed` | `Renew` succeeds | Refresh the certificate reference; no mapping change |
 
 Each payload carries the host, the tenant id, the optional organization id, and a
