@@ -8,7 +8,7 @@ Give the Hub a domain: the four aggregates the control plane is built out of —
 
 The load-bearing deliverable is the **entitlement projection**. Everything the Hub exists to do reduces to producing one correct, monotonically versioned projection per tenant; the internal API in [P02c-2](p02c-2-internal-api-and-contract.md) is transport for it, and the operator portal in [P02c-4](p02c-4-operator-portal.md) is an editor for its inputs. If the projection's shape or its `generation` counter is wrong here, every consumer downstream inherits the error.
 
-This packet is also where the Hub's structural difference from LearnStack core becomes code rather than prose: **no Row Level Security, no tenant context, `OperatorId` instead of `UserId`, six pipeline steps instead of eight.** Those four deltas are not simplifications — they follow from the Hub being operator-administered and holding no tenant content.
+This packet is also where the Hub's structural difference from LearnStack core becomes code rather than prose: **no Row Level Security, no tenant context, `OperatorId` instead of `UserId`, six pipeline behaviors instead of seven.** Those four deltas are not simplifications — they follow from the Hub being operator-administered and holding no tenant content.
 
 ## Scope
 

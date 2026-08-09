@@ -1,5 +1,7 @@
 # P02c-4: Operator Portal MVP
 
+> **Status: ⏳ Not started.** Depends on [P02c-1](p02c-1-hub-domain-core.md) and [P02c-2](p02c-2-internal-api-and-contract.md). Runs in parallel with [P02c-3](p02c-3-learnstack-integration.md) — this packet touches no LearnStack code.
+
 ## Goal
 
 Give a Hub operator a browser.

@@ -94,8 +94,14 @@ Pinned once, in one place, because getting it wrong is expensive and silent:
 - Late-arriving reports for a closed period are recorded against the period they belong to
   and surfaced as an adjustment, not silently dropped or silently folded into the current
   month.
-- Soft-limit alerts (`usage.alert.soft_limit_reached`, produced since P02c-2) surface in
-  the operator portal and optionally notify the tenant admin.
+- Soft-limit alerts are **produced by LearnStack**, not by the Hub: the gated call site
+  compares current usage against the limit it already holds from the entitlement
+  projection and emits `usage.alert.soft_limit_reached` over
+  `POST /api/v1/usage/report`
+  ([LearnStack Architecture 21 § Soft vs Hard Limits](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/21-feature-flags.md)).
+  [P02c-2](p02c-2-internal-api-and-contract.md) ingests that stream. **This track adds
+  the Hub half**: distinguishing an alert row from an ordinary usage row, retaining it,
+  surfacing it in the operator portal, and optionally notifying the tenant admin.
 
 ### Billing lifecycle
 

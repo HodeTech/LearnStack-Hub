@@ -34,7 +34,7 @@ public readonly record struct LimitKey(string Value);
 ```
 
 - These live in `LearnStack.Hub.SharedKernel.FeatureFlags` (mirror of `LearnStack.SharedKernel.FeatureFlags`).
-- The `FeatureKeys` / `LimitKeys` static registries enumerate the known keys. **Hub is the authoring side** — the plan editor (P02c-4) writes these keys into `Plan.features` / `Plan.limits`. The wire-format strings (snake_case dotted, no `.enabled` suffix) must match LearnStack core's registry exactly so the projection LearnStack consumes lines up.
+- The `FeatureKeys` / `LimitKeys` static registries enumerate the known keys. **Hub is the authoring side** — the plan editor writes these keys into `Plan.features` / `Plan.limits`; it ships in [Hub Billing](../roadmap/hub-billing.md), not in P02c-4. The wire-format strings (snake_case dotted, no `.enabled` suffix) must match LearnStack core's registry exactly so the projection LearnStack consumes lines up.
 - A `Plan` validator checks that every key in `features` / `limits` is a known registry key — an unknown key is a `Result.Fail(validation_failed)`, not a silent accept. (This is the Hub-side analogue of LearnStack's `FeatureKey_AllReferences_AreInRegistry` architecture test; in Hub it's a runtime validator because keys arrive as data, not code references.)
 
 > **Registry sync.** Because the two repos each keep their own copy of the key registries, they can drift. P02c-1 ships the Hub registry seeded from [ADR-0021 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md) + [Architecture 24 § 4](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md). A future cross-repo reconciliation (or a shared `LearnStack.Contracts` package, Phase 11) is the durable fix. Note this in the Hub roadmap.
@@ -77,6 +77,6 @@ Validators: tier in enum, billing cycle in enum, currency ISO 4217, every featur
 
 ## Out of scope for P02c-1
 
-- The operator plan-editor UI (P02c-4).
+- The operator plan-editor UI — deferred out of [P02c-4](../roadmap/p02c-4-operator-portal.md) into [Hub Billing](../roadmap/hub-billing.md) so that a plan's feature payload and its price are edited on one form. Until then plans are authored by P02c-1 seed data and changed through `CreatePlanCommand` / `UpdatePlanCommand` over the API.
 - `compliance_defaults` content — the column ships empty; CompliancePolicy + caps land in P02c-5.
 - Hangfire-backed fan-out for large plan-change recomputes (Phase 09b / 11).

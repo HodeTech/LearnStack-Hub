@@ -33,7 +33,7 @@ These are Hub-owned phases that sit outside the P02c series. LearnStack's [Phase
 | Track                                    | What it covers                                                                                         | Trigger                      |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------- |
 | [Hub Billing](hub-billing.md)            | Stripe / Iyzico adapters, `Invoicing` module, `WebhookLedger`, dunning, proration, the storefront flow | Commercial billing is needed |
-| [Hub Marketplace](hub-marketplace.md)    | Shared customization packages, listing, install, revenue share                                         | Product-market evidence      |
+| [Hub Marketplace](hub-marketplace.md)    | Shared customization packages, listing, install — free-only; paid listings and revenue splits are out of the roadmap | Demonstrated cross-tenant duplication **and** an accepted ADR resolving the ADR-0034 collision |
 | Hub Operations (unscheduled)             | Hub production deployment, HA topology, backup and restore drill, release process, and the operational runbooks the [P02c-7](p02c-7-exit-gate.md) gate names | A Hub instance serves a paying tenant |
 
 Hub Operations has no plan document yet. It is listed so the work has a named owner in this repository rather than being handed to LearnStack Phase 11, which scopes itself to LearnStack ([Phase 11 § Release Engineering](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md)).
@@ -130,7 +130,7 @@ A packet that changes both repositories lands as two pull requests in one sessio
 Known reconciliations still open, each named in its owning packet doc so it cannot be lost:
 
 - The `backend-integration` CI job's owning packet. Three files on `main` say P02c-2; the P02c-1 implementation prompt and the frozen branch say P02c-1. **P02c-2 owns it** — see [p02c-2-internal-api-and-contract.md](p02c-2-internal-api-and-contract.md).
-- The operator portal's app name. LearnStack's core docs say `learnstack-hub-web`; this repository and its architecture test say `operator-portal`. This repository is correct.
+- Operator-portal naming: **closed 2026-08-08.** LearnStack's `docs/` corpus now says `operator-portal` everywhere. Three residues remain outside it and are tracked rather than open: `frontend/README.md` and `frontend/apps/web/README.md` still say `learnstack-hub-web`, and [ADR-0015](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0015-api-gateway-apisix.md) § Frontend apps says `apps/hub-web` — a third spelling, corrected by the next PR that touches that ADR. LearnStack's frozen [Phase 01](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-01-repository-tooling.md) record keeps the old name deliberately, annotated in place. The Keycloak client id `learnstack-hub-web` is an OIDC identifier, not an app name, and does not change.
 - Feature-key / limit-key registry drift between the two repositories, which each keep their own copy. Recorded in [plans.md § Registry sync](../modules/plans.md).
 
 ## Where cross-cutting authority lives

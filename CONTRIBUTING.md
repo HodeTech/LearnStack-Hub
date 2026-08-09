@@ -47,7 +47,7 @@ When a packet changes both `learnstack` and `learnstack-hub` (e.g. P02c-3 lands 
 2. Open the LearnStack-side PR referencing the Hub PR's commit hash.
 3. Merge both in the same session — either-side merge alone leaves the contract dangling.
 
-Adding or changing a cross-repo contract endpoint requires a **new ADR in `learnstack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](https://github.com/cemililik/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md).
+Adding or changing a cross-repo contract endpoint requires a **new ADR in `../LearnStack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](https://github.com/cemililik/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md).
 
 ## Pre-commit hook
 

@@ -1,5 +1,7 @@
 # P02c-6: License Key
 
+> **Status: ⏳ Not started.** Depends on [P02c-1](p02c-1-hub-domain-core.md) and [P02c-2](p02c-2-internal-api-and-contract.md). **Cross-repo** — the LearnStack-side `SignedLicenseKeyEntitlementProvider` skeleton ships in a coordinated pull request; its operational hardening is [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md).
+
 ## Goal
 
 Make the Hub able to issue, and later withdraw, a portable statement of what a customer

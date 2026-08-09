@@ -1,5 +1,7 @@
 # P02c-5: Custom Domain Lifecycle
 
+> **Status: ⏳ Not started.** Depends on [P02c-1](p02c-1-hub-domain-core.md) and [P02c-2](p02c-2-internal-api-and-contract.md). **Cross-repo** — the LearnStack-side `host-mappings` handler ships in [LearnStack Phase 02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) in a coordinated pull request; TLS termination at the LearnStack edge is [Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) and this packet does not wait on it.
+
 ## Goal
 
 Let a tenant run under its own domain, and make the whole path — submission, ownership

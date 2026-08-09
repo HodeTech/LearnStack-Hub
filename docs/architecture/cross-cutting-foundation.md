@@ -44,9 +44,9 @@ This is the load-bearing Hub adjustment. LearnStack core's `AuditableEntity<TId>
 
 ## 2. MediatR pipeline — Hub's behavior set
 
-LearnStack core runs an 8-step pipeline: Validation → Logging → AuditLog → TenantContext → Authorization → Transaction → OutboxFlush → Handler.
+LearnStack core registers **seven** pipeline behaviors: Validation → Logging → AuditLog → TenantContext → Authorization → Transaction → OutboxFlush, then the Handler. [ADR-0032 § Sub-decision 2](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md) writes that as an eight-step list because it counts the Handler; this document counts behaviors, so the numbers below are behavior counts throughout.
 
-Hub runs a **6-step** pipeline. The two LearnStack steps that drop out are tenant-isolation concerns Hub does not have:
+Hub registers **six**. The one behavior that drops out is a tenant-isolation concern Hub does not have:
 
 | #   | Behavior                | P02c-1 state                    | Why                                                                                                                                                                                                                               |
 | --- | ----------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -62,7 +62,7 @@ Hub runs a **6-step** pipeline. The two LearnStack steps that drop out are tenan
 
 - **`TenantContextBehavior`** — REMOVED. Hub has no per-request tenant context to assert / no RLS GUC to set. Hub requests are operator-scoped; the operator identity rides on the JWT, resolved by an `OperatorContext` (P02c-4), not by a tenant resolver.
 
-The `MediatR_Pipeline_Order_Matches_Canonical_Sequence` architecture test (if mirrored) asserts the 6-step Hub order, not LearnStack's 8.
+The `MediatR_Pipeline_Order_Matches_Canonical_Sequence` architecture test (if mirrored) asserts the six-behavior Hub order, not LearnStack's seven.
 
 ## 3. Exception handling
 
@@ -95,7 +95,7 @@ P02c-1 grows `Program.cs` from the P02c-0 minimal `/healthz` host into the found
 1. `builder.Host.UseSerilog(...)` (console + OTLP).
 2. `builder.Services.AddOpenTelemetry()...` (tracing + metrics; no LoggerProvider).
 3. `builder.Services.AddExceptionHandler<HubExceptionHandler>()` + `AddProblemDetails()`.
-4. MediatR registration with the 6-step pipeline in canonical order.
+4. MediatR registration with the six-behavior pipeline in canonical order.
 5. `IClock` / `IGuidFactory` / `IRandom` / `ISecretProvider` / `IErrorTrackingProvider` / `IProviderResilience<>` registered, `DeploymentMode`-branched at the composition root (modules never read `DeploymentMode`).
 6. Each module's `Add<Module>Module(...)` extension (DbContext + handlers + validators).
 7. `/healthz` stays; real endpoints arrive in P02c-2.

@@ -1,5 +1,7 @@
 # P02c-7: End-to-End Exit Gate
 
+> **Status: ⏳ Not started.** The gate, not a build packet: it closes only when P02c-1 through P02c-6 have shipped.
+
 ## Goal
 
 Decide, on evidence, whether Phase 02c is done.

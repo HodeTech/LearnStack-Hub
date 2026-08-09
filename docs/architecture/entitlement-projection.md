@@ -139,7 +139,14 @@ The cross-module trigger (Subscriptions / Plans → Entitlements) uses an in-pro
 These are LearnStack-core-side behaviours that consume the projection; documented here so the Hub-side shape stays compatible. They are **not** P02c-1 deliverables:
 
 - `NullEntitlementProvider` (LearnStack Development mode): all features `true`, all limits `null`.
-- `HubEntitlementProvider` + Hub unreachable: serve cached projection until `expires_at`; within `grace_until` keep serving; past `grace_until` → read-only mode.
+- `HubEntitlementProvider` + Hub unreachable: the read path is normative and lives on
+  the LearnStack side — L1 in-process cache → L2 distributed cache → the durable
+  `platform_entitlement_cache` row carrying its own grace window → the Hub. Past the
+  grace window, resolution is per feature-key class: fail-open keys stay enabled,
+  fail-closed keys are refused. It never throws out of a feature-flag check. See
+  [ADR-0034 § The entitlement read path](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
+  and [LearnStack Phase 02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md); this document
+  does not restate them. Superseded detail: serve cached projection until `expires_at`; within `grace_until` keep serving; past `grace_until` → read-only mode.
 
 Hub's only obligation is to keep emitting a projection whose shape matches the contract above, with a correct monotonic `generation`.
 
