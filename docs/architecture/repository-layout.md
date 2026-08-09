@@ -5,9 +5,10 @@ repositories sit side by side on disk as `LearnStack/` and `LearnStack-Hub/`, wi
 exact capitalisations; cross-repo links from this file are written
 `../../../LearnStack/...`.
 
-This tree describes what is on `main`. `backend/src/Modules/` is still empty of module
-subdirectories: the P02c-1 branch that fills it exists but is
-[frozen](../roadmap/p02c-1-hub-domain-core.md) by owner decision.
+This tree describes what is on `main`. `backend/src/Modules/` carries the four
+[P02c-1](../roadmap/p02c-1-hub-domain-core.md) modules — `TenantLifecycle`, `Plans`,
+`Subscriptions`, `Entitlements` — merged 2026-08-09. The remaining seven land in later
+packets, which are frozen from P02c-2 onward.
 
 ```
 LearnStack-Hub/
@@ -25,7 +26,7 @@ LearnStack-Hub/
 │   │   │   ├── LearnStack.Hub.Infrastructure/       # EF Core DbContexts, provider adapters, LearnStackApiClient
 │   │   │   ├── LearnStack.Hub.Infrastructure.Audit/ # Hub operator audit pipeline
 │   │   │   └── LearnStack.Hub.Api/                  # ASP.NET Core host
-│   │   └── Modules/                                 # Hub modules — DIRECTORY EXISTS, contents PLANNED (see below)
+│   │   └── Modules/                                 # 4 modules on main (P02c-1); 7 planned (see below)
 │   │       └── README.md                            # only file on disk today; describes planned topology
 │   └── tests/
 │       ├── LearnStack.Hub.Tests.Unit/               # domain + application unit tests (SmokeTests.cs)
@@ -110,9 +111,9 @@ LearnStack-Hub/
 | `docs/operations/` | `README.md`                                                                                                                | Runbooks land with the first non-dev deployment. |
 | `docs/glossary.md` | single file                                                                                                                | Hub-specific terms.                          |
 
-## Planned module topology (NOT YET ON DISK)
+## Module topology (four on disk, seven planned)
 
-`backend/src/Modules/` contains only its own `README.md` on `main`. The 11 modules below land across the remaining Hub packets. The four P02c-1 modules have written specifications under `docs/modules/` but no code on `main` — the branch that carries them is [frozen](../roadmap/p02c-1-hub-domain-core.md).
+The four [P02c-1](../roadmap/p02c-1-hub-domain-core.md) modules — `TenantLifecycle`, `Plans`, `Subscriptions`, `Entitlements` — **are on `main`** as of 2026-08-09, with their specifications under `docs/modules/`. The seven below them are not yet on disk and land across the remaining Hub packets, which are frozen from P02c-2 onward.
 
 | Module subdirectory under `backend/src/Modules/` | Lands in                                     | Aggregates                                      |
 | ------------------------------------------------ | -------------------------------------------- | ----------------------------------------------- |
