@@ -86,7 +86,8 @@ Both repositories block each other in places. Neither table is a wish list — e
 | P02c-3     | [P02a-6 Tenancy schema](../../../LearnStack/docs/roadmap/phase-02a-kernel-tenancy.md)         | `platform_entitlement_cache`, `platform_host_to_tenant` and `outbox_messages` tables                                     |
 | P02c-3     | [P02a-7 Resolution + isolation](../../../LearnStack/docs/roadmap/phase-02a-kernel-tenancy.md) | `IHostToTenantResolver`, `TenantResolverMiddleware`, and the `HubCorrelationMiddleware` seam that populates `ITenantContext` on `/api/internal/*` |
 | P02c-3     | [P02a-9 Audit + entitlement socket](../../../LearnStack/docs/roadmap/phase-02a-kernel-tenancy.md) | The `IEntitlementProvider` socket with `NullEntitlementProvider` as its only implementation                            |
-| P02c-5     | [Phase 11 custom-domain TLS](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md) | The LearnStack-side host-mapping handler and secret-store replication path; TLS automation is demand-gated there per [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md) |
+| P02c-5     | [LearnStack Phase 02c](../../../LearnStack/docs/roadmap/phase-02c-hub-foundation.md) | The LearnStack-side `host-mappings` handler and its `platform_host_to_tenant` mirroring — the paired half of this packet, merged in the same session |
+| P02c-5     | [LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md) | The LearnStack **edge** half only: certificate installation at the gateway, demand-gated per [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md). P02c-5 does **not** wait on it — host resolution works from the `platform_host_to_tenant` row alone |
 
 P02c-0, P02c-1, P02c-2, P02c-4 and P02c-6 are **unblocked by LearnStack** — they touch no LearnStack code and can proceed whenever the Hub track resumes.
 
@@ -99,7 +100,7 @@ P02c-0, P02c-1, P02c-2, P02c-4 and P02c-6 are **unblocked by LearnStack** — th
 | `IUsageReporter` (Phase 02c)                                     | P02c-2     | Needs `POST /api/v1/usage/report` live, with its idempotency semantics fixed Hub-side.                                                  |
 | LearnStack `/api/internal/*` handlers (Phase 02c)                | P02c-2     | The Hub PR carries the canonical request / response shapes and the mTLS + JWT + HMAC chain the handlers validate against.               |
 | `NullEntitlementProvider_NotRegistered_OutsideDevelopment`       | P02c-3     | The rule is vacuous until a second `IEntitlementProvider` implementation exists.                                                        |
-| `platform_host_to_tenant` mirror handler (Phase 11)              | P02c-5     | The Hub is the certificate issuer and authors the `PUT /api/internal/tenants/{id}/host-mappings` payload shape.                         |
+| `platform_host_to_tenant` mirror handler (Phase 02c)            | P02c-5     | The Hub is the certificate issuer and authors the `PUT /api/internal/tenants/{id}/host-mappings` payload shape.                         |
 | `SignedLicenseKeyEntitlementProvider` skeleton (Phase 11)        | P02c-6     | Needs the `.lic` format, the claim set, and the public key the Self-Hosted instance ships with.                                         |
 
 ### Coordination protocol
