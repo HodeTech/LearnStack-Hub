@@ -102,6 +102,6 @@ Body structure: **Purpose**, **When to use** / **When not to use**, **Inputs**, 
 
 ## What skills are not
 
-- **Not duplicates of standards.** A skill is a _workflow_. LearnStack's [Standards corpus](https://github.com/cemililik/LearnStack/blob/main/docs/standards/) is the authority; skills cite it.
+- **Not duplicates of standards.** A skill is a _workflow_. LearnStack's [Standards corpus](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/) is the authority; skills cite it.
 - **Not decisions.** Decisions live in ADRs (LearnStack `../LearnStack/docs/decisions/` for cross-cutting; this repo's `docs/decisions/` for `HUB-NNNN`).
 - **Not scratch space.** Exploratory notes go in `docs/analysis/` (gitignored).

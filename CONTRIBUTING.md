@@ -1,6 +1,6 @@
 # Contributing to LearnStack Hub
 
-LearnStack Hub follows the same engineering rigour as [LearnStack core](https://github.com/cemililik/LearnStack/blob/main/). Most engineering standards are defined once in LearnStack's [Standards corpus](https://github.com/cemililik/LearnStack/blob/main/docs/standards/) and apply here by reference.
+LearnStack Hub follows the same engineering rigour as [LearnStack core](https://github.com/HodeTech/LearnStack/blob/main/). Most engineering standards are defined once in LearnStack's [Standards corpus](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/) and apply here by reference.
 
 ## Branch protection
 
@@ -23,7 +23,7 @@ Required status checks on `main`:
   - `hub-domain` — Hub domain model
   - `hub-infra` — Hub infrastructure (compose, APISIX, Dapr, Vault)
   - `hub-docs` — Hub documentation
-- AI co-author trailer (per [LearnStack AGENTS.md § Trailers](https://github.com/cemililik/LearnStack/blob/main/AGENTS.md)):
+- AI co-author trailer (per [LearnStack AGENTS.md § Trailers](https://github.com/HodeTech/LearnStack/blob/main/AGENTS.md)):
   - Claude Code: `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
   - Codex: `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
 
@@ -47,7 +47,7 @@ When a packet changes both `learnstack` and `learnstack-hub` (e.g. P02c-3 lands 
 2. Open the LearnStack-side PR referencing the Hub PR's commit hash.
 3. Merge both in the same session — either-side merge alone leaves the contract dangling.
 
-Adding or changing a cross-repo contract endpoint requires a **new ADR in `../LearnStack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](https://github.com/cemililik/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md).
+Adding or changing a cross-repo contract endpoint requires a **new ADR in `../LearnStack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md).
 
 ## Pre-commit hook
 

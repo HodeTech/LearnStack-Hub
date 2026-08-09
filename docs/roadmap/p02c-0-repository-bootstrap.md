@@ -6,7 +6,7 @@
 
 Stand up the `learnstack-hub` repository as a second, independently buildable codebase that a LearnStack developer can be productive in on the first day — same directory shape, same solution layout, same CI gates, same commit conventions — before any Hub domain code exists.
 
-This is the packet that makes [ADR-0019](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md)'s "separate repository" decision real. Everything it fixes is cheap to fix now and expensive later: the project graph, the schema and database names, the dev-stack port allocations that must not collide with LearnStack's, and the CI gates that every subsequent commit is measured against.
+This is the packet that makes [ADR-0019](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md)'s "separate repository" decision real. Everything it fixes is cheap to fix now and expensive later: the project graph, the schema and database names, the dev-stack port allocations that must not collide with LearnStack's, and the CI gates that every subsequent commit is measured against.
 
 It deliberately ships **zero** domain code. A bootstrap that also carries aggregates cannot be reviewed as a bootstrap.
 
@@ -30,7 +30,7 @@ The full layout is documented in [repository-layout.md](../architecture/reposito
 
 - `infra/compose/dev.yml` plus an `e2e.yml` ephemeral overlay running only the Hub-specific services: Dapr placement + sidecar, APISIX, and the `learnstack_hub` database init. Postgres, Valkey, Vault, Kafka, Keycloak and Mailpit are shared with LearnStack core's stack over `host.docker.internal`.
 - Every Hub port is offset from LearnStack core's so both stacks run side by side: APISIX 9180 / 9543 / 9191, Dapr placement 50006, Dapr sidecar 3501 / 50002, API 5181.
-- `infra/keycloak/README.md` documents the shared-instance, two-realm topology per [ADR-0004 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md).
+- `infra/keycloak/README.md` documents the shared-instance, two-realm topology per [ADR-0004 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md).
 
 ### Developer experience and CI
 
@@ -51,7 +51,7 @@ Three tests land as structural placeholders that become real when module assembl
 
 ## Deliverables
 
-- Sibling `learnstack-hub` git repository (GitHub: `cemililik/LearnStack-Hub`), initialised and pushed.
+- Sibling `learnstack-hub` git repository (GitHub: `HodeTech/LearnStack-Hub`), initialised and pushed.
 - Top-level config: `.gitignore`, `.editorconfig`, `.gitattributes`, `.env.example`, `.leakwatch.yaml`, `.leakwatchignore`.
 - Top-level docs: `README.md`, `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`.
 - `Makefile` + `.githooks/pre-commit` (executable; activated by `make hooks`).

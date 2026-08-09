@@ -2,7 +2,7 @@
 
 `LearnStack.Hub.Modules.Subscriptions` owns the **per-tenant binding to a plan** and the subscription lifecycle state machine. It is the second input (alongside `Plan`) to the entitlement projection.
 
-Authoritative sources: [ADR-0019 § Hub data model](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md), [Architecture 24 § 2 ERD + § 5 plan-upgrade sequence](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md), [ADR-0020 Triple Deployment + Hybrid License](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md).
+Authoritative sources: [ADR-0019 § Hub data model](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md), [Architecture 24 § 2 ERD + § 5 plan-upgrade sequence](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md), [ADR-0020 Triple Deployment + Hybrid License](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md).
 
 ## Aggregate: `HubSubscription`
 
@@ -53,7 +53,7 @@ P02c-1 implements the transitions that don't require a payment provider:
 
 ## Relationship to tenant creation
 
-When `CreateTenantCommand` (TenantLifecycle) runs, it creates the initial `HubSubscription` in `Trial` bound to the chosen plan, then triggers the first entitlement recompute (generation = 1). In P02c-1 there's no payment step — the trial is created directly. The Stripe/Iyzico checkout that precedes this in production ([Architecture 24 § 5 provisioning sequence](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)) is Phase 09b.
+When `CreateTenantCommand` (TenantLifecycle) runs, it creates the initial `HubSubscription` in `Trial` bound to the chosen plan, then triggers the first entitlement recompute (generation = 1). In P02c-1 there's no payment step — the trial is created directly. The Stripe/Iyzico checkout that precedes this in production ([Architecture 24 § 5 provisioning sequence](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)) is Phase 09b.
 
 ## Commands + queries (P02c-1)
 

@@ -24,13 +24,13 @@ Hub is the **authoring** side of entitlements: operators build plans whose `feat
 
 - Reading a flag at runtime → that's LearnStack core's `IFeatureFlags.IsEnabledAsync`, not Hub. Hub never _reads_ entitlements for gating; it _authors_ them.
 - Per-request toggling → forbidden; entitlements are plan-projected.
-- A domain-flavoured key (`english.placement`, `yoga.asana`) → forbidden; keys are generic platform capabilities ([ADR-0021](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)).
+- A domain-flavoured key (`english.placement`, `yoga.asana`) → forbidden; keys are generic platform capabilities ([ADR-0021](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)).
 
 ## Workflow
 
 ### Step 1 — Confirm shape + naming
 
-Per [ADR-0021 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md) + [entitlement-projection.md § key-shape rules](../../../docs/architecture/entitlement-projection.md):
+Per [ADR-0021 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md) + [entitlement-projection.md § key-shape rules](../../../docs/architecture/entitlement-projection.md):
 
 - `FeatureKey` value: dotted snake_case, **no `.enabled` suffix** (every feature is implicitly boolean). e.g. `classroom.recording`, `tenancy.custom_domain`, `identity.sso.saml`.
 - `LimitKey` value: `limits.` prefix. e.g. `limits.max_users`. `-1` = unlimited, `0` = unavailable.

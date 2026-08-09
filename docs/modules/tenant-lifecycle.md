@@ -2,7 +2,7 @@
 
 `LearnStack.Hub.Modules.TenantLifecycle` owns the Hub-side mirror of LearnStack's `Tenant` aggregate. It is the root of the Hub domain graph: every subscription, entitlement, custom domain, compliance policy, and usage aggregate hangs off a `LearnStackTenant`.
 
-Authoritative sources: [ADR-0019 § Hub data model](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md), [Architecture 24 § 2 ERD](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md).
+Authoritative sources: [ADR-0019 § Hub data model](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md), [Architecture 24 § 2 ERD](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md).
 
 ## Aggregate: `LearnStackTenant`
 

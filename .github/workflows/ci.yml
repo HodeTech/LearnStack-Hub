@@ -200,7 +200,7 @@ jobs:
                   esac
                   # There is deliberately NO exemption for cross-repo links.
                   # Hub docs link into LearnStack core by absolute URL
-                  # (https://github.com/cemililik/LearnStack/blob/main/...),
+                  # (https://github.com/HodeTech/LearnStack/blob/main/...),
                   # which the external-URL skip above already covers. A
                   # sibling-relative `../LearnStack/...` link is a defect: it
                   # 404s on github.com and depends on a local checkout that is

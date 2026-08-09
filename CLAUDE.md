@@ -4,7 +4,7 @@ This file is read first by Claude Code (and any other agent following the conven
 
 ## What this is
 
-**LearnStack Hub** is the control plane companion to [LearnStack core](https://github.com/cemililik/LearnStack/blob/main/) — a separate codebase that owns tenant lifecycle, subscription / plan / billing, license issuance, entitlement projection, custom-domain administration, compliance caps, and the operator portal. The two repos communicate over an internal HTTPS surface carrying mTLS + signed JWT + HMAC body signature on every call. See [ADR-0019](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) and [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
+**LearnStack Hub** is the control plane companion to [LearnStack core](https://github.com/HodeTech/LearnStack/blob/main/) — a separate codebase that owns tenant lifecycle, subscription / plan / billing, license issuance, entitlement projection, custom-domain administration, compliance caps, and the operator portal. The two repos communicate over an internal HTTPS surface carrying mTLS + signed JWT + HMAC body signature on every call. See [ADR-0019](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) and [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
 
 Hub **never** stores tenant content. Hub holds tenant _metadata_ (plan, subscription, license, custom domain, compliance caps); tenant _data_ (courses, lessons, learners, enrollments, classroom sessions) lives exclusively inside LearnStack core. This separation is enforced by the `Hub_NeverStores_TenantData` architecture test.
 
@@ -12,18 +12,18 @@ Hub **never** stores tenant content. Hub holds tenant _metadata_ (plan, subscrip
 
 **P02c-0 (Repository bootstrap)** ✅ — solution scaffold, frontend monorepo, compose stack, CI, and the docs skeleton are in place. No Hub domain code is on `main`.
 
-**P02c-1 is frozen by owner decision (2026-08-08).** The branch `feat/phase-02c-packet-1-hub-domain-core` exists and carries the Hub domain core, but it is not merged. It was written against the pre-restructure corpus, and three decisions have moved underneath it: [ADR-0033](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md) (audit durability), [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) (the real endpoint set, plus host-mapping and TLS key delivery), and [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) (which makes the Hub a demand-gated integration rather than a Phase-02a prerequisite).
+**P02c-1 is frozen by owner decision (2026-08-08).** The branch `feat/phase-02c-packet-1-hub-domain-core` exists and carries the Hub domain core, but it is not merged. It was written against the pre-restructure corpus, and three decisions have moved underneath it: [ADR-0033](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md) (audit durability), [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) (the real endpoint set, plus host-mapping and TLS key delivery), and [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) (which makes the Hub a demand-gated integration rather than a Phase-02a prerequisite).
 
 **It unfreezes when both hold:**
 
-1. The [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) trigger for `IEntitlementProvider` fires — **a tenant must be billed or plan-gated**. Until then LearnStack runs on `NullEntitlementProvider` and needs nothing from the Hub.
+1. The [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) trigger for `IEntitlementProvider` fires — **a tenant must be billed or plan-gated**. Until then LearnStack runs on `NullEntitlementProvider` and needs nothing from the Hub.
 2. The branch is reconciled with ADR-0033 and ADR-0034 — the endpoint set, the `host-mappings` path, the entitlement read path, and the audit model.
 
 Until then, work in this repo is documentation and planning only. Merging Hub domain code against a superseded contract would put the cross-repo snapshot tests out of step in both directions.
 
 ## Roadmap
 
-**This repository owns the Hub plan.** [`docs/roadmap/`](docs/roadmap/README.md) holds a document per packet — Goal, Scope, Deliverables, Completion Criteria, Risks, Phase Exit Decision — not a status mirror of a LearnStack file. LearnStack's [phase-02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) covers only LearnStack's side of the boundary and points here for the rest.
+**This repository owns the Hub plan.** [`docs/roadmap/`](docs/roadmap/README.md) holds a document per packet — Goal, Scope, Deliverables, Completion Criteria, Risks, Phase Exit Decision — not a status mirror of a LearnStack file. LearnStack's [phase-02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) covers only LearnStack's side of the boundary and points here for the rest.
 
 | Packet | Document | State |
 | ------ | -------- | ----- |
@@ -45,10 +45,10 @@ The `P02c-N` identifiers are load-bearing across both repositories (branch names
 For any task in this repo, read in this order:
 
 1. [README.md](README.md) — direction at a glance.
-2. [ADR-0019 LearnStack Hub](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) — why the Hub is a separate repository.
-3. [ADR-0034 Hub Contract Surface Invariant](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) — the two invariants and the real endpoint set.
-4. [Architecture 24 LearnStack Hub](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md) — the deep dive.
-5. [Standards 20 § Hub HTTPS Contract Surface](https://github.com/cemililik/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md) — the rule as written for reviewers.
+2. [ADR-0019 LearnStack Hub](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) — why the Hub is a separate repository.
+3. [ADR-0034 Hub Contract Surface Invariant](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) — the two invariants and the real endpoint set.
+4. [Architecture 24 LearnStack Hub](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md) — the deep dive.
+5. [Standards 20 § Hub HTTPS Contract Surface](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md) — the rule as written for reviewers.
 6. [docs/roadmap/README.md](docs/roadmap/README.md) — the Hub plan, owned here.
 7. [docs/architecture/contract-with-learnstack.md](docs/architecture/contract-with-learnstack.md) — pointers to LearnStack-side authority.
 8. [docs/glossary.md](docs/glossary.md) — Hub-specific terms.
@@ -61,19 +61,19 @@ Then pick an entry-point skill from **this repo's** catalogue at [`.claude/skill
 
 These rules are **non-negotiable** for any change in this repo:
 
-- **No tenant content tables.** Hub schema must NOT contain `course`, `lesson`, `user` (tenant users — operator users are separate), `enrollment`, `live_session`, `lesson_item`, `media_asset`, or any tenant data table. Architecture test `Hub_NeverStores_TenantData` enforces. This is invariant 1 of [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
+- **No tenant content tables.** Hub schema must NOT contain `course`, `lesson`, `user` (tenant users — operator users are separate), `enrollment`, `live_session`, `lesson_item`, `media_asset`, or any tenant data table. Architecture test `Hub_NeverStores_TenantData` enforces. This is invariant 1 of [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
 - **No imports from LearnStack core internals.** Hub modules may reference **only** LearnStack `Application.Contracts` DTOs (and even those are kept as local copies in this repo until a shared NuGet package is introduced — Phase 11). LearnStack `Domain` / `Infrastructure` / `Modules.*` types are off-limits. Architecture test `Hub_Modules_DoNotReference_LearnStack_Internals` enforces.
-- **The contract surface is governed by two invariants, not by a count** ([ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)). The old "closed at four endpoints" rule was never true — the corpus enumerated six paths while claiming four, and protecting the number is what pushed TLS private keys into the entitlement payload. The rules that replace it:
+- **The contract surface is governed by two invariants, not by a count** ([ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)). The old "closed at four endpoints" rule was never true — the corpus enumerated six paths while claiming four, and protecting the number is what pushed TLS private keys into the entitlement payload. The rules that replace it:
   1. **The Hub stores no tenant content.**
   2. **Every LearnStack↔Hub crossing goes through a named adapter** — `IEntitlementProvider`, `IUsageReporter`, `IHubTenantSync`. No other type may hold a Hub client, and nothing resolves a host by calling the Hub.
 
   Adding an endpoint still requires a new ADR filed in `../LearnStack/docs/decisions/`, not here — the surface is a cross-repository contract and both repositories have to agree. ADR-0034 carries the authoritative endpoint table.
-- **TLS certificates and private keys never travel in the entitlement payload.** Host mappings go through `PUT /api/internal/tenants/{id}/host-mappings`; cert material moves between the Hub-owned and LearnStack-owned secret stores by secret-store replication and is referenced from the host-mapping payload **by path, never by value**. [ADR-0022 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)'s step 3 is superseded by [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
+- **TLS certificates and private keys never travel in the entitlement payload.** Host mappings go through `PUT /api/internal/tenants/{id}/host-mappings`; cert material moves between the Hub-owned and LearnStack-owned secret stores by secret-store replication and is referenced from the host-mapping payload **by path, never by value**. [ADR-0022 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)'s step 3 is superseded by [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
 - **`/api/internal/*` endpoints are NOT internet-exposed.** They are bound to an internal listener (or a dedicated APISIX route guarded by mTLS SSL-object). Architecture test `Internal_API_Endpoints_AreNot_Public` enforces.
-- **Hub never writes to LearnStack's K8s state.** Cert + route propagation flows through published events and the internal-API pushes. Hub never holds Kubernetes credentials on LearnStack's cluster — the guarantee [ADR-0022 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md) exists to protect, and the one part of it ADR-0034 leaves unchanged.
+- **Hub never writes to LearnStack's K8s state.** Cert + route propagation flows through published events and the internal-API pushes. Hub never holds Kubernetes credentials on LearnStack's cluster — the guarantee [ADR-0022 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md) exists to protect, and the one part of it ADR-0034 leaves unchanged.
 - **Two-realm Keycloak boundary.** Hub authenticates against the `learnstack-hub` realm only. The `learnstack` realm is rejected on Hub endpoints; the `learnstack-hub` realm is rejected on LearnStack tenant-facing endpoints.
 - **Modular monolith.** Hub follows the same module boundary rules as LearnStack — no cross-module Domain dependencies; cross-module communication through Application.Contracts or integration events.
-- **English documentation.** All docs in English per [ADR-0007](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0007-documentation-language-and-conventions.md).
+- **English documentation.** All docs in English per [ADR-0007](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0007-documentation-language-and-conventions.md).
 - **Mermaid for diagrams.** Fenced ` ```mermaid ` blocks; remain readable as text for renderers that don't support Mermaid.
 - **Single source of truth.** Cross-cutting architectural decisions live in `../LearnStack/docs/decisions/`; Hub-internal-only decisions live in `docs/decisions/` here with the `HUB-NNNN` numbering series. The **Hub roadmap** is the exception that runs the other way: it is owned here, and LearnStack links to it.
 
@@ -90,7 +90,7 @@ These rules are **non-negotiable** for any change in this repo:
 - Serve a host lookup from the Hub. `IHostToTenantResolver` on the LearnStack side reads `platform_host_to_tenant` and nothing else; a Hub outage must not take tenant public pages down.
 - Merge Hub domain code while P02c-1 is frozen. See [What state this is in](#what-state-this-is-in) for the two conditions that unfreeze it.
 - Bypass `WebhookLedger` for Stripe / Iyzico webhook processing. Idempotency unique constraint enforces.
-- Throw `DomainException` for expected business-rule violations — return `Result.Fail(business_rule_violation, ...)` instead (mirrors LearnStack [ADR-0032 § Sub-decision 4](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)).
+- Throw `DomainException` for expected business-rule violations — return `Result.Fail(business_rule_violation, ...)` instead (mirrors LearnStack [ADR-0032 § Sub-decision 4](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)).
 - Edit an Accepted ADR's decision section in either repo. Write a new ADR that supersedes it.
 - Reuse an ADR number.
 
@@ -119,6 +119,6 @@ When a packet changes both repos (e.g., P02c-3 lands the LearnStack-side interna
 2. LearnStack-side PR references the Hub-side PR's commit hash.
 3. Both PRs merge in the same session; either-side merge alone leaves the contract dangling.
 
-The wire shape is pinned by a checked-in `entitlement-v1.schema.json` and a snapshot test in **each** repository, per [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md). Both snapshots move together or the contract has drifted.
+The wire shape is pinned by a checked-in `entitlement-v1.schema.json` and a snapshot test in **each** repository, per [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md). Both snapshots move together or the contract has drifted.
 
-Cross-repo **references** to LearnStack core use absolute URLs — `https://github.com/cemililik/LearnStack/blob/main/docs/...`. Never a sibling-relative path: it 404s on github.com and depends on a local checkout. Shell commands and filesystem paths still say `../LearnStack`, and the on-disk sibling layout is `LearnStack/` and `LearnStack-Hub/` with those exact capitalisations — a lower-cased spelling works on macOS and fails on Linux.
+Cross-repo **references** to LearnStack core use absolute URLs — `https://github.com/HodeTech/LearnStack/blob/main/docs/...`. Never a sibling-relative path: it 404s on github.com and depends on a local checkout. Shell commands and filesystem paths still say `../LearnStack`, and the on-disk sibling layout is `LearnStack/` and `LearnStack-Hub/` with those exact capitalisations — a lower-cased spelling works on macOS and fails on Linux.

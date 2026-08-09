@@ -2,7 +2,7 @@
 
 This document is the design spec for the Hub modular monolith as it stands after **P02c-1 (Hub Domain Core)**. It describes the four modules that land in P02c-1, the dependency direction rules, and how cross-module communication works inside Hub. Modules that arrive in later packets (CustomDomains, Compliance, Usage, LicenseKeys, Audit, Operators, Invoicing) are listed for context but specced in their own packets.
 
-Authoritative cross-cutting sources: [ADR-0019 § Hub data model](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md), [Architecture 24 § 2 / § 7](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md), [ADR-0010 Cross-Module Communication](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0010-cross-module-communication.md).
+Authoritative cross-cutting sources: [ADR-0019 § Hub data model](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md), [Architecture 24 § 2 / § 7](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md), [ADR-0010 Cross-Module Communication](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0010-cross-module-communication.md).
 
 ## Modules in P02c-1
 
@@ -36,7 +36,7 @@ Identical rules to LearnStack core (enforced by `ModuleDependencyTests`):
 
 ## Cross-module communication
 
-Hub uses the same four mechanisms as LearnStack core ([ADR-0010](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0010-cross-module-communication.md)) — no fifth:
+Hub uses the same four mechanisms as LearnStack core ([ADR-0010](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0010-cross-module-communication.md)) — no fifth:
 
 1. **Application contract** — synchronous in-process call to another module's `Application.Contracts` interface.
 2. **Intra-module domain event** — `IDomainEvent : INotification`, dispatched in-process via MediatR inside the same transaction.
@@ -70,7 +70,7 @@ In P02c-1 the trigger is an **in-process call** from the Subscriptions / Plans h
 
 ## Database isolation model — Hub does NOT use RLS
 
-This is the load-bearing difference from LearnStack core. LearnStack core enforces tenant isolation with PostgreSQL Row-Level Security ([Standards 05 § Tenant-Owned Tables](https://github.com/cemililik/LearnStack/blob/main/docs/standards/05-database.md)) because tenant users must never see another tenant's data. **Hub has no such requirement** — Hub operators act _across_ all tenants by design (that is the entire point of a control plane). Therefore:
+This is the load-bearing difference from LearnStack core. LearnStack core enforces tenant isolation with PostgreSQL Row-Level Security ([Standards 05 § Tenant-Owned Tables](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/05-database.md)) because tenant users must never see another tenant's data. **Hub has no such requirement** — Hub operators act _across_ all tenants by design (that is the entire point of a control plane). Therefore:
 
 - Hub tables carry a `tenant_id` **foreign-key / reference column** where they relate to a tenant, but it is an ordinary FK, **not** an RLS-policy boundary.
 - Hub tables do **not** get `ENABLE ROW LEVEL SECURITY`, do **not** get `*_tenant_isolation` policies, do **not** get EF global query filters keyed on a tenant context.
@@ -81,9 +81,9 @@ Hub's isolation guarantee is a different one: **Hub never stores tenant content*
 ## Schema + database
 
 - **Database:** `learnstack_hub` (separate database; in dev it lives in the shared Postgres instance per `infra/postgres/init/01-create-hub-database.sql`; in production it is a separate Postgres instance).
-- **Schema:** `hub` (per [Architecture 24 intro](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)). Every module's DbContext sets `modelBuilder.HasDefaultSchema("hub")`. Tables therefore live at `learnstack_hub.hub.<table>`.
-- **Naming:** `snake_case` plural tables, `snake_case` columns, `id` PK (`uuid`), `<entity>_id` FKs, `ix_`/`ux_` index prefixes — same conventions as [Standards 05 § Naming](https://github.com/cemililik/LearnStack/blob/main/docs/standards/05-database.md), minus the RLS-policy / org-isolation rows that don't apply to Hub.
-- **One DbContext per module** ([Standards 05 § Database](https://github.com/cemililik/LearnStack/blob/main/docs/standards/05-database.md)). Migrations live with the owning module.
+- **Schema:** `hub` (per [Architecture 24 intro](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)). Every module's DbContext sets `modelBuilder.HasDefaultSchema("hub")`. Tables therefore live at `learnstack_hub.hub.<table>`.
+- **Naming:** `snake_case` plural tables, `snake_case` columns, `id` PK (`uuid`), `<entity>_id` FKs, `ix_`/`ux_` index prefixes — same conventions as [Standards 05 § Naming](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/05-database.md), minus the RLS-policy / org-isolation rows that don't apply to Hub.
+- **One DbContext per module** ([Standards 05 § Database](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/05-database.md)). Migrations live with the owning module.
 - **Audit columns:** Hub aggregates that inherit `AuditableEntity<TId>` carry `created_at` / `created_by` / `updated_at` / `updated_by` / `deleted_at` / `deleted_by` / `version` where `*_by` is an `OperatorId` (NOT a tenant `UserId` — see [cross-cutting-foundation.md § OperatorId](cross-cutting-foundation.md)).
 
 ## Module registration

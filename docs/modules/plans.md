@@ -2,7 +2,7 @@
 
 `LearnStack.Hub.Modules.Plans` owns the **plan catalogue** — the set of plans operators author, each carrying the feature toggles, numeric limits, and (later) compliance defaults that a subscription projects into a tenant's entitlement.
 
-Authoritative sources: [ADR-0021 Feature-Based Entitlement](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md) (+ Amendment 1), [Architecture 24 § 2 ERD + § 8 plan tiers](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md).
+Authoritative sources: [ADR-0021 Feature-Based Entitlement](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md) (+ Amendment 1), [Architecture 24 § 2 ERD + § 8 plan tiers](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md).
 
 ## Aggregate: `Plan`
 
@@ -26,7 +26,7 @@ Strongly-typed id: `PlanId` — `[ValueObject<Guid>(LearnStackHubVogenDefaults.I
 
 ## Feature / Limit key registries
 
-Hub mirrors LearnStack core's typed `FeatureKey` / `LimitKey` value objects ([ADR-0021 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)):
+Hub mirrors LearnStack core's typed `FeatureKey` / `LimitKey` value objects ([ADR-0021 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)):
 
 ```csharp
 public readonly record struct FeatureKey(string Value);
@@ -37,11 +37,11 @@ public readonly record struct LimitKey(string Value);
 - The `FeatureKeys` / `LimitKeys` static registries enumerate the known keys. **Hub is the authoring side** — the plan editor writes these keys into `Plan.features` / `Plan.limits`; it ships in [Hub Billing](../roadmap/hub-billing.md), not in P02c-4. The wire-format strings (snake_case dotted, no `.enabled` suffix) must match LearnStack core's registry exactly so the projection LearnStack consumes lines up.
 - A `Plan` validator checks that every key in `features` / `limits` is a known registry key — an unknown key is a `Result.Fail(validation_failed)`, not a silent accept. (This is the Hub-side analogue of LearnStack's `FeatureKey_AllReferences_AreInRegistry` architecture test; in Hub it's a runtime validator because keys arrive as data, not code references.)
 
-> **Registry sync.** Because the two repos each keep their own copy of the key registries, they can drift. P02c-1 ships the Hub registry seeded from [ADR-0021 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md) + [Architecture 24 § 4](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md). A future cross-repo reconciliation (or a shared `LearnStack.Contracts` package, Phase 11) is the durable fix. Note this in the Hub roadmap.
+> **Registry sync.** Because the two repos each keep their own copy of the key registries, they can drift. P02c-1 ships the Hub registry seeded from [ADR-0021 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md) + [Architecture 24 § 4](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md). A future cross-repo reconciliation (or a shared `LearnStack.Contracts` package, Phase 11) is the durable fix. Note this in the Hub roadmap.
 
 ## Plan-change → entitlement recompute fan-out
 
-A `Plan` definition change must recompute the entitlement of **every** subscription bound to that plan ([Architecture 24 § 4 Recompute rule](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)). In P02c-1:
+A `Plan` definition change must recompute the entitlement of **every** subscription bound to that plan ([Architecture 24 § 4 Recompute rule](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)). In P02c-1:
 
 - `UpdatePlanCommand` handler, after persisting the plan change, asks the Subscriptions module (via Application.Contracts) for all subscription tenant-ids bound to the plan, then calls the Entitlements projection service per tenant.
 - For a large fan-out this would be a background job (Hangfire) — but P02c-1 has no real tenant volume; an in-process loop is acceptable, with a TODO noting the Hangfire migration when volume warrants (Phase 09b / 11).
@@ -64,7 +64,7 @@ Validators: tier in enum, billing cycle in enum, currency ISO 4217, every featur
 
 ## Seed data (P02c-1)
 
-`scripts/seed.sh` (and/or an EF seed) provisions the four illustrative tiers from [Architecture 24 § 8](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md): Starter ($49), Growth ($199), Scale ($799), Enterprise (custom). These give P02c-1's tenant-creation flow a plan to bind to and exercise the projection. Keep them as **data**, not code constants.
+`scripts/seed.sh` (and/or an EF seed) provisions the four illustrative tiers from [Architecture 24 § 8](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md): Starter ($49), Growth ($199), Scale ($799), Enterprise (custom). These give P02c-1's tenant-creation flow a plan to bind to and exercise the projection. Keep them as **data**, not code constants.
 
 ## Audit coverage (formal matrix lands in P02c-4)
 

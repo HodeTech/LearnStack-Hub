@@ -1,6 +1,6 @@
 # LearnStack Hub
 
-The control plane application for [LearnStack](https://github.com/cemililik/LearnStack) — a separate codebase that owns tenant lifecycle, subscription / plan / billing, license issuance, entitlement projection, custom-domain administration, compliance caps, and the operator portal.
+The control plane application for [LearnStack](https://github.com/HodeTech/LearnStack) — a separate codebase that owns tenant lifecycle, subscription / plan / billing, license issuance, entitlement projection, custom-domain administration, compliance caps, and the operator portal.
 
 LearnStack Hub is **not** an LMS, **not** a tenant-facing surface, and **never** stores tenant content. Hub holds tenant _metadata_ (plan, subscription, license, custom domain, compliance caps); tenant _data_ (courses, lessons, learners, enrollments, classroom sessions) lives exclusively inside LearnStack core.
 
@@ -8,9 +8,9 @@ LearnStack Hub is **not** an LMS, **not** a tenant-facing surface, and **never**
 
 **P02c-0 — Repository bootstrap** ✅. Solution scaffold, frontend monorepo, compose stack, CI, and the docs skeleton are in place. No Hub domain code is on `main`.
 
-**P02c-1 (Hub Domain Core) is frozen by owner decision (2026-08-08).** The branch exists but is not merged: it predates [ADR-0033](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md), [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) and [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md). It unfreezes when a tenant must actually be billed or plan-gated — the ADR-0035 trigger for `IEntitlementProvider` — and the branch has been reconciled with the corrected contract. Until then LearnStack runs on `NullEntitlementProvider` and needs nothing from the Hub. See [CLAUDE.md](CLAUDE.md) and [docs/roadmap/p02c-1-hub-domain-core.md](docs/roadmap/p02c-1-hub-domain-core.md).
+**P02c-1 (Hub Domain Core) is frozen by owner decision (2026-08-08).** The branch exists but is not merged: it predates [ADR-0033](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md), [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) and [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md). It unfreezes when a tenant must actually be billed or plan-gated — the ADR-0035 trigger for `IEntitlementProvider` — and the branch has been reconciled with the corrected contract. Until then LearnStack runs on `NullEntitlementProvider` and needs nothing from the Hub. See [CLAUDE.md](CLAUDE.md) and [docs/roadmap/p02c-1-hub-domain-core.md](docs/roadmap/p02c-1-hub-domain-core.md).
 
-**The Hub plan lives in this repository.** [`docs/roadmap/`](docs/roadmap/README.md) carries a document per packet (P02c-0 … P02c-7) plus the post-02c [billing](docs/roadmap/hub-billing.md) and [marketplace](docs/roadmap/hub-marketplace.md) tracks. LearnStack's [phase-02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) covers only LearnStack's side of the boundary.
+**The Hub plan lives in this repository.** [`docs/roadmap/`](docs/roadmap/README.md) carries a document per packet (P02c-0 … P02c-7) plus the post-02c [billing](docs/roadmap/hub-billing.md) and [marketplace](docs/roadmap/hub-marketplace.md) tracks. LearnStack's [phase-02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) covers only LearnStack's side of the boundary.
 
 ```bash
 make install   # one-time: deps + git hooks
@@ -19,17 +19,17 @@ make dev       # bring Hub-side compose stack up (requires the LearnStack compos
 
 ## Why a Separate Repo
 
-LearnStack Hub ships as a **separate git repository** per [ADR-0019](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) — separate CI/CD, separate release cadence, separate Keycloak realm (`learnstack-hub` vs. `learnstack`), separate operator audit stream. The two repos communicate over an internal HTTPS surface carrying mTLS + signed JWT + HMAC body signature on every call.
+LearnStack Hub ships as a **separate git repository** per [ADR-0019](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) — separate CI/CD, separate release cadence, separate Keycloak realm (`learnstack-hub` vs. `learnstack`), separate operator audit stream. The two repos communicate over an internal HTTPS surface carrying mTLS + signed JWT + HMAC body signature on every call.
 
-The architecture deep-dive lives in the sibling repo: [docs/architecture/24-learnstack-hub.md](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md).
+The architecture deep-dive lives in the sibling repo: [docs/architecture/24-learnstack-hub.md](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md).
 
 ## Sibling Layout Expected
 
-Hub documentation **links** to LearnStack core by absolute URL (`https://github.com/cemililik/LearnStack/blob/main/docs/...`), per [Documentation Standards § Layout](https://github.com/cemililik/LearnStack/blob/main/docs/standards/13-documentation.md). A relative path does not cross a repository boundary on github.com and depends on a sibling checkout being present and identically capitalised; an absolute URL works everywhere. Shell commands and filesystem references still use `../LearnStack` — those are paths, not links — so the expected on-disk layout still matters:
+Hub documentation **links** to LearnStack core by absolute URL (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`), per [Documentation Standards § Layout](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/13-documentation.md). A relative path does not cross a repository boundary on github.com and depends on a sibling checkout being present and identically capitalised; an absolute URL works everywhere. Shell commands and filesystem references still use `../LearnStack` — those are paths, not links — so the expected on-disk layout still matters:
 
 ```
 <parent-dir>/
-├── LearnStack/        (https://github.com/cemililik/LearnStack)
+├── LearnStack/        (https://github.com/HodeTech/LearnStack)
 └── LearnStack-Hub/    (this repo)
 ```
 
@@ -75,7 +75,7 @@ In production, the two repos deploy independently — the shared compose is a de
 
 ## Contract Surface
 
-Governed by two invariants rather than by a count, per [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md):
+Governed by two invariants rather than by a count, per [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md):
 
 1. **The Hub stores no tenant content** — enforced by `Hub_NeverStores_TenantData`.
 2. **Every LearnStack↔Hub crossing goes through a named adapter** — `IEntitlementProvider`, `IUsageReporter`, `IHubTenantSync`. Nothing else holds a Hub client, and nothing resolves a host by calling the Hub.
@@ -121,21 +121,21 @@ TLS certificates and private keys never travel in the entitlement payload. Host 
 
 ### Authoritative cross-cutting (LearnStack core)
 
-- [ADR-0019 LearnStack Hub](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md)
-- [ADR-0020 Triple Deployment + Hybrid License](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)
-- [ADR-0021 Feature-Based Entitlement](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)
-- [ADR-0022 Custom Domain + TLS](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md) (Amendment 1; its cert-delivery step is superseded by ADR-0034)
-- [ADR-0004 Authentication Strategy](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md) (Amendment 1 — `learnstack-hub` realm)
-- [ADR-0034 Hub Contract Surface Invariant](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) — the two invariants and the authoritative endpoint table
-- [ADR-0035 Demand-Gated Infrastructure](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) — why the Hub track waits on a trigger rather than a date
-- [Architecture 24 LearnStack Hub](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)
-- [Standards 20 Infrastructure Stack](https://github.com/cemililik/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md)
-- [Phase 02c — LearnStack side](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md)
+- [ADR-0019 LearnStack Hub](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md)
+- [ADR-0020 Triple Deployment + Hybrid License](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)
+- [ADR-0021 Feature-Based Entitlement](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)
+- [ADR-0022 Custom Domain + TLS](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md) (Amendment 1; its cert-delivery step is superseded by ADR-0034)
+- [ADR-0004 Authentication Strategy](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md) (Amendment 1 — `learnstack-hub` realm)
+- [ADR-0034 Hub Contract Surface Invariant](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) — the two invariants and the authoritative endpoint table
+- [ADR-0035 Demand-Gated Infrastructure](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) — why the Hub track waits on a trigger rather than a date
+- [Architecture 24 LearnStack Hub](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)
+- [Standards 20 Infrastructure Stack](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md)
+- [Phase 02c — LearnStack side](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md)
 
 ## Conventions
 
-- All documentation in **English** (mirrors [ADR-0007](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0007-documentation-language-and-conventions.md)).
+- All documentation in **English** (mirrors [ADR-0007](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0007-documentation-language-and-conventions.md)).
 - Diagrams use **Mermaid** in fenced code blocks.
 - Cross-cutting architectural decisions live in **LearnStack core** under `../LearnStack/docs/decisions/`; Hub-internal-only decisions live here under `docs/decisions/` with the `HUB-NNNN` numbering series so they never collide with LearnStack ADR numbers. The Hub **roadmap** runs the other way — it is owned here, and LearnStack links to it.
-- Engineering rules from LearnStack's [Standards corpus](https://github.com/cemililik/LearnStack/blob/main/docs/standards/) apply here unless explicitly overridden by a Hub-internal ADR.
+- Engineering rules from LearnStack's [Standards corpus](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/) apply here unless explicitly overridden by a Hub-internal ADR.
 - Single source of truth: each piece of knowledge lives in exactly one place. Linking is preferred over copying.

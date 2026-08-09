@@ -15,7 +15,7 @@ description: >
 
 ## Purpose
 
-Stand up a new Hub modular-monolith module that complies with the dependency-direction rules from day one: four packages, the right references, a registration extension, a DbContext in the `hub` schema (no RLS), and architecture-test coverage. Mirrors LearnStack's [add-backend-module](https://github.com/cemililik/LearnStack/blob/main/.claude/skills/add-backend-module/SKILL.md) minus the tenant-isolation layer.
+Stand up a new Hub modular-monolith module that complies with the dependency-direction rules from day one: four packages, the right references, a registration extension, a DbContext in the `hub` schema (no RLS), and architecture-test coverage. Mirrors LearnStack's [add-backend-module](https://github.com/HodeTech/LearnStack/blob/main/.claude/skills/add-backend-module/SKILL.md) minus the tenant-isolation layer.
 
 ## When to use
 

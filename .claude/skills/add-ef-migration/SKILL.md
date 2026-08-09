@@ -12,7 +12,7 @@ description: >
 
 ## Purpose
 
-Produce a migration that follows Hub's database conventions: `hub` schema, snake_case, the right index/constraint naming, JSONB for dictionaries, **no RLS** (the load-bearing difference from LearnStack's migrations) and the forward-only / two-step destructive rules from [Standards 05](https://github.com/cemililik/LearnStack/blob/main/docs/standards/05-database.md).
+Produce a migration that follows Hub's database conventions: `hub` schema, snake_case, the right index/constraint naming, JSONB for dictionaries, **no RLS** (the load-bearing difference from LearnStack's migrations) and the forward-only / two-step destructive rules from [Standards 05](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/05-database.md).
 
 ## When to use
 

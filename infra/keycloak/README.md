@@ -6,7 +6,7 @@ Hub does **not** run its own Keycloak instance. The `learnstack-hub` realm is im
 ../LearnStack/infra/keycloak/realms/learnstack-hub.json
 ```
 
-This shared-instance + two-realm topology is the dev-time convenience documented in [ADR-0004 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md):
+This shared-instance + two-realm topology is the dev-time convenience documented in [ADR-0004 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md):
 
 - **`learnstack` realm** — tenant users (admins, instructors, learners). Lives in `../LearnStack/infra/keycloak/realms/learnstack.json`.
 - **`learnstack-hub` realm** — LearnStack operators. Lives in `../LearnStack/infra/keycloak/realms/learnstack-hub.json`. MFA (TOTP) required for every operator account.

@@ -1,6 +1,6 @@
 # Hub cross-cutting foundation
 
-This document specs the Hub-side cross-cutting foundation that lands in **P02c-1**. It mirrors LearnStack core's Phase 02a Packet 3 ([ADR-0032](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)) — same shapes, Hub-adjusted where Hub's operator-scoped (not tenant-scoped) model demands it.
+This document specs the Hub-side cross-cutting foundation that lands in **P02c-1**. It mirrors LearnStack core's Phase 02a Packet 3 ([ADR-0032](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)) — same shapes, Hub-adjusted where Hub's operator-scoped (not tenant-scoped) model demands it.
 
 The intent: when domain code starts landing in Hub modules, it programs against the _same_ `Result<T>` / MediatR-pipeline / exception-handling / observability surface a LearnStack core developer already knows. Patterns are copied, not invented.
 
@@ -44,7 +44,7 @@ This is the load-bearing Hub adjustment. LearnStack core's `AuditableEntity<TId>
 
 ## 2. MediatR pipeline — Hub's behavior set
 
-LearnStack core registers **seven** pipeline behaviors: Validation → Logging → AuditLog → TenantContext → Authorization → Transaction → OutboxFlush, then the Handler. [ADR-0032 § Sub-decision 2](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md) writes that as an eight-step list because it counts the Handler; this document counts behaviors, so the numbers below are behavior counts throughout.
+LearnStack core registers **seven** pipeline behaviors: Validation → Logging → AuditLog → TenantContext → Authorization → Transaction → OutboxFlush, then the Handler. [ADR-0032 § Sub-decision 2](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md) writes that as an eight-step list because it counts the Handler; this document counts behaviors, so the numbers below are behavior counts throughout.
 
 Hub registers **six**. The one behavior that drops out is a tenant-isolation concern Hub does not have:
 
@@ -69,7 +69,7 @@ The `MediatR_Pipeline_Order_Matches_Canonical_Sequence` architecture test (if mi
 - **L1 handler:** `HubExceptionHandler : IExceptionHandler` in `LearnStack.Hub.Api/Common/` — mirror of `LearnStackExceptionHandler`. Captures via `IErrorTrackingProvider`, reads `CapturedContext` (operator + correlation), maps to RFC 7807 Problem Details, logs through `ILogger`.
 - **`Result<T>.ToActionResult()`** in `LearnStack.Hub.Api/Common/ResultExtensions.cs` — explicit at every controller endpoint (no action filter). Success → `OkObjectResult`; failure → `ProblemDetailsActionResult(error)`.
 - **`ProblemDetailsFactory` + `HttpStatusMap`** — mirror of LearnStack core's. Problem-type prefix `https://errors.hub.learnstack.dev/` (Hub's own error domain).
-- **Exception hierarchy:** `HubException` (base) → `DomainException`, `InfrastructureException`, `ProviderException`. `DomainException` is reserved for programmer errors / aggregate-invariant bugs; expected business-rule violations return `Result.Fail(...)` (mirror of [ADR-0032 § Sub-decision 4](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)).
+- **Exception hierarchy:** `HubException` (base) → `DomainException`, `InfrastructureException`, `ProviderException`. `DomainException` is reserved for programmer errors / aggregate-invariant bugs; expected business-rule violations return `Result.Fail(...)` (mirror of [ADR-0032 § Sub-decision 4](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)).
 - **No `ExceptionHandlingBehavior` in the pipeline** — `AuditLogBehavior` (catch + rethrow) plus the L1 `HubExceptionHandler` cover every exception path, same as LearnStack core.
 
 ## 4. Observability

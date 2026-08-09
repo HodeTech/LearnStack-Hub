@@ -24,24 +24,24 @@ Every roadmap packet document carries the same six sections as a LearnStack phas
 
 ## Authoritative cross-cutting docs (LearnStack core, not here)
 
-Hub docs cite these by absolute URL (`https://github.com/cemililik/LearnStack/blob/main/docs/...`), per [Documentation Standards § Layout](https://github.com/cemililik/LearnStack/blob/main/docs/standards/13-documentation.md). Relative paths do not cross a repository boundary on github.com and depend on a sibling checkout being present and identically capitalised.
+Hub docs cite these by absolute URL (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`), per [Documentation Standards § Layout](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/13-documentation.md). Relative paths do not cross a repository boundary on github.com and depend on a sibling checkout being present and identically capitalised.
 
-- [ADR-0019 LearnStack Hub](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) — why the Hub is a separate repository
-- [ADR-0034 Hub Contract Surface Invariant](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) — the two invariants that replaced the "closed at four endpoints" rule, and the authoritative endpoint table
-- [ADR-0035 Demand-Gated Infrastructure](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) — why the Hub integration waits on a written trigger
-- [ADR-0033 Audit Durability Model](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md) — MUST-class audit as durable intent (supersedes ADR-0016)
-- [ADR-0020 Triple Deployment + Hybrid License](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)
-- [ADR-0021 Feature-Based Entitlement](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)
-- [ADR-0022 Custom Domain + TLS](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md) (Amendment 1; its cert-delivery step is superseded by ADR-0034)
-- [ADR-0004 Authentication Strategy](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md) (Amendment 1 — `learnstack-hub` realm)
-- [Architecture 24 LearnStack Hub](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md) — the deep dive
-- [Standards 20 Infrastructure Stack](https://github.com/cemililik/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md)
-- [Standards 21 Architecture Tests Catalogue](https://github.com/cemililik/LearnStack/blob/main/docs/standards/21-architecture-tests-catalogue.md)
-- [Phase 02c — LearnStack side](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md)
+- [ADR-0019 LearnStack Hub](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) — why the Hub is a separate repository
+- [ADR-0034 Hub Contract Surface Invariant](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) — the two invariants that replaced the "closed at four endpoints" rule, and the authoritative endpoint table
+- [ADR-0035 Demand-Gated Infrastructure](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) — why the Hub integration waits on a written trigger
+- [ADR-0033 Audit Durability Model](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md) — MUST-class audit as durable intent (supersedes ADR-0016)
+- [ADR-0020 Triple Deployment + Hybrid License](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)
+- [ADR-0021 Feature-Based Entitlement](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)
+- [ADR-0022 Custom Domain + TLS](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md) (Amendment 1; its cert-delivery step is superseded by ADR-0034)
+- [ADR-0004 Authentication Strategy](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md) (Amendment 1 — `learnstack-hub` realm)
+- [Architecture 24 LearnStack Hub](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md) — the deep dive
+- [Standards 20 Infrastructure Stack](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md)
+- [Standards 21 Architecture Tests Catalogue](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/21-architecture-tests-catalogue.md)
+- [Phase 02c — LearnStack side](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md)
 
 ## Engineering standards
 
-Hub follows LearnStack's [Standards corpus](https://github.com/cemililik/LearnStack/blob/main/docs/standards/) by reference. Hub does not maintain its own standards. If a Hub-internal-only rule emerges (for example a Stripe webhook idempotency strategy), it lands as a Hub-internal ADR (`HUB-NNNN`), not as a standards file.
+Hub follows LearnStack's [Standards corpus](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/) by reference. Hub does not maintain its own standards. If a Hub-internal-only rule emerges (for example a Stripe webhook idempotency strategy), it lands as a Hub-internal ADR (`HUB-NNNN`), not as a standards file.
 
 ## Skills
 
