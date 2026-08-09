@@ -65,25 +65,16 @@ public sealed class HubBoundaryTests
     /// name in the Hub assemblies and asserts none of the forbidden fragments
     /// appear.
     /// </summary>
-    // TODO(2026-05-21, @platform, phase-02c-1): once `LearnStack.Hub.Modules.*`
-    // assemblies exist, narrow the scan to those (and `Infrastructure.Audit`
-    // since it can hold tenant references). Today the scan walks ALL six core
-    // assemblies including test fixtures' transitive types — broader than
-    // strictly necessary. Narrowing reduces false-positive surface and makes
-    // intent clearer. Keep `User` excluded from the forbidden list per the
-    // operator-user carve-out documented above.
     [Fact]
     public void Hub_NeverStores_TenantData()
     {
-        var hubAssemblies = new[]
-        {
-            typeof(LearnStack.Hub.SharedKernel.AssemblyMarker).Assembly,
-            typeof(LearnStack.Hub.Domain.AssemblyMarker).Assembly,
-            typeof(LearnStack.Hub.Application.Contracts.AssemblyMarker).Assembly,
-            typeof(LearnStack.Hub.Application.AssemblyMarker).Assembly,
-            typeof(LearnStack.Hub.Infrastructure.AssemblyMarker).Assembly,
-            typeof(LearnStack.Hub.Infrastructure.Audit.AssemblyMarker).Assembly,
-        };
+        // Scan the four domain-module assemblies (all layers) + the operator-audit
+        // infrastructure (which can legitimately hold tenant references). These
+        // are where domain types live; keep `User` excluded per the operator-user
+        // carve-out documented above.
+        var hubAssemblies = HubAssemblies.AllModuleLayers
+            .Append(typeof(LearnStack.Hub.Infrastructure.Audit.AssemblyMarker).Assembly)
+            .ToArray();
 
         // Forbidden type-name fragments. Substring-matched against full type
         // names. See the summary above for the User-carve-out rationale.
@@ -113,5 +104,34 @@ public sealed class HubBoundaryTests
             "(in the Operators module); the tenant-vs-operator User distinction is enforced " +
             "via CLAUDE.md + reviewer discipline + the Operators module's permission model, " +
             "not via this scanner. See ADR-0019 § Hub data model.");
+    }
+
+    /// <summary>
+    /// Hub modules reference only their own code + the Hub SharedKernel — never
+    /// any LearnStack core assembly (Domain / Infrastructure / Modules.*). Hub
+    /// is a self-contained mirror; the only sanctioned coupling is local DTO
+    /// copies of LearnStack Application.Contracts (none exist yet). Trivially
+    /// green today (Hub has zero LearnStack references) but real: it scans every
+    /// module assembly for any dependency whose namespace starts with
+    /// <c>LearnStack.</c> but not <c>LearnStack.Hub.</c>.
+    /// </summary>
+    [Fact]
+    public void Hub_Modules_DoNotReference_LearnStack_Internals()
+    {
+        var offenders = HubAssemblies.AllModuleLayers
+            .SelectMany(a => a.GetReferencedAssemblies()
+                .Select(r => r.Name)
+                .Where(name => name is not null
+                    && name.StartsWith("LearnStack.", StringComparison.Ordinal)
+                    && !name.StartsWith("LearnStack.Hub.", StringComparison.Ordinal))
+                .Select(name => $"{a.GetName().Name} -> {name}"))
+            .Distinct()
+            .ToArray();
+
+        offenders.Should().BeEmpty(
+            "Hub modules must reference only Hub assemblies (LearnStack.Hub.*). A reference to a " +
+            "LearnStack core assembly (LearnStack.Domain / .Infrastructure / .Modules.*) breaks the " +
+            "independent-release boundary — mirror the pattern by copying source, never by referencing " +
+            "LearnStack assemblies. See CLAUDE.md § Hard rules.");
     }
 }

@@ -5,8 +5,8 @@
 #   - Solution is `LearnStack.Hub.slnx`.
 #   - Frontend monorepo runs `pnpm -r typecheck/lint/build/test` against
 #     `apps/operator-portal` + `packages/{config,sdk,ui}`.
-#   - `backend-integration` job is `if: false` until P02c-2 lands the first
-#     Testcontainers-backed test.
+#   - `backend-integration` runs from P02c-1, which landed the first
+#     Testcontainers-backed tests (the entitlement-rebuild round trip).
 #   - `openapi-diff` job is `if: false` until P02c-2 produces the first
 #     generated OpenAPI spec.
 #   - No `lighthouse-budget` job — operator portal is internal-only; the
@@ -93,13 +93,48 @@ jobs:
           path: artifacts/backend-tests
           if-no-files-found: warn
 
-  # ─── Backend integration (deferred — Testcontainers harness lights up P02c-2) ─
+  # ─── Backend integration (Testcontainers — Postgres) ─────────────────────
   backend-integration:
-    name: backend integration (Testcontainers — deferred)
+    name: backend integration (Testcontainers)
     runs-on: ubuntu-latest
-    if: false  # activate when LearnStack.Hub.Tests.Integration has its first test
+    timeout-minutes: 25
     steps:
-      - run: echo "Placeholder — P02c-2 wires the first Testcontainers integration test."
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_SDK_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('backend/**/*.csproj', 'backend/Directory.Packages.props') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Restore
+        working-directory: backend
+        run: dotnet restore tests/LearnStack.Hub.Tests.Integration/LearnStack.Hub.Tests.Integration.csproj
+
+      - name: Test (integration — Testcontainers Postgres)
+        working-directory: backend
+        run: |
+          dotnet test tests/LearnStack.Hub.Tests.Integration/LearnStack.Hub.Tests.Integration.csproj \
+            --logger "trx;LogFileName=integration-results.trx" \
+            --results-directory ../artifacts/backend-integration-tests
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-integration-test-results
+          path: artifacts/backend-integration-tests
+          if-no-files-found: warn
 
   # ─── Frontend ───────────────────────────────────────────────────────────
   frontend:

@@ -25,8 +25,9 @@
 
   <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
     <IsPackable>false</IsPackable>
-    <!-- xunit-pattern allowances; same as LearnStack core. -->
-    <NoWarn>$(NoWarn);CA1707;CA1812;CA1515;CA1034;CA2234</NoWarn>
+    <!-- xunit-pattern allowances; same as LearnStack core. CA1711: xUnit
+         collection-definition classes conventionally end in "Collection". -->
+    <NoWarn>$(NoWarn);CA1707;CA1812;CA1515;CA1034;CA2234;CA1711</NoWarn>
   </PropertyGroup>
 
 </Project>

@@ -52,17 +52,47 @@
     P02c-2 outbound HTTP client; P02c-5 cert provisioning). Declared centrally
     so the version matrix is consistent the moment they are pulled in.
   -->
-  <ItemGroup Label="Reserved for later P02c packets">
+  <ItemGroup Label="P02c-1 cross-cutting foundation (in use)">
+    <!-- Composition root + module registration. -->
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options" Version="10.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.10.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.10.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.10.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.10.0" />
+
+    <!-- IProviderResilience<TPort> exposes the Polly v8 ResiliencePipeline. -->
+    <PackageVersion Include="Polly" Version="8.5.0" />
+
+    <!-- Serilog primary logger + console + OTLP sink (cross-cutting-foundation.md § 4). -->
+    <PackageVersion Include="Serilog" Version="4.1.0" />
+    <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.1.1" />
+    <PackageVersion Include="Serilog.Formatting.Compact" Version="3.0.0" />
+
+    <!-- OpenTelemetry SDK: tracing + metrics, OTLP exporter (guarded by config endpoint).
+         1.15.x clears the NU1902 advisory (GHSA-4625-4j76-fww9) that flagged 1.10–1.12. -->
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.15.3" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.15.2" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.15.1" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.15.3" />
+  </ItemGroup>
+
+  <!--
+    EF Core OTel instrumentation (AddEntityFrameworkCoreInstrumentation) is
+    deferred: the only published package is a 1.x-beta whose OpenTelemetry.Api
+    floor conflicts with the stable 1.10.0 instrumentation set above and would
+    trip the CI version-conflict-as-error gate. Tracked as a P02c-2 follow-up
+    in docs/roadmap/README.md. Span coverage in P02c-1 comes from the ASP.NET
+    Core instrumentation + the manual learnstack.hub.* ActivitySources.
+  -->
+
+  <ItemGroup Label="Reserved for later P02c packets">
+    <PackageVersion Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.10.0-beta.1" />
   </ItemGroup>
 
   <!--

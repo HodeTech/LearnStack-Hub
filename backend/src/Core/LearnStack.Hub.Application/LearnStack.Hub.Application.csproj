@@ -1,8 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    MediatR handlers for cross-module application work. P02c-1 wires MediatR;
-    P02c-0 ships an empty assembly so the host can reference it.
+    Core application layer: the Hub MediatR pipeline — six behaviors, a mirror
+    of LearnStack core's seven minus the one tenant-isolation behavior Hub does
+    not have (TenantContextBehavior) + the cross-module application handlers that orchestrate
+    work spanning modules.
   -->
 
   <PropertyGroup>
@@ -13,6 +15,13 @@
     <ProjectReference Include="..\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
     <ProjectReference Include="..\LearnStack.Hub.Domain\LearnStack.Hub.Domain.csproj" />
     <ProjectReference Include="..\LearnStack.Hub.Application.Contracts\LearnStack.Hub.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
   </ItemGroup>
 
 </Project>

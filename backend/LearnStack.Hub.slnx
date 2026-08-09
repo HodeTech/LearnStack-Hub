@@ -10,6 +10,31 @@
   </Folder>
   <Folder Name="/src/Modules/">
     <File Path="src/Modules/README.md" />
+    <File Path="src/Modules/Directory.Build.props" />
+  </Folder>
+  <Folder Name="/src/Modules/TenantLifecycle/">
+    <Project Path="src/Modules/TenantLifecycle/LearnStack.Hub.Modules.TenantLifecycle.Domain/LearnStack.Hub.Modules.TenantLifecycle.Domain.csproj" />
+    <Project Path="src/Modules/TenantLifecycle/LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts/LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts.csproj" />
+    <Project Path="src/Modules/TenantLifecycle/LearnStack.Hub.Modules.TenantLifecycle.Application/LearnStack.Hub.Modules.TenantLifecycle.Application.csproj" />
+    <Project Path="src/Modules/TenantLifecycle/LearnStack.Hub.Modules.TenantLifecycle.Infrastructure/LearnStack.Hub.Modules.TenantLifecycle.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Plans/">
+    <Project Path="src/Modules/Plans/LearnStack.Hub.Modules.Plans.Domain/LearnStack.Hub.Modules.Plans.Domain.csproj" />
+    <Project Path="src/Modules/Plans/LearnStack.Hub.Modules.Plans.Application.Contracts/LearnStack.Hub.Modules.Plans.Application.Contracts.csproj" />
+    <Project Path="src/Modules/Plans/LearnStack.Hub.Modules.Plans.Application/LearnStack.Hub.Modules.Plans.Application.csproj" />
+    <Project Path="src/Modules/Plans/LearnStack.Hub.Modules.Plans.Infrastructure/LearnStack.Hub.Modules.Plans.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Subscriptions/">
+    <Project Path="src/Modules/Subscriptions/LearnStack.Hub.Modules.Subscriptions.Domain/LearnStack.Hub.Modules.Subscriptions.Domain.csproj" />
+    <Project Path="src/Modules/Subscriptions/LearnStack.Hub.Modules.Subscriptions.Application.Contracts/LearnStack.Hub.Modules.Subscriptions.Application.Contracts.csproj" />
+    <Project Path="src/Modules/Subscriptions/LearnStack.Hub.Modules.Subscriptions.Application/LearnStack.Hub.Modules.Subscriptions.Application.csproj" />
+    <Project Path="src/Modules/Subscriptions/LearnStack.Hub.Modules.Subscriptions.Infrastructure/LearnStack.Hub.Modules.Subscriptions.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Entitlements/">
+    <Project Path="src/Modules/Entitlements/LearnStack.Hub.Modules.Entitlements.Domain/LearnStack.Hub.Modules.Entitlements.Domain.csproj" />
+    <Project Path="src/Modules/Entitlements/LearnStack.Hub.Modules.Entitlements.Application.Contracts/LearnStack.Hub.Modules.Entitlements.Application.Contracts.csproj" />
+    <Project Path="src/Modules/Entitlements/LearnStack.Hub.Modules.Entitlements.Application/LearnStack.Hub.Modules.Entitlements.Application.csproj" />
+    <Project Path="src/Modules/Entitlements/LearnStack.Hub.Modules.Entitlements.Infrastructure/LearnStack.Hub.Modules.Entitlements.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/LearnStack.Hub.Tests.Unit/LearnStack.Hub.Tests.Unit.csproj" />

@@ -16,13 +16,52 @@ LearnStack Hub is the **control plane** for LearnStack: tenant lifecycle, plan c
 | Packet                                                     | Title                                                    | State                             |
 | ---------------------------------------------------------- | -------------------------------------------------------- | --------------------------------- |
 | [**P02c-0**](p02c-0-repository-bootstrap.md)               | Repository bootstrap                                     | ✅ Shipped                        |
-| [**P02c-1**](p02c-1-hub-domain-core.md)                    | Hub domain core + Hub cross-cutting foundation           | ⏸ Implemented on branch, frozen  |
-| [**P02c-2**](p02c-2-internal-api-and-contract.md)          | Internal API handlers + outbound `LearnStackApiClient`   | ⏳ Not started                    |
-| [**P02c-3**](p02c-3-learnstack-integration.md)             | LearnStack integration (cross-repo, two coordinated PRs) | ⏳ Not started — [blocked](#hub-waits-on-learnstack) |
-| [**P02c-4**](p02c-4-operator-portal.md)                    | Operator portal MVP + Operators + Audit modules          | ⏳ Not started                    |
-| [**P02c-5**](p02c-5-custom-domain-lifecycle.md)            | Custom-domain lifecycle + Compliance module              | ⏳ Not started                    |
-| [**P02c-6**](p02c-6-license-key.md)                        | Licence key (functional skeleton)                        | ⏳ Not started                    |
-| [**P02c-7**](p02c-7-exit-gate.md)                          | End-to-end exit gate                                     | ⏳ Not started                    |
+| [**P02c-1**](p02c-1-hub-domain-core.md)                    | Hub domain core + Hub cross-cutting foundation           | ✅ Shipped — reconciliations owed |
+| [**P02c-2**](p02c-2-internal-api-and-contract.md)          | Internal API handlers + outbound `LearnStackApiClient`   | ⏸ Frozen — [ADR-0035 trigger](#the-freeze) |
+| [**P02c-3**](p02c-3-learnstack-integration.md)             | LearnStack integration (cross-repo, two coordinated PRs) | ⏸ Frozen — also [blocked](#hub-waits-on-learnstack) |
+| [**P02c-4**](p02c-4-operator-portal.md)                    | Operator portal MVP + Operators + Audit modules          | ⏸ Frozen                          |
+| [**P02c-5**](p02c-5-custom-domain-lifecycle.md)            | Custom-domain lifecycle + Compliance module              | ⏸ Frozen                          |
+| [**P02c-6**](p02c-6-license-key.md)                        | Licence key (functional skeleton)                        | ⏸ Frozen                          |
+| [**P02c-7**](p02c-7-exit-gate.md)                          | End-to-end exit gate                                     | ⏸ Frozen                          |
+
+### The freeze
+
+P02c-1 is **merged**. Everything after it is frozen by owner decision (2026-08-08), on the
+[ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md)
+trigger for `IEntitlementProvider`: **a tenant must be billed or plan-gated**. Until then
+LearnStack runs on `NullEntitlementProvider` and consumes nothing from the Hub, so building
+P02c-2's contract surface would be building against a boundary with no caller.
+
+P02c-1 merged rather than waiting because its domain code conflicts with none of the three
+decisions that moved: the entitlement wire shape already carries `grace_until` and
+`generation`, no endpoint is hosted, and `AuditLogBehavior` is a shell that writes nothing.
+Freezing the artefact would have cost the SharedKernel reconciliation against LearnStack
+Packet 3b, which grows with every packet built on top.
+
+### Reconciliations owed on the merged P02c-1
+
+Tracked here rather than in the packet document, because they are follow-ups on shipped
+code and P02c-1's own record is closed:
+
+- **Audit seam (ADR-0033).** `AuditLogBehavior` is step 3 and wraps `TransactionBehavior`;
+  its success-path TODO writes after commit. ADR-0033 puts the MUST-class write on the
+  ambient transaction immediately before `COMMIT`. Nothing misbehaves today — the behavior
+  writes nothing — but the TODO specifies the superseded shape. Lands with the Audit
+  module in P02c-4.
+- **SharedKernel vs LearnStack Packet 3b.** The mirrored kernel inherited all three
+  defects Packet 3b exists to repair: `Results.Unit` colliding with `MediatR.Unit`, missing
+  `[MemberNotNullWhen]` on `Result<T>`, and `Entity<TId>` boxing on every equality check.
+  Unlike LearnStack, the Hub already has four modules of consumers, so this grows with
+  each packet.
+
+### Deferred from P02c-1 (tracked follow-ups)
+
+- ⏳ **Roslyn `DomainException` analyzer** (`LearnStack.Hub.Analyzers`) — deferred per cross-cutting-foundation.md § 5; the `DomainException`-vs-`Result.Fail` rule rides code review until then. Target: P02c-2.
+- ⏳ **EF-Core OpenTelemetry instrumentation** (`AddEntityFrameworkCoreInstrumentation`) — the only published package is a 1.x-beta whose `OpenTelemetry.Api` floor conflicts with the stable 1.15.x instrumentation set; reserved in `Directory.Packages.props`. Target: P02c-2.
+- ⏳ **Feature/limit registry sync** — Hub seeds `FeatureKeys`/`LimitKeys` from the projection wire-shape (Architecture 24 § 4); a cross-repo reconciliation with LearnStack core's registry (or a shared `LearnStack.Contracts` package) is the durable fix. Target: Phase 11.
+- ⏳ **SQL keyset pagination** — list repositories slice in memory in P02c-1 (tiny volume); promote to `ORDER BY ... WHERE id > cursor` when volume warrants.
+
+## Dependency on LearnStack core packets
 
 Execution artifacts live alongside the packet docs: [`P02c-1-implementation-prompt.md`](P02c-1-implementation-prompt.md) is the kickoff prompt the P02c-1 agent ran against.
 
@@ -129,7 +168,7 @@ A packet that changes both repositories lands as two pull requests in one sessio
 
 Known reconciliations still open, each named in its owning packet doc so it cannot be lost:
 
-- The `backend-integration` CI job's owning packet. Three files on `main` say P02c-2; the P02c-1 implementation prompt and the frozen branch say P02c-1. **P02c-2 owns it** — see [p02c-2-internal-api-and-contract.md](p02c-2-internal-api-and-contract.md).
+- ~~The `backend-integration` CI job's owning packet.~~ **Closed 2026-08-09.** P02c-1 shipped the first Testcontainers-backed tests and activated the job with them, which is the correct assignment; the three files on `main` that said P02c-2 were written when P02c-1 was expected to ship without integration tests, and are corrected.
 - Operator-portal naming: **closed 2026-08-08.** LearnStack's `docs/` corpus now says `operator-portal` everywhere. Three residues remain outside it and are tracked rather than open: `frontend/README.md` and `frontend/apps/web/README.md` still say `learnstack-hub-web`, and [ADR-0015](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0015-api-gateway-apisix.md) § Frontend apps says `apps/hub-web` — a third spelling, corrected by the next PR that touches that ADR. LearnStack's frozen [Phase 01](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-01-repository-tooling.md) record keeps the old name deliberately, annotated in place. The Keycloak client id `learnstack-hub-web` is an OIDC identifier, not an app name, and does not change.
 - Feature-key / limit-key registry drift between the two repositories, which each keep their own copy. Recorded in [plans.md § Registry sync](../modules/plans.md).
 

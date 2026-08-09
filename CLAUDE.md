@@ -10,16 +10,38 @@ Hub **never** stores tenant content. Hub holds tenant _metadata_ (plan, subscrip
 
 ## What state this is in
 
-**P02c-0 (Repository bootstrap)** ✅ — solution scaffold, frontend monorepo, compose stack, CI, and the docs skeleton are in place. No Hub domain code is on `main`.
+**P02c-0 (Repository bootstrap)** ✅ and **P02c-1 (Hub Domain Core)** ✅ are on `main`.
+P02c-1 landed the Hub SharedKernel, the six-behavior cross-cutting foundation, and the four
+domain modules (`TenantLifecycle`, `Plans`, `Subscriptions`, `Entitlements`) with their
+DbContexts, migrations and the entitlement projection.
 
-**P02c-1 is frozen by owner decision (2026-08-08).** The branch `feat/phase-02c-packet-1-hub-domain-core` exists and carries the Hub domain core, but it is not merged. It was written against the pre-restructure corpus, and three decisions have moved underneath it: [ADR-0033](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md) (audit durability), [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) (the real endpoint set, plus host-mapping and TLS key delivery), and [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) (which makes the Hub a demand-gated integration rather than a Phase-02a prerequisite).
+**P02c-2 onward is frozen by owner decision (2026-08-08).** The freeze is on the track's
+*forward motion*, not on what has already shipped — P02c-1 was reviewed against the
+restructured corpus and merged because its domain code conflicts with none of the three
+decisions that moved (its entitlement wire shape already carries `grace_until` and
+`generation`, it hosts no endpoint, and its audit behavior is a shell). What is frozen is
+everything that would build **on** the boundary those decisions redrew:
+[ADR-0033](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md)
+(audit durability),
+[ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
+(the real endpoint set, plus host-mapping and TLS key delivery), and
+[ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md)
+(which makes the Hub a demand-gated integration rather than a Phase-02a prerequisite).
 
-**It unfreezes when both hold:**
+**P02c-2 unfreezes when both hold:**
 
-1. The [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) trigger for `IEntitlementProvider` fires — **a tenant must be billed or plan-gated**. Until then LearnStack runs on `NullEntitlementProvider` and needs nothing from the Hub.
-2. The branch is reconciled with ADR-0033 and ADR-0034 — the endpoint set, the `host-mappings` path, the entitlement read path, and the audit model.
+1. The [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md)
+   trigger for `IEntitlementProvider` fires — **a tenant must be billed or plan-gated**.
+   Until then LearnStack runs on `NullEntitlementProvider` and needs nothing from the Hub.
+2. The contract surface is built against ADR-0034's **two invariants**, not against an
+   endpoint count — the enumerated set, the `host-mappings` path, and the single auth
+   chain in both directions.
 
-Until then, work in this repo is documentation and planning only. Merging Hub domain code against a superseded contract would put the cross-repo snapshot tests out of step in both directions.
+Two reconciliations are owed on the merged P02c-1 code and are tracked in
+[p02c-1-hub-domain-core.md](docs/roadmap/p02c-1-hub-domain-core.md): the audit seam
+(`AuditLogBehavior` decides, `TransactionBehavior` writes before `COMMIT`, per ADR-0033 —
+today's shell writes nothing, so nothing misbehaves yet) and the SharedKernel's alignment
+with LearnStack **Packet 3b**, whose three defects the mirrored kernel inherited.
 
 ## Roadmap
 
@@ -28,13 +50,13 @@ Until then, work in this repo is documentation and planning only. Merging Hub do
 | Packet | Document | State |
 | ------ | -------- | ----- |
 | P02c-0 — Repository bootstrap | [p02c-0-repository-bootstrap.md](docs/roadmap/p02c-0-repository-bootstrap.md) | ✅ Shipped |
-| P02c-1 — Hub Domain Core (`LearnStackTenant`, `Plan`, `HubSubscription`, `Entitlement`) | [p02c-1-hub-domain-core.md](docs/roadmap/p02c-1-hub-domain-core.md) | ❄️ Frozen — branch exists, not merged |
-| P02c-2 — Hub-side internal API + outbound `LearnStackApiClient` | [p02c-2-internal-api-and-contract.md](docs/roadmap/p02c-2-internal-api-and-contract.md) | ⏳ |
-| P02c-3 — LearnStack-side integration (`HubEntitlementProvider`, `IUsageReporter`, internal-API handlers) | [p02c-3-learnstack-integration.md](docs/roadmap/p02c-3-learnstack-integration.md) | ⏳ |
-| P02c-4 — Operator portal MVP | [p02c-4-operator-portal.md](docs/roadmap/p02c-4-operator-portal.md) | ⏳ |
-| P02c-5 — Custom domain lifecycle | [p02c-5-custom-domain-lifecycle.md](docs/roadmap/p02c-5-custom-domain-lifecycle.md) | ⏳ |
-| P02c-6 — License key skeleton | [p02c-6-license-key.md](docs/roadmap/p02c-6-license-key.md) | ⏳ |
-| P02c-7 — End-to-end exit gate | [p02c-7-exit-gate.md](docs/roadmap/p02c-7-exit-gate.md) | ⏳ |
+| P02c-1 — Hub Domain Core (`LearnStackTenant`, `Plan`, `HubSubscription`, `Entitlement`) | [p02c-1-hub-domain-core.md](docs/roadmap/p02c-1-hub-domain-core.md) | ✅ Shipped — two reconciliations owed |
+| P02c-2 — Hub-side internal API + outbound `LearnStackApiClient` | [p02c-2-internal-api-and-contract.md](docs/roadmap/p02c-2-internal-api-and-contract.md) | ⏸ Frozen — ADR-0035 trigger |
+| P02c-3 — LearnStack-side integration (`HubEntitlementProvider`, `IUsageReporter`, internal-API handlers) | [p02c-3-learnstack-integration.md](docs/roadmap/p02c-3-learnstack-integration.md) | ⏸ |
+| P02c-4 — Operator portal MVP | [p02c-4-operator-portal.md](docs/roadmap/p02c-4-operator-portal.md) | ⏸ |
+| P02c-5 — Custom domain lifecycle | [p02c-5-custom-domain-lifecycle.md](docs/roadmap/p02c-5-custom-domain-lifecycle.md) | ⏸ |
+| P02c-6 — License key skeleton | [p02c-6-license-key.md](docs/roadmap/p02c-6-license-key.md) | ⏸ |
+| P02c-7 — End-to-end exit gate | [p02c-7-exit-gate.md](docs/roadmap/p02c-7-exit-gate.md) | ⏸ |
 
 Post-02c Hub tracks — [hub-billing.md](docs/roadmap/hub-billing.md) and [hub-marketplace.md](docs/roadmap/hub-marketplace.md) — also live here; LearnStack's `phase-09b` and `phase-12` are pointers at those documents.
 
@@ -88,7 +110,8 @@ These rules are **non-negotiable** for any change in this repo:
 - Add an endpoint to the LearnStack↔Hub contract surface without a new ADR in `../LearnStack/docs/decisions/`, landed in both repositories.
 - Carry TLS certificates or private keys in any payload LearnStack caches, logs, audits or mirrors — including the entitlement projection.
 - Serve a host lookup from the Hub. `IHostToTenantResolver` on the LearnStack side reads `platform_host_to_tenant` and nothing else; a Hub outage must not take tenant public pages down.
-- Merge Hub domain code while P02c-1 is frozen. See [What state this is in](#what-state-this-is-in) for the two conditions that unfreeze it.
+- Start P02c-2 or anything downstream of it while the track is frozen. P02c-1 is merged; what is frozen is the work that builds on the boundary ADR-0033/0034/0035 redrew. See [What state this is in](#what-state-this-is-in) for the two conditions that unfreeze it.
+- Build the Hub HTTPS contract surface to an endpoint **count**. ADR-0034 governs it by two invariants, and protecting a count is what caused TLS private keys to be tunnelled through the entitlement payload.
 - Bypass `WebhookLedger` for Stripe / Iyzico webhook processing. Idempotency unique constraint enforces.
 - Throw `DomainException` for expected business-rule violations — return `Result.Fail(business_rule_violation, ...)` instead (mirrors LearnStack [ADR-0032 § Sub-decision 4](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)).
 - Edit an Accepted ADR's decision section in either repo. Write a new ADR that supersedes it.

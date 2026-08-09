@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Modules.Plans.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.Plans.Domain\LearnStack.Hub.Modules.Plans.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.Plans.Application.Contracts\LearnStack.Hub.Modules.Plans.Application.Contracts.csproj" />
+
+    <!-- Plan-change fan-out recompute: ask Subscriptions for the bound tenants
+         (GetSubscriptionsByPlanQuery) then RecomputeEntitlementCommand per tenant. -->
+    <ProjectReference Include="..\..\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Application.Contracts\LearnStack.Hub.Modules.Subscriptions.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\Entitlements\LearnStack.Hub.Modules.Entitlements.Application.Contracts\LearnStack.Hub.Modules.Entitlements.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+</Project>

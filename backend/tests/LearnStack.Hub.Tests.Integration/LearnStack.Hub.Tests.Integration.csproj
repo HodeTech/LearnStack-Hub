@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Testcontainers-backed integration tests. Activates in P02c-2 with the
-    first real test (Hub-side internal API endpoint smoke). Until then the
-    CI job `backend-integration` is `if: false` and `make test-backend`
-    filters this project out.
+    Testcontainers-backed integration tests. Activated in P02c-1 with the first
+    real test (the create-tenant -> trial -> recompute -> change-plan
+    entitlement flow against a throwaway Postgres). The CI job
+    `backend-integration` and `make test-integration` run this project.
   -->
 
   <PropertyGroup>
@@ -16,6 +16,12 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
     <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Api\LearnStack.Hub.Api.csproj" />
+
+    <!-- Module Infrastructure projects: DbContext types to migrate + contracts (transitive). -->
+    <ProjectReference Include="..\..\src\Modules\TenantLifecycle\LearnStack.Hub.Modules.TenantLifecycle.Infrastructure\LearnStack.Hub.Modules.TenantLifecycle.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Plans\LearnStack.Hub.Modules.Plans.Infrastructure\LearnStack.Hub.Modules.Plans.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Infrastructure\LearnStack.Hub.Modules.Subscriptions.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Entitlements\LearnStack.Hub.Modules.Entitlements.Infrastructure\LearnStack.Hub.Modules.Entitlements.Infrastructure.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +30,8 @@
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Testcontainers" />
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="Testcontainers.Redis" />

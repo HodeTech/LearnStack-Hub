@@ -11,7 +11,7 @@ Required status checks on `main`:
 - `meta` — `make lint`-style format verification + Markdown link audit
 - `secret-scan` — Leakwatch scan (gates per LearnStack Standards 12 § Secrets Management)
 
-`backend-integration` is **deferred** with `if: false` until P02c-2 lands the first Testcontainers-backed test.
+`backend-integration` runs from **P02c-1**, which landed the first Testcontainers-backed tests (the entitlement-rebuild round trip). It was gated `if: false` from P02c-0 until then.
 
 ## Commit conventions
 

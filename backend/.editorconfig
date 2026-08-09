@@ -21,3 +21,8 @@ dotnet_diagnostic.CS8601.severity = error
 dotnet_diagnostic.CS8602.severity = error
 dotnet_diagnostic.CS8603.severity = error
 dotnet_diagnostic.CS8604.severity = error
+
+# EF Core migrations are tool-generated; treat them as generated code so the
+# style analyzers (e.g. IDE0161 file-scoped namespace) do not gate the build.
+[**/Migrations/*.cs]
+generated_code = true

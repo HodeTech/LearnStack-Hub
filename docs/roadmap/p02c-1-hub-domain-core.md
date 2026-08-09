@@ -1,6 +1,8 @@
 # P02c-1: Hub Domain Core
 
-> **Status: ⏸ Implemented on branch, frozen.** The packet is written and green on `feat/phase-02c-packet-1-hub-domain-core` (seven commits, ~222 files) and is **not merged**. The freeze is an owner decision recorded on 2026-08-08; the condition that lifts it is in [Phase Exit Decision](#phase-exit-decision) below. The design specs the branch implements are merged on `main` and remain the contract.
+> **Status: ✅ Shipped**, merged 2026-08-09 (~222 files). Reviewed against the restructured corpus before merging: its domain code conflicts with none of the three decisions that moved after it was written — the entitlement wire shape already carries `grace_until` and `generation`, no endpoint is hosted, and `AuditLogBehavior` is a shell. Two reconciliations are owed on the merged code and are listed in [Phase Exit Decision](#phase-exit-decision).
+>
+> **The freeze recorded on 2026-08-08 stands, on the track's forward motion.** It moved to [P02c-2](p02c-2-internal-api-and-contract.md), which is where the contract surface ADR-0034 redrew actually gets built, and which is genuinely gated on the ADR-0035 trigger. Freezing this packet's merged artefact would have bought nothing and cost the SharedKernel reconciliation, which grows with every packet built on top.
 
 ## Goal
 
@@ -104,25 +106,27 @@ Hub integration tests have **no tenant-isolation pair**. There is no Row Level S
 
 ## Risks
 
-- **The mirrored SharedKernel drifts from its original.** It already has. LearnStack's [Phase 02a Packet 3b](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) repairs three defects in the source this copy was taken from: `Results.Unit` collides with `MediatR.Unit` in any file importing both, `Result<T>` carries no `[MemberNotNullWhen]` so the compiler cannot prove `Value` is non-null after an `IsSuccess` check, and `Entity<TId>` overrides `Equals(object?)` without implementing `IEquatable<T>` or `operator ==` so every comparison boxes. All three are in the frozen branch and all three are cheapest to fix before the first handler exists. Reconciling against Packet 3b is the first item on the unfreeze checklist.
+- **The mirrored SharedKernel drifts from its original.** It already has. LearnStack's [Phase 02a Packet 3b](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) repairs three defects in the source this copy was taken from: `Results.Unit` collides with `MediatR.Unit` in any file importing both, `Result<T>` carries no `[MemberNotNullWhen]` so the compiler cannot prove `Value` is non-null after an `IsSuccess` check, and `Entity<TId>` overrides `Equals(object?)` without implementing `IEquatable<T>` or `operator ==` so every comparison boxes. All three are in the merged code, and all three were cheapest to fix before the first handler existed — that moment has passed, which is why reconciling against Packet 3b is the first reconciliation owed in [Phase Exit Decision](#phase-exit-decision).
 - **The projection shape is a cross-repository contract with a single author.** Nothing stops the Hub from changing `EntitlementProjectionDto` and breaking LearnStack silently. The mitigation is the checked-in schema plus a snapshot test in each repository, which converts a silent break into two failing builds.
 - **Feature-key and limit-key registries drift.** Each repository keeps its own copy, and a key spelled differently on the two sides produces a projection that parses and means nothing. Recorded in [plans.md § Registry sync](../modules/plans.md); the durable fix is a shared contract package, which is a Phase 11 question.
 - **Row Level Security creeps in by habit.** Every LearnStack skill and standard assumes it. A `DbContext` copied from a LearnStack module brings a tenant filter with it, and the filter would silently hide operator rows rather than fail loudly. Caught by reviewing the generated migration SQL and by the architecture test that asserts the Hub schema has no policies.
-- **The freeze rots the branch.** Two hundred files that do not merge age against `main`, against the LearnStack SharedKernel they mirror, and against the ADRs written since. Mitigated by keeping the design specs on `main` as the authority, so the unfreeze is a re-implementation against a current spec rather than an archaeology exercise on a stale diff.
+- **~~The freeze rots the branch.~~ Discharged 2026-08-09 by merging.** Two hundred files that do not merge age against `main`, against the LearnStack SharedKernel they mirror, and against the ADRs written since. This is the risk that decided the merge: the review found the code conflicted with nothing, so holding it bought no safety and the rot was the only certain outcome.
 
 ## Phase Exit Decision
 
-**The packet is implemented and frozen.** The branch is green against its own definition of done; it is deliberately not merged.
+**The packet is implemented and merged.** It was green against its own definition of done, and the review that preceded the merge found no conflict with the three ADRs written after it.
 
 The freeze exists because the Hub is a demand-gated track. LearnStack runs on `NullEntitlementProvider` and resolves hosts from `platform_host_to_tenant`, so nothing in LearnStack is blocked by the Hub's absence — and merging a control plane before it has a consumer means maintaining it through every LearnStack refactor for no user-visible return.
 
-**The unfreeze condition is the Phase 02c trigger in [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md): a tenant must be billed or plan-gated.** When that becomes true, this packet resumes first — nothing else in the Hub can proceed without it.
+**This packet is closed.** It merged to `main` on 2026-08-09 with its suites green in CI, which was its own exit condition.
 
-The unfreeze checklist, in order:
+**What it hands to [P02c-2](p02c-2-internal-api-and-contract.md) is a freeze, not a start.** The Phase 02c trigger in [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) — **a tenant must be billed or plan-gated** — has not fired. LearnStack runs on `NullEntitlementProvider` and consumes nothing from the Hub, so P02c-2 would build a contract surface with no caller.
 
-1. Reconcile the Hub SharedKernel against LearnStack's post-Packet-3b source: the `Unit` rename, the `[MemberNotNullWhen]` annotations, and `Entity<TId>` equality. Also pick up Packet 4's `CursorPagination` binding fix, which returns 400 rather than surfacing an unhandled exception as a 500.
-2. Move the `backend-integration` CI activation to [P02c-2](p02c-2-internal-api-and-contract.md), which owns it. The frozen branch flips it here, and the implementation prompt says so; three files on `main` say P02c-2, and P02c-2 is correct.
-3. Confirm the projection still matches [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)'s read path — in particular that `grace_until` is carried in the projection and honoured durably on the LearnStack side, rather than collapsed into a cache TTL.
-4. Note that the operator-audit writer this packet leaves as a shell follows [ADR-0033](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md) when [P02c-4](p02c-4-operator-portal.md) lights it up: MUST-class audit is a durable intent inside the business transaction, not a best-effort write after it.
+Two reconciliations are owed on the code this packet merged. Neither blocks anything today; both get more expensive the longer they wait:
 
-[P02c-2](p02c-2-internal-api-and-contract.md) begins when this packet is merged to `main` with its suites green in CI.
+1. **Reconcile the Hub SharedKernel against LearnStack's post-Packet-3b source** — the `Unit` rename, the `[MemberNotNullWhen]` annotations, and `Entity<TId>` equality. Also pick up Packet 4's `CursorPagination` binding fix, which returns 400 rather than surfacing an unhandled exception as a 500. This is the expensive one, and unlike LearnStack the Hub already has four modules of consumers.
+2. **Reshape the operator-audit seam to ADR-0033** when [P02c-4](p02c-4-operator-portal.md) lights it up. `AuditLogBehavior` is step 3 and wraps `TransactionBehavior`, so its success-path TODO writes after commit — the shape [ADR-0033](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md) supersedes. The behavior writes nothing today, so nothing misbehaves; what is wrong is the TODO that specifies the work. MUST-class audit is a durable intent written on the ambient transaction immediately before `COMMIT`, not a best-effort write after it.
+
+The projection was checked at merge and needs no reconciliation: it carries `grace_until` and `generation` with the wire names [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) fixed, and no certificate, key, host or domain field.
+
+**[P02c-2](p02c-2-internal-api-and-contract.md) begins when the ADR-0035 trigger fires** — not when this packet closed.

@@ -7,6 +7,21 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+
+    <!-- MediatR pipeline registration is invoked from Program.cs. -->
+    <PackageReference Include="MediatR" />
+
+    <!-- Serilog primary logger: console + OTLP sink (cross-cutting-foundation.md § 4). -->
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" />
+    <PackageReference Include="Serilog.Formatting.Compact" />
+
+    <!-- OpenTelemetry tracing + metrics + OTLP exporter (guarded by config endpoint). -->
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+    <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" />
   </ItemGroup>
 
   <ItemGroup>
@@ -16,6 +31,19 @@
     <ProjectReference Include="..\LearnStack.Hub.Application\LearnStack.Hub.Application.csproj" />
     <ProjectReference Include="..\LearnStack.Hub.Infrastructure\LearnStack.Hub.Infrastructure.csproj" />
     <ProjectReference Include="..\LearnStack.Hub.Infrastructure.Audit\LearnStack.Hub.Infrastructure.Audit.csproj" />
+
+    <!-- Domain modules (Infrastructure brings Application + Domain + Contracts transitively). -->
+    <ProjectReference Include="..\..\Modules\TenantLifecycle\LearnStack.Hub.Modules.TenantLifecycle.Infrastructure\LearnStack.Hub.Modules.TenantLifecycle.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Plans\LearnStack.Hub.Modules.Plans.Infrastructure\LearnStack.Hub.Modules.Plans.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Infrastructure\LearnStack.Hub.Modules.Subscriptions.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Modules\Entitlements\LearnStack.Hub.Modules.Entitlements.Infrastructure\LearnStack.Hub.Modules.Entitlements.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Tests reach the internal HubExceptionHandler (ShouldCapture boundary). -->
+    <InternalsVisibleTo Include="LearnStack.Hub.Tests.Unit" />
+    <InternalsVisibleTo Include="LearnStack.Hub.Tests.Contract" />
+    <InternalsVisibleTo Include="LearnStack.Hub.Tests.Integration" />
   </ItemGroup>
 
 </Project>

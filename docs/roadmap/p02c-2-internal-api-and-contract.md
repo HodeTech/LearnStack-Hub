@@ -63,7 +63,7 @@ Correctness does not depend on the signal arriving. If it is lost, the projectio
 
 ### CI
 
-**This packet activates the `backend-integration` CI job.** The job has been gated `if: false` since [P02c-0](p02c-0-repository-bootstrap.md) because there was nothing for it to run. Three files on `main` — `CONTRIBUTING.md`, `.github/workflows/ci.yml` and the integration test project itself — name P02c-2 as the activating packet, and that is the correct assignment. [`P02c-1-implementation-prompt.md`](P02c-1-implementation-prompt.md) and the frozen P02c-1 branch flip it a packet early; reconciling that is on the P02c-1 unfreeze checklist.
+**The `backend-integration` CI job is already active.** It was gated `if: false` from [P02c-0](p02c-0-repository-bootstrap.md) because there was nothing for it to run, and [P02c-1](p02c-1-hub-domain-core.md) activated it along with the first Testcontainers-backed tests — the entitlement-rebuild round trip. An earlier draft of this document assigned the activation here; that was written when P02c-1 was expected to ship without integration tests. This packet adds its own cases to a running job.
 
 ### Documentation
 
