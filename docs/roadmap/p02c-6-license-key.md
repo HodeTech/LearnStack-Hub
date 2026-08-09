@@ -217,6 +217,17 @@ operations.
   the duplicate timestamp spellings reconciled; snapshot test on each side.
 - Dated Amendment to ADR-0020 recording the claim-set correction.
 - Signed revocation bundle generator publishing to a fixed URL.
+- **Phone-home client certificate in the licence bundle.**
+  [ADR-0034 § One auth chain, both directions](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+  extends the mTLS + JWT + HMAC chain to the LearnStack → Hub direction, replacing the
+  per-instance API key. A `SelfHostedOnline` instance therefore cannot phone home
+  without a client certificate the Hub's CA will validate, and this packet is the only
+  one that hands a customer-run instance anything. The certificate is issued alongside
+  the `.lic` file, carries the same `license_id`, and is re-issued by the same
+  re-issue command on the same cadence — one artefact, one expiry, one revocation. A
+  revoked licence revokes the certificate with it, so a revoked instance loses the
+  transport before it loses the entitlement. `SelfHostedAirGapped` makes no outbound
+  call and is issued no certificate.
 - Live `POST /api/v1/internal/license/refresh` path calling `RecordPhoneHome`.
 - Recompute trigger on licence issuance, setting `expires_at` and `grace_until` on the
   `Entitlement` row.
@@ -241,7 +252,11 @@ operations.
 - Past `exp` but within `grace_until`, the instance is functional and shows the grace
   banner; past `grace_until`, it is read-only rather than broken.
 - A successful phone-home from a `SelfHostedOnline` deployment updates
-  `last_phone_home_at` and is visible on the Phone-Home Activity screen.
+  `last_phone_home_at` and is visible on the Phone-Home Activity screen. It presents the
+  client certificate issued with its licence bundle; the same call with no certificate,
+  with an expired one, or with one belonging to a revoked licence is refused at the TLS
+  handshake — before any handler runs and before the JWT or the HMAC signature is
+  examined.
 - No log line, span attribute or error envelope contains the private key or a full `.lic`
   payload.
 
