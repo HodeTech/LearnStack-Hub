@@ -129,4 +129,4 @@ Two reconciliations are owed on the code this packet merged. Neither blocks anyt
 
 The projection was checked at merge and needs no reconciliation: it carries `grace_until` and `generation` with the wire names [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) fixed, and no certificate, key, host or domain field.
 
-**[P02c-2](p02c-2-internal-api-and-contract.md) begins when the ADR-0035 trigger fires** — not when this packet closed.
+**[P02c-2](p02c-2-internal-api-and-contract.md) begins when both conditions hold** — not when this packet closed. First, the [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) trigger fires: a tenant must be billed or plan-gated. Second, its contract surface is built against [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)'s two invariants rather than an endpoint count — the condition that exists because protecting a count is what tunnelled TLS private keys through the entitlement payload.
