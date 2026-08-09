@@ -12,7 +12,7 @@ It also fixes the shape of the contract. Everything [P02c-3](p02c-3-learnstack-i
 
 ### The endpoint set
 
-The authoritative list of paths, methods and directions is the table in [ADR-0034 § The endpoint set](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md). It is not restated here — a second copy is a second thing to keep in step, and the corpus has already paid that price once.
+The authoritative list of paths, methods and directions is the table in [ADR-0034 § The endpoint set](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md). It is not restated here — a second copy is a second thing to keep in step, and the corpus has already paid that price once.
 
 Two rules from that ADR govern this packet directly:
 
@@ -28,7 +28,7 @@ The Hub's own tenant-facing and operator-facing API (`/api/v1/tenants/*`, `/api/
 
 ### The authentication chain
 
-Three independent layers on every call in both directions, per [ADR-0019](../../../LearnStack/docs/decisions/0019-learnstack-hub.md) and unchanged by ADR-0034:
+Three independent layers on every call in both directions, per [ADR-0019](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) and unchanged by ADR-0034:
 
 - **mTLS** with client certificates signed by the LearnStack-internal CA.
 - **A signed RS256 JWT** with `aud=learnstack-internal` and an expiry of at most five minutes, replay-protected by a short-TTL inbox keyed on `jti`.
@@ -51,7 +51,7 @@ All three secrets — the client certificate and key, the JWT signing key, the H
 Two things travel when a projection is recomputed, and they are not the same thing:
 
 - **The projection itself**, pushed over `PUT /api/internal/tenants/{id}/entitlements`. This is the contract-bearing path and it is HTTP. It carries the `generation` counter, which is what lets the receiver reject an out-of-order delivery instead of overwriting newer state with older.
-- **An eager-invalidation signal**, published as `learnstack.hub.entitlement`. This is an optimisation over waiting for a cache to expire, and it is the first genuine cross-process integration event in either system — which is precisely the trigger [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md) names for promoting `IEventBus` from its in-process default to a broker-backed adapter. This packet ships the publish behind `IOutbox` and `IEventBus` so that the transport choice stays at the composition root and is settled by that trigger, not by this packet.
+- **An eager-invalidation signal**, published as `learnstack.hub.entitlement`. This is an optimisation over waiting for a cache to expire, and it is the first genuine cross-process integration event in either system — which is precisely the trigger [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) names for promoting `IEventBus` from its in-process default to a broker-backed adapter. This packet ships the publish behind `IOutbox` and `IEventBus` so that the transport choice stays at the composition root and is settled by that trigger, not by this packet.
 
 Correctness does not depend on the signal arriving. If it is lost, the projection is still authoritative and the receiver still converges on the next read.
 

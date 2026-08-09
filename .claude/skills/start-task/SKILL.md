@@ -49,7 +49,7 @@ Confirm the planned change honours [the Hub deltas](../README.md) and [CLAUDE.md
 
 ### Step 4 — Name the workflow skill(s)
 
-Identify which `add-*` / `wire-*` skill the implementation will invoke (e.g. [add-hub-aggregate](../add-hub-aggregate/SKILL.md) + [add-ef-migration](../add-ef-migration/SKILL.md) + [add-mediatr-handler](../add-mediatr-handler/SKILL.md)). If none fits, fall back to LearnStack's [Standards index](../../../../LearnStack/docs/standards/README.md) + the relevant Hub architecture doc.
+Identify which `add-*` / `wire-*` skill the implementation will invoke (e.g. [add-hub-aggregate](../add-hub-aggregate/SKILL.md) + [add-ef-migration](../add-ef-migration/SKILL.md) + [add-mediatr-handler](../add-mediatr-handler/SKILL.md)). If none fits, fall back to LearnStack's [Standards index](https://github.com/cemililik/LearnStack/blob/main/docs/standards/README.md) + the relevant Hub architecture doc.
 
 ### Step 5 — Produce the plan
 

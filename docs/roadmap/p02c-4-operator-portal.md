@@ -23,7 +23,7 @@ stream) — which is why several shells left open in P02c-1 close here rather th
 
 - OIDC Authorization Code flow with **PKCE** against the `learnstack-hub` Keycloak realm.
   The `learnstack` realm is never accepted; the two-realm boundary from
-  [ADR-0004 Amendment 1](../../../LearnStack/docs/decisions/0004-authentication-strategy.md)
+  [ADR-0004 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)
   is enforced on both sides of the login — the portal validates issuer and `azp`, and the
   Hub API rejects any token whose issuer is the tenant realm.
 - **Backend-for-frontend session.** Tokens are held server-side by the Next.js route
@@ -49,7 +49,7 @@ resolves the `OperatorContext` that the rest of the pipeline reads.
 
 - Permission keys follow LearnStack's convention — `{module}.{resource}.{action}` with the
   closed action set `read | write | delete | admin`
-  ([Standards 19](../../../LearnStack/docs/standards/19-permissions.md)) — and are **all
+  ([Standards 19](https://github.com/cemililik/LearnStack/blob/main/docs/standards/19-permissions.md)) — and are **all
   Platform scope**. Hub has no tenant or organization scope: an operator either has a
   capability across the control plane or does not have it. Examples:
   `tenants.tenant.read`, `tenants.tenant.write`, `plans.plan.read`, `audit.entry.read`.
@@ -70,7 +70,7 @@ resolves the `OperatorContext` that the rest of the pipeline reads.
   lets a reader looking at Hub and LearnStack audit records side by side tell a
   control-plane action from a tenant action. Without it, "who suspended this tenant" and
   "who suspended this learner" become the same shape.
-- Durability follows [ADR-0033](../../../LearnStack/docs/decisions/0033-audit-durability-model.md):
+- Durability follows [ADR-0033](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md):
   MUST-class operator audit rows are enrolled in the **same `SaveChanges`** as the
   business write, so a crash between the write and the audit cannot happen. Hub has no
   Row Level Security, so ADR-0033's RLS-visibility argument does not apply here — but its
@@ -87,7 +87,7 @@ resolves the `OperatorContext` that the rest of the pipeline reads.
 ### Screens
 
 The MVP is a deliberate subset of the full portal tree in
-[Architecture 24 § 6](../../../LearnStack/docs/architecture/24-learnstack-hub.md):
+[Architecture 24 § 6](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md):
 
 | Screen | Content |
 |---|---|
@@ -99,13 +99,13 @@ The MVP is a deliberate subset of the full portal tree in
 | **Audit stream** | Filterable operator audit log — actor, action, target, before/after snapshot |
 
 Cursor pagination, RFC 7807 Problem Details rendering and idempotency-key handling follow
-[Standards 04](../../../LearnStack/docs/standards/04-api-design.md) through the generated
+[Standards 04](https://github.com/cemililik/LearnStack/blob/main/docs/standards/04-api-design.md) through the generated
 `@learnstack-hub/sdk` client from P02c-2. The portal never hand-rolls `fetch` against the
 Hub API.
 
 ### The plan editor is not in this packet
 
-[Architecture 24 § 6](../../../LearnStack/docs/architecture/24-learnstack-hub.md) shows a
+[Architecture 24 § 6](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md) shows a
 plan editor with feature toggles, limit inputs, price and billing cycle. A plan's feature
 payload and its price are edited on one form — splitting them yields two editors for one
 aggregate and a second place to get the `FeatureKey` registry wrong. The editor therefore
@@ -122,7 +122,7 @@ it reach LearnStack.
 The app is **`frontend/apps/operator-portal`**.
 
 LearnStack-side documents call it `learnstack-hub-web`
-([Architecture 24 § 6](../../../LearnStack/docs/architecture/24-learnstack-hub.md) and
+([Architecture 24 § 6](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md) and
 LearnStack's `CLAUDE.md` among them). **That name is stale.** The Hub repository ships
 `apps/operator-portal`, and
 [`RepositoryLayoutTests.Frontend_Has_Only_The_OperatorPortal_App`](../../backend/tests/LearnStack.Hub.Tests.Architecture/RepositoryLayoutTests.cs)
@@ -136,7 +136,7 @@ Also landing here, per [repository-layout.md](../architecture/repository-layout.
 - `@learnstack-hub/ui` design-system primitives, previously an empty package.
 - ESLint flat-config migration and the Next 16 upgrade the P02c-0 scaffold deferred.
 - WCAG 2.2 AA across every screen
-  ([Standards 16](../../../LearnStack/docs/standards/16-accessibility.md)). An internal
+  ([Standards 16](https://github.com/cemililik/LearnStack/blob/main/docs/standards/16-accessibility.md)). An internal
   tool is still a tool someone uses all day.
 
 ### Observability
@@ -161,7 +161,7 @@ code thinking in tenant context.
 One item from Architecture 24 § 6 is **out of the roadmap entirely**: the
 **"Read-only Tenant View"** support tool. Reading a tenant's settings from the Hub means
 the Hub holds or caches tenant content, which
-[ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)'s
+[ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)'s
 first invariant forbids. There is no phase that owns it, and there should not be one
 until an ADR explains how a support read happens without the Hub touching tenant data.
 

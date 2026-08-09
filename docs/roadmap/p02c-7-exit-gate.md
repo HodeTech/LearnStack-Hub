@@ -52,7 +52,7 @@ seconds.
   gate, it has merely waited.
 - The L1 and L2 caches are invalidated by the push, and the durable
   `platform_entitlement_cache` row is updated, in the order
-  [ADR-0034 § The entitlement read path](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+  [ADR-0034 § The entitlement read path](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
   makes normative.
 
 ### Gate 3 — Custom domain resolves to the right tenant
@@ -77,7 +77,7 @@ Both directions, three negative tests each.
 
 The chain is mTLS + RS256 JWT (`aud=learnstack-internal`, five-minute expiry, `jti` replay
 protection) + HMAC body signature, applied to every endpoint in
-[ADR-0034's set](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md).
+[ADR-0034's set](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
 
 | Removed | Expected |
 |---|---|
@@ -129,12 +129,12 @@ identical to one that passes until the day it matters.
 - `Modules_Do_Not_Reference_DeploymentMode`
 - `CustomDomain_TenantId_NeverReadFrom_RequestBody` and
   `Cert_PrivateKey_NeverLeavesVault_To_Logs` from
-  [ADR-0022](../../../LearnStack/docs/decisions/0022-custom-domain-tls.md)
+  [ADR-0022](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)
 - `LicenseKey_Validation_Is_Pinned_RSA2048` from
-  [ADR-0020](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md)
+  [ADR-0020](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)
 
 Names follow the reconciled canonical identifiers in
-[Standards 21](../../../LearnStack/docs/standards/21-architecture-tests-catalogue.md);
+[Standards 21](https://github.com/cemililik/LearnStack/blob/main/docs/standards/21-architecture-tests-catalogue.md);
 Hub-side rules are registered there rather than existing only in this repository.
 
 ### Gate 7 — One contract, two repositories
@@ -145,7 +145,7 @@ Hub-side rules are registered there rather than existing only in this repository
 - `license-payload-v1.schema.json` likewise, with `license_id` required
   ([P02c-6](p02c-6-license-key.md)).
 - The endpoint set implemented on both sides matches
-  [ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+  [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
   exactly — no extra path, no missing one.
 - The `FeatureKey` / `LimitKey` registries agree. The two repositories each keep their own
   copy ([plans.md § Registry sync](../modules/plans.md)), so a reconciliation check runs
@@ -167,11 +167,11 @@ the packet that owns it, and that packet's status is reopened. A defect found he
 - A short runbook for running the gate locally, in
   [docs/operations/](../operations/README.md).
 - Hub-side architecture test registrations added to
-  [Standards 21](../../../LearnStack/docs/standards/21-architecture-tests-catalogue.md)
+  [Standards 21](https://github.com/cemililik/LearnStack/blob/main/docs/standards/21-architecture-tests-catalogue.md)
   under canonical names.
 - A dated Phase 02c status entry in [the Hub roadmap index](README.md), and the matching
   entry on the LearnStack side in
-  [Phase 02c](../../../LearnStack/docs/roadmap/phase-02c-hub-foundation.md).
+  [Phase 02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md).
 
 ## Completion Criteria
 
@@ -230,11 +230,11 @@ What Phase 02c explicitly does **not** deliver, with owners:
 |---|---|
 | Invoicing, payment capture, dunning, usage aggregation, plan editor | [hub-billing.md](hub-billing.md) |
 | Marketplace listings and installs | [hub-marketplace.md](hub-marketplace.md) |
-| Self-Hosted as a *supported* deployment mode — rotation, revocation distribution, hot-reload runbook | [LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md) |
-| Custom-domain TLS termination at the LearnStack edge | [LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md) |
-| Hub production deployment, HA, backup and restore | [LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md) |
+| Self-Hosted as a *supported* deployment mode — rotation, revocation distribution, hot-reload runbook | [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) |
+| Custom-domain TLS termination at the LearnStack edge | [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) |
+| Hub production deployment, HA, backup and restore | [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) |
 
 LearnStack does not wait on any of it. Per
-[ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md) the
+[ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) the
 core runs on `NullEntitlementProvider` until a tenant must be billed or plan-gated, which
 is the trigger that makes this phase urgent rather than the calendar.

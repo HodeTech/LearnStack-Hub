@@ -1,6 +1,6 @@
 # Hub Glossary
 
-Hub-specific terms. Cross-cutting glossary terms (`Tenant`, `Organization`, `IModule`, `Entitlement`, etc.) live in the [LearnStack core glossary](../../LearnStack/docs/glossary.md) — not duplicated here.
+Hub-specific terms. Cross-cutting glossary terms (`Tenant`, `Organization`, `IModule`, `Entitlement`, etc.) live in the [LearnStack core glossary](https://github.com/cemililik/LearnStack/blob/main/docs/glossary.md) — not duplicated here.
 
 ## Hub aggregates
 
@@ -43,7 +43,7 @@ The Keycloak realm that authenticates LearnStack operators. Separate from the `l
 The Hub-internal typed `HttpClient` wrapper that calls into LearnStack core's `/api/internal/*` endpoints. Carries the mTLS + RS256 JWT + HMAC-SHA256 body-signature chain. The **only** sanctioned outbound path from Hub to LearnStack — no module is allowed to call LearnStack core directly. Lands in P02c-2.
 
 **Hub HTTPS Contract Surface**
-The boundary between Hub and LearnStack core, governed by **two invariants** rather than by an endpoint count ([ADR-0034](../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)): the Hub stores no tenant content, and every crossing goes through a named adapter (`IEntitlementProvider` / `IUsageReporter` / `IHubTenantSync`). Every call carries mTLS + RS256 JWT + HMAC body signature. The enumerated endpoint set lives in ADR-0034; adding one still requires an ADR in `../LearnStack/docs/decisions/`, because the surface is a cross-repository contract. (This entry previously claimed a closed set of four — the corpus enumerated six paths while claiming four, and defending the number is what pushed TLS private keys into the entitlement payload.)
+The boundary between Hub and LearnStack core, governed by **two invariants** rather than by an endpoint count ([ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)): the Hub stores no tenant content, and every crossing goes through a named adapter (`IEntitlementProvider` / `IUsageReporter` / `IHubTenantSync`). Every call carries mTLS + RS256 JWT + HMAC body signature. The enumerated endpoint set lives in ADR-0034; adding one still requires an ADR in `../LearnStack/docs/decisions/`, because the surface is a cross-repository contract. (This entry previously claimed a closed set of four — the corpus enumerated six paths while claiming four, and defending the number is what pushed TLS private keys into the entitlement payload.)
 
 **Operator portal**
 The Next.js single-page application (`apps/operator-portal`) deployed at `hub.learnstack.dev`. Tenant list, plan editor, custom-domain admin, license-key issuance UI, operator audit log. Single-brand (no tenant theming); accessed only via the `learnstack-hub` Keycloak realm with MFA. Lands in P02c-4.

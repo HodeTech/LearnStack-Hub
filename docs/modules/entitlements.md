@@ -4,7 +4,7 @@
 
 The full design lives in [../architecture/entitlement-projection.md](../architecture/entitlement-projection.md) — this file is the module-level summary. Read the architecture doc for the recompute algorithm, the wire-format contract, and the `generation` semantics.
 
-Authoritative sources: [ADR-0021 Feature-Based Entitlement](../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md), [Architecture 24 § 4](../../../LearnStack/docs/architecture/24-learnstack-hub.md), [ADR-0020](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md).
+Authoritative sources: [ADR-0021 Feature-Based Entitlement](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md), [Architecture 24 § 4](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md), [ADR-0020](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md).
 
 ## Aggregate: `Entitlement`
 
@@ -47,7 +47,7 @@ In P02c-1 the service's final step — publishing `learnstack.hub.entitlement` v
 
 ## Architecture / contract tests (recommended in P02c-1)
 
-- `EntitlementProjection_Shape_IsStable` ([ADR-0021 § Architecture tests](../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md)) — snapshot-test the serialised `EntitlementProjectionDto` JSON against a checked-in `entitlement-v1.schema.json` under `LearnStack.Hub.Tests.Contract`. This is the contract guard; land it here because P02c-1 is where the projection serialiser is born.
+- `EntitlementProjection_Shape_IsStable` ([ADR-0021 § Architecture tests](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)) — snapshot-test the serialised `EntitlementProjectionDto` JSON against a checked-in `entitlement-v1.schema.json` under `LearnStack.Hub.Tests.Contract`. This is the contract guard; land it here because P02c-1 is where the projection serialiser is born.
 - Unit test: `generation` strictly increases across successive `Recompute` calls; starts at 1.
 - Integration test (Testcontainers, lights up the `backend-integration` CI job): create tenant → trial subscription → recompute → assert `Entitlement` row exists with generation 1, correct tier/features/limits; change plan → recompute → assert generation 2 + updated fields.
 

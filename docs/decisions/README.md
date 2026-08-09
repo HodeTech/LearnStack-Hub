@@ -1,6 +1,6 @@
 # Hub-Internal ADRs
 
-Architecture Decision Records that affect **only** Hub. Cross-cutting decisions (LearnStack ↔ Hub contracts, deployment models, entitlement projection, custom-domain lifecycle) live in the [LearnStack core decisions corpus](../../../LearnStack/docs/decisions/) — not duplicated here.
+Architecture Decision Records that affect **only** Hub. Cross-cutting decisions (LearnStack ↔ Hub contracts, deployment models, entitlement projection, custom-domain lifecycle) live in the [LearnStack core decisions corpus](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/) — not duplicated here.
 
 ## Numbering convention
 

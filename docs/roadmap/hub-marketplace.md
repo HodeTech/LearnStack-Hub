@@ -17,7 +17,7 @@ Let tenants publish and install reusable **tenant customization data**.
 A yoga studio that has authored a good asana content type, its level taxonomy, its page
 blocks and its completion rules has built something a second yoga studio would pay in time
 to skip. Under
-[ADR-0018](../../../LearnStack/docs/decisions/0018-tenant-driven-customization-model.md)
+[ADR-0018](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0018-tenant-driven-customization-model.md)
 all of that is data, so it is transferable in principle: a bundle, a validation pass, an
 install.
 
@@ -32,7 +32,7 @@ conditions are in the [Phase Exit Decision](#phase-exit-decision).
 
 ### The genericity boundary decides what a bundle may contain
 
-[ADR-0018's 2026-08-08 Amendment](../../../LearnStack/docs/decisions/0018-tenant-driven-customization-model.md)
+[ADR-0018's 2026-08-08 Amendment](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0018-tenant-driven-customization-model.md)
 draws the line the marketplace has to respect. Inside the boundary — **content shape**,
 **presentation**, and **pure rule evaluation** — everything is a pure function of tenant
 data and already-recorded state, and everything is bundleable:
@@ -60,14 +60,14 @@ saying plainly, because a "code challenge runner" bundle is the single most requ
 marketplace listing in any education platform. Installing one would mean installing a
 sandbox as data. There is no extension point that can carry it, and inventing one would
 reopen the plugin model that
-[ADR-0011](../../../LearnStack/docs/decisions/0011-extension-points.md) described and
+[ADR-0011](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0011-extension-points.md) described and
 ADR-0018 superseded. A tenant that needs code execution needs a **LearnStack release** —
 a platform feature gated by plan — or an adapter to an external provider. It does not need,
 and cannot have, a marketplace listing.
 
 ### The unresolved collision with ADR-0034
 
-[ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)'s
+[ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)'s
 first invariant is that **the Hub stores no tenant content**. A marketplace listing is
 authored by a tenant, describes that tenant's product, and often carries sample fixtures
 drawn from that tenant's data. On the plainest reading, a listing *is* tenant content, and
@@ -171,7 +171,7 @@ If the track is activated, it is complete when:
 - **Bundles as an injection surface.** A bundle is JSON, but JSON that names renderer keys
   and can carry `embed-html` block content is executable-adjacent. Mitigated by the
   sanitisation contract in
-  [Architecture 32](../../../LearnStack/docs/architecture/32-tenant-customization-model.md)
+  [Architecture 32](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/32-tenant-customization-model.md)
   applying to installed content exactly as it applies to authored content — installation
   is not a trust boundary crossing that grants privileges.
 - **Operator review burden at scale.** Manual review is the quality gate and the
@@ -193,7 +193,7 @@ together, and neither is a matter of judgement:
 1. **Demonstrated duplication.** At least two tenants in the same domain have
    independently authored substantially equivalent customization data. Until that has
    happened in production, sharing is a hypothesis about a market, not an observation of
-   one. [LearnStack Phase 10](../../../LearnStack/docs/roadmap/phase-10-english-learning-mvp.md)
+   one. [LearnStack Phase 10](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-10-english-learning-mvp.md)
    exercises one tenant in depth; it is the evidence base, not the trigger.
 2. **The ADR-0034 collision is resolved by a written, accepted ADR** that says where
    listings live and why that does not make the Hub a store of tenant content.

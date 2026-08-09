@@ -198,32 +198,14 @@ jobs:
                   case "$link" in
                       http://*|https://*|mailto:*|tel:*|ftp://*) continue ;;
                   esac
-                  # Sibling-relative LearnStack link at any `../` depth.
-                  # Hub docs reference LearnStack core at varying depths
-                  # depending on the source file's own location:
-                  #   - root files (README, CLAUDE.md):       ../LearnStack/...
-                  #   - docs/*.md:                            ../../LearnStack/...
-                  #   - docs/{architecture,decisions}/*.md:   ../../../LearnStack/...
-                  #   - backend/src/Modules/README.md:        ../../../../LearnStack/...
-                  # The trailing piece is optional — `../LearnStack` (a bare
-                  # directory link to the sibling repo's root) is just as
-                  # legitimate as `../LearnStack/docs/...`. CI cannot reach
-                  # the sibling repo, so skip the file-existence check for
-                  # any `(../)+LearnStack` link, with or without a trailing
-                  # path. The links are validated locally on the developer's
-                  # workstation.
-                  #
-                  # The directory is spelled `LearnStack` on disk and every link
-                  # in this repository uses that capitalisation. Bash `=~` is
-                  # case-sensitive and this workflow sets no `nocasematch`, so
-                  # the pattern matches both cases explicitly rather than
-                  # depending on a shell option set somewhere else. The trailing
-                  # `(/|$)` is what keeps a hypothetical `../LearnStack-Hub/...`
-                  # self-reference OUT of the skip: it would have to be followed
-                  # by `/` or end-of-string, and `-` is neither.
-                  if [[ "$link" =~ ^(\.\./)+[Ll]earn[Ss]tack(/|$) ]]; then
-                      continue
-                  fi
+                  # There is deliberately NO exemption for cross-repo links.
+                  # Hub docs link into LearnStack core by absolute URL
+                  # (https://github.com/cemililik/LearnStack/blob/main/...),
+                  # which the external-URL skip above already covers. A
+                  # sibling-relative `../LearnStack/...` link is a defect: it
+                  # 404s on github.com and depends on a local checkout that is
+                  # present and identically capitalised. It now fails here
+                  # instead of reaching a reader.
                   link_path="${link%%#*}"
                   link_path="${link_path%%\?*}"
                   [[ -z "$link_path" ]] && continue

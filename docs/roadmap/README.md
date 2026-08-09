@@ -2,11 +2,11 @@
 
 LearnStack Hub is the **control plane** for LearnStack: tenant lifecycle, plan catalogue, subscriptions, the entitlement projection, custom-domain administration, licence issuance, and the operator portal. It holds tenant _metadata_ and never tenant _content_.
 
-**This directory is the authoritative plan for Hub work.** LearnStack's [Phase 02c](../../../LearnStack/docs/roadmap/phase-02c-hub-foundation.md) covers only LearnStack's side of the boundary — the `HubEntitlementProvider` / `IUsageReporter` / `IHubTenantSync` adapters and the `/api/internal/*` handlers — and points here for everything Hub-side. Cross-cutting decisions (ADRs, engineering standards) remain LearnStack's; see [Where cross-cutting authority lives](#where-cross-cutting-authority-lives).
+**This directory is the authoritative plan for Hub work.** LearnStack's [Phase 02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) covers only LearnStack's side of the boundary — the `HubEntitlementProvider` / `IUsageReporter` / `IHubTenantSync` adapters and the `/api/internal/*` handlers — and points here for everything Hub-side. Cross-cutting decisions (ADRs, engineering standards) remain LearnStack's; see [Where cross-cutting authority lives](#where-cross-cutting-authority-lives).
 
 ## How this plan is governed
 
-- **Hub is a demand-gated track, not a prerequisite.** LearnStack runs on `NullEntitlementProvider` and resolves hosts from `platform_host_to_tenant` until a tenant must be billed or plan-gated. That sentence is the literal trigger condition [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md) records for the Hub entitlement adapter, and it is what governs when this plan resumes.
+- **Hub is a demand-gated track, not a prerequisite.** LearnStack runs on `NullEntitlementProvider` and resolves hosts from `platform_host_to_tenant` until a tenant must be billed or plan-gated. That sentence is the literal trigger condition [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) records for the Hub entitlement adapter, and it is what governs when this plan resumes.
 - **The `P02c-N` identifiers are stable and load-bearing.** They appear in branch names, commit subjects, skill bodies, design specs, CI comments, and in LearnStack's roadmap. They are not renumbered, and `P02c-3` in this repo means the same packet as `P02c-3` in LearnStack's.
 - **Every packet doc carries the same six sections** — `## Goal`, `## Scope`, `## Deliverables`, `## Completion Criteria`, `## Risks`, `## Phase Exit Decision` — matching LearnStack's roadmap convention.
 - **No owners, no effort estimates, no timeboxes.** This is a dependency and scope plan. Sequencing decisions belong here; capacity decisions do not.
@@ -28,7 +28,7 @@ Execution artifacts live alongside the packet docs: [`P02c-1-implementation-prom
 
 ## Post-MVP tracks
 
-These are Hub-owned phases that sit outside the P02c series. LearnStack's [Phase 09b](../../../LearnStack/docs/roadmap/phase-09b-hub-billing.md) and [Phase 12](../../../LearnStack/docs/roadmap/phase-12-hub-marketplace.md) are pointers at them.
+These are Hub-owned phases that sit outside the P02c series. LearnStack's [Phase 09b](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-09b-hub-billing.md) and [Phase 12](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-12-hub-marketplace.md) are pointers at them.
 
 | Track                                    | What it covers                                                                                         | Trigger                      |
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------- |
@@ -82,12 +82,12 @@ Both repositories block each other in places. Neither table is a wish list — e
 
 | Hub packet | LearnStack packet                                                                             | What it provides                                                                                                         |
 | ---------- | --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| P02c-3     | [P02a-5 Foundation ports](../../../LearnStack/docs/roadmap/phase-02a-kernel-tenancy.md)       | `IEventBus` / `ICacheService` / `ISecretProvider` and their default implementations, which the LearnStack-side handlers use |
-| P02c-3     | [P02a-6 Tenancy schema](../../../LearnStack/docs/roadmap/phase-02a-kernel-tenancy.md)         | `platform_entitlement_cache`, `platform_host_to_tenant` and `outbox_messages` tables                                     |
-| P02c-3     | [P02a-7 Resolution + isolation](../../../LearnStack/docs/roadmap/phase-02a-kernel-tenancy.md) | `IHostToTenantResolver`, `TenantResolverMiddleware`, and the `HubCorrelationMiddleware` seam that populates `ITenantContext` on `/api/internal/*` |
-| P02c-3     | [P02a-9 Audit + entitlement socket](../../../LearnStack/docs/roadmap/phase-02a-kernel-tenancy.md) | The `IEntitlementProvider` socket with `NullEntitlementProvider` as its only implementation                            |
-| P02c-5     | [LearnStack Phase 02c](../../../LearnStack/docs/roadmap/phase-02c-hub-foundation.md) | The LearnStack-side `host-mappings` handler and its `platform_host_to_tenant` mirroring — the paired half of this packet, merged in the same session |
-| P02c-5     | [LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md) | The LearnStack **edge** half only: certificate installation at the gateway, demand-gated per [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md). P02c-5 does **not** wait on it — host resolution works from the `platform_host_to_tenant` row alone |
+| P02c-3     | [P02a-5 Foundation ports](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md)       | `IEventBus` / `ICacheService` / `ISecretProvider` and their default implementations, which the LearnStack-side handlers use |
+| P02c-3     | [P02a-6 Tenancy schema](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md)         | `platform_entitlement_cache`, `platform_host_to_tenant` and `outbox_messages` tables                                     |
+| P02c-3     | [P02a-7 Resolution + isolation](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) | `IHostToTenantResolver`, `TenantResolverMiddleware`, and the `HubCorrelationMiddleware` seam that populates `ITenantContext` on `/api/internal/*` |
+| P02c-3     | [P02a-9 Audit + entitlement socket](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) | The `IEntitlementProvider` socket with `NullEntitlementProvider` as its only implementation                            |
+| P02c-5     | [LearnStack Phase 02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) | The LearnStack-side `host-mappings` handler and its `platform_host_to_tenant` mirroring — the paired half of this packet, merged in the same session |
+| P02c-5     | [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) | The LearnStack **edge** half only: certificate installation at the gateway, demand-gated per [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md). P02c-5 does **not** wait on it — host resolution works from the `platform_host_to_tenant` row alone |
 
 P02c-0, P02c-1, P02c-2, P02c-4 and P02c-6 are **unblocked by LearnStack** — they touch no LearnStack code and can proceed whenever the Hub track resumes.
 
@@ -96,7 +96,7 @@ P02c-0, P02c-1, P02c-2, P02c-4 and P02c-6 are **unblocked by LearnStack** — th
 | LearnStack artefact                                             | Hub packet | Why                                                                                                                                    |
 | ----------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
 | `entitlement-v1.schema.json` + its snapshot test                 | P02c-1     | The schema is born with the Hub projection serialiser. Both repositories check in the same file and assert it independently.            |
-| `HubEntitlementProvider` (Phase 02c)                             | P02c-2     | The last hop of the entitlement read path in [ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md) is `POST /api/v1/internal/license/verify`, which is a Hub handler. |
+| `HubEntitlementProvider` (Phase 02c)                             | P02c-2     | The last hop of the entitlement read path in [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) is `POST /api/v1/internal/license/verify`, which is a Hub handler. |
 | `IUsageReporter` (Phase 02c)                                     | P02c-2     | Needs `POST /api/v1/usage/report` live, with its idempotency semantics fixed Hub-side.                                                  |
 | LearnStack `/api/internal/*` handlers (Phase 02c)                | P02c-2     | The Hub PR carries the canonical request / response shapes and the mTLS + JWT + HMAC chain the handlers validate against.               |
 | `NullEntitlementProvider_NotRegistered_OutsideDevelopment`       | P02c-3     | The rule is vacuous until a second `IEntitlementProvider` implementation exists.                                                        |
@@ -134,16 +134,16 @@ Hub does not maintain its own standards corpus and does not restate LearnStack's
 
 | Topic                                                | Authority                                                                                                        |
 | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| The Hub boundary, separate repository, internal API  | [ADR-0019](../../../LearnStack/docs/decisions/0019-learnstack-hub.md)                                            |
-| Contract-surface invariants + the real endpoint set  | [ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)                            |
-| What ships now versus on demand, and the triggers    | [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md)                                |
-| Deployment modes + hybrid licence                    | [ADR-0020](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md)                           |
-| Entitlement projection shape                         | [ADR-0021](../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md)                                  |
-| Custom domain + TLS                                  | [ADR-0022](../../../LearnStack/docs/decisions/0022-custom-domain-tls.md)                                          |
-| Two-realm Keycloak boundary                          | [ADR-0004](../../../LearnStack/docs/decisions/0004-authentication-strategy.md)                                    |
-| Exception handling, logging, observability           | [ADR-0032](../../../LearnStack/docs/decisions/0032-exception-handling-logging-and-observability.md)               |
-| Engineering standards                                | [Standards corpus](../../../LearnStack/docs/standards/README.md)                                                  |
-| Architecture-test identifiers                        | [Standards 21](../../../LearnStack/docs/standards/21-architecture-tests-catalogue.md)                             |
+| The Hub boundary, separate repository, internal API  | [ADR-0019](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md)                                            |
+| Contract-surface invariants + the real endpoint set  | [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)                            |
+| What ships now versus on demand, and the triggers    | [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md)                                |
+| Deployment modes + hybrid licence                    | [ADR-0020](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)                           |
+| Entitlement projection shape                         | [ADR-0021](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)                                  |
+| Custom domain + TLS                                  | [ADR-0022](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)                                          |
+| Two-realm Keycloak boundary                          | [ADR-0004](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)                                    |
+| Exception handling, logging, observability           | [ADR-0032](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)               |
+| Engineering standards                                | [Standards corpus](https://github.com/cemililik/LearnStack/blob/main/docs/standards/README.md)                                                  |
+| Architecture-test identifiers                        | [Standards 21](https://github.com/cemililik/LearnStack/blob/main/docs/standards/21-architecture-tests-catalogue.md)                             |
 | Hub-internal decisions only                          | [`docs/decisions/`](../decisions/README.md) — the `HUB-NNNN` series                                               |
 
-> **One correction worth stating explicitly.** [ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md) replaces the "the Hub contract surface is closed at four endpoints" rule with two invariants: the Hub stores no tenant content, and every LearnStack↔Hub crossing goes through a named adapter. Adding an endpoint still requires an ADR. Pointer text elsewhere in this repository that still says "four endpoints" predates that ADR and is corrected as those files are touched.
+> **One correction worth stating explicitly.** [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) replaces the "the Hub contract surface is closed at four endpoints" rule with two invariants: the Hub stores no tenant content, and every LearnStack↔Hub crossing goes through a named adapter. Adding an endpoint still requires an ADR. Pointer text elsewhere in this repository that still says "four endpoints" predates that ADR and is corrected as those files are touched.

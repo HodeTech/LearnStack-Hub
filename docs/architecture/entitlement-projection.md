@@ -2,11 +2,11 @@
 
 The `Entitlement` aggregate is the **single most load-bearing thing Hub produces**: a flattened, denormalised projection of `Plan` + `HubSubscription` (+ `CompliancePolicy`, from P02c-5) per tenant. It is the only shape LearnStack core's `HubEntitlementProvider` consumes, and the only shape pushed across the `PUT /api/internal/tenants/{id}/entitlements` contract.
 
-Authoritative sources: [ADR-0021 Feature-Based Entitlement](../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md) (+ Amendment 1), [Architecture 24 § 4 Entitlement projection](../../../LearnStack/docs/architecture/24-learnstack-hub.md), [ADR-0020 Triple Deployment + Hybrid License](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md).
+Authoritative sources: [ADR-0021 Feature-Based Entitlement](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md) (+ Amendment 1), [Architecture 24 § 4 Entitlement projection](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md), [ADR-0020 Triple Deployment + Hybrid License](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md).
 
 ## Projection shape (the wire contract)
 
-This is the JSON the projection serialises to (per [Architecture 24 § 4](../../../LearnStack/docs/architecture/24-learnstack-hub.md)). It is the contract LearnStack core mirrors into `platform_entitlement_cache`:
+This is the JSON the projection serialises to (per [Architecture 24 § 4](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md)). It is the contract LearnStack core mirrors into `platform_entitlement_cache`:
 
 ```json
 {
@@ -53,7 +53,7 @@ This is the JSON the projection serialises to (per [Architecture 24 § 4](../../
 
 ### Key-shape rules (load-bearing; do not drift)
 
-- **Feature keys** use the dotted snake_case form with **no `.enabled` suffix** (dropped in [ADR-0021 Amendment 1](../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md)). Every feature is implicitly boolean. e.g. `classroom.recording`, `tenancy.custom_domain`, `identity.sso.saml`.
+- **Feature keys** use the dotted snake_case form with **no `.enabled` suffix** (dropped in [ADR-0021 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)). Every feature is implicitly boolean. e.g. `classroom.recording`, `tenancy.custom_domain`, `identity.sso.saml`.
 - **Limit keys** carry the `limits.` prefix; value `-1` = unlimited, `0` = not available. e.g. `limits.max_users`.
 - **Compliance-cap keys** keep their own `.enabled` portion as part of the cap name (it is NOT a redundant suffix), and the value is a `{ allowed, forced, value? }` object — not a bare bool.
 - The `tier` mirrors the `Plan.tier` (`starter | growth | scale | enterprise | custom`).
@@ -62,7 +62,7 @@ P02c-1 stores `features` / `limits` / `compliance_caps` as **JSONB columns** on 
 
 ## `Entitlement` aggregate (P02c-1)
 
-Per [Architecture 24 § 2 ERD](../../../LearnStack/docs/architecture/24-learnstack-hub.md):
+Per [Architecture 24 § 2 ERD](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md):
 
 | Column            | Type             | Notes                                                                                                              |
 | ----------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------ |
@@ -122,7 +122,7 @@ RETURN: Result<EntitlementProjection>
 
 ### When recompute fires (P02c-1 triggers)
 
-Per [Architecture 24 § 4 Recompute rule](../../../LearnStack/docs/architecture/24-learnstack-hub.md), recompute fires on:
+Per [Architecture 24 § 4 Recompute rule](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md), recompute fires on:
 
 | Trigger                                                                              | P02c-1?   | Mechanism                                                                                   |
 | ------------------------------------------------------------------------------------ | --------- | ------------------------------------------------------------------------------------------- |
@@ -145,5 +145,5 @@ Hub's only obligation is to keep emitting a projection whose shape matches the c
 
 ## Architecture-test hooks
 
-- `EntitlementProjection_Shape_IsStable` (from [ADR-0021 § Architecture tests](../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md)) — snapshot-test the serialised projection JSON against a checked-in `entitlement-v1.schema.json`. A breaking change requires a schema-version bump. Recommended to land this in P02c-1 since the projection serialiser is the contract surface.
+- `EntitlementProjection_Shape_IsStable` (from [ADR-0021 § Architecture tests](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)) — snapshot-test the serialised projection JSON against a checked-in `entitlement-v1.schema.json`. A breaking change requires a schema-version bump. Recommended to land this in P02c-1 since the projection serialiser is the contract surface.
 - `generation` monotonicity is not an architecture test (it's a runtime invariant) — cover it with a unit test on the `Entitlement.Recompute` method (generation strictly increases) and an integration test on the projection service.

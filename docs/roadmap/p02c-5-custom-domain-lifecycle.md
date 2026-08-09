@@ -8,11 +8,11 @@ an operator editing a route file.
 
 Education platforms compete on brand. A yoga studio does not want its learners typing
 `anatolia-yoga.learnstack.app`; the domain is part of the product
-([ADR-0022](../../../LearnStack/docs/decisions/0022-custom-domain-tls.md)). But the
+([ADR-0022](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)). But the
 mechanism that delivers that domain is the single most security-sensitive thing the Hub
 does: it handles ACME challenges, private keys, and the mapping that decides which
 tenant's data a request sees. P02c-5 builds it under two hard constraints that
-[ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+[ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
 makes explicit — **certificate material never travels in the entitlement payload**, and
 **the Hub never holds Kubernetes credentials on the LearnStack cluster**.
 
@@ -25,7 +25,7 @@ both belong to the same "per-tenant policy an operator sets" surface.
 ### `CustomDomain` aggregate and state machine
 
 `LearnStack.Hub.Modules.CustomDomains` owns `CustomDomain : AuditableEntity<CustomDomainId>`,
-shaped as [ADR-0022 § Hub data model](../../../LearnStack/docs/decisions/0022-custom-domain-tls.md)
+shaped as [ADR-0022 § Hub data model](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)
 specifies.
 
 ```mermaid
@@ -61,10 +61,10 @@ Validation at `Create`:
   is one tenant serving another tenant's traffic.
 - One `is_primary` domain per tenant.
 - The `tenancy.custom_domain` feature key must be present in the tenant's entitlement
-  ([ADR-0021](../../../LearnStack/docs/decisions/0021-feature-based-entitlement.md)); the
+  ([ADR-0021](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)); the
   gate is checked at submission, not at activation, so a tenant is told immediately.
 
-Per [ADR-0022 § Architecture tests](../../../LearnStack/docs/decisions/0022-custom-domain-tls.md),
+Per [ADR-0022 § Architecture tests](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md),
 `CustomDomain_TenantId_NeverReadFrom_RequestBody` — the tenant is always derived from the
 authenticated context, never from a submitted field.
 
@@ -107,7 +107,7 @@ authenticated context, never from a submitted field.
 ### Integration events
 
 Published through `IOutbox` → `IEventBus` on the topics
-[ADR-0022 Amendment 1](../../../LearnStack/docs/decisions/0022-custom-domain-tls.md)
+[ADR-0022 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)
 names:
 
 | Topic | Emitted when | LearnStack-side effect |
@@ -123,13 +123,13 @@ Each payload carries the host, the tenant id, the optional organization id, and 
 
 This is the load-bearing section of the packet.
 
-[ADR-0022 Amendment 1](../../../LearnStack/docs/decisions/0022-custom-domain-tls.md)
+[ADR-0022 Amendment 1](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)
 routed host mappings, and with them TLS certificate material including private keys,
 through `PUT /api/internal/tenants/{id}/entitlements` — because that kept the contract
 surface at four endpoints. The entitlement payload is cached in
 `platform_entitlement_cache`, logged, audited and mirrored. Tunnelling a private key
 through a cached projection is strictly worse than declaring another endpoint, and
-[ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+[ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
 supersedes that step.
 
 Two channels, with different trust properties:
@@ -196,13 +196,13 @@ Added to the P02c-4 shell: Custom Domains → Pending Queue, Active List, Renewa
 
 The LearnStack-side event consumer, the `host-mappings` handler and the
 `platform_host_to_tenant` writes are the paired half of this packet and live in LearnStack
-[Phase 02c](../../../LearnStack/docs/roadmap/phase-02c-hub-foundation.md), merged in the
+[Phase 02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md), merged in the
 same session per [CLAUDE.md § Cross-repo coordination](../../CLAUDE.md).
 
 The LearnStack **edge** half is demand-gated. Per
-[ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md), both
+[ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md), both
 the APISIX adapter and custom-domain TLS automation land in
-[LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md),
+[LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md),
 with the trigger *"a tenant needs its own domain in production"*. Before that trigger
 fires, LearnStack terminates TLS with its default ASP.NET hosting rather than APISIX SSL
 objects.
@@ -280,7 +280,7 @@ serving that host on a publicly trusted certificate at the edge.
   next to mapping state.
 - **Air-gapped deployments have no Hub at all.** Customer-provided certificates placed
   directly in the customer's own secret store are the path there
-  ([ADR-0022 Amendment 2](../../../LearnStack/docs/decisions/0022-custom-domain-tls.md));
+  ([ADR-0022 Amendment 2](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md));
   none of this packet applies to `SelfHostedAirGapped`, and the `.lic` file's
   `custom_domains` claim is how that mode tells LearnStack which hosts to expect
   ([P02c-6](p02c-6-license-key.md)).

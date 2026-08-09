@@ -9,7 +9,7 @@ Every other entitlement path in this repository assumes a network. `HubEntitleme
 calls the Hub; the projection push reaches LearnStack over HTTPS; a plan change propagates
 in seconds. A Self-Hosted customer in a regulated or air-gapped environment has none of
 that, and
-[ADR-0020](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md)
+[ADR-0020](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)
 answers it with an RSA-signed `.lic` file that embeds the same entitlement projection —
 no schema fork, no second entitlement model, just a different transport with a longer
 refresh interval and bounded trust.
@@ -17,9 +17,9 @@ refresh interval and bounded trust.
 P02c-6 builds the issuing half of that: the `LicenseKey` aggregate, the signing keypair
 and its rotation seam, the file format, and the revocation mechanism. The consuming half
 on the LearnStack side ships as a **functional skeleton** here and is hardened in
-[LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md),
+[LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md),
 whose trigger — per
-[ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md) — is
+[ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) — is
 *"a Self-Hosted contract is signed"*.
 
 ## Scope
@@ -50,7 +50,7 @@ Issuing and revoking are both MUST-class audited operator actions
 
 - **RSA-2048 minimum**, RS256. The verifier rejects anything weaker;
   `LicenseKey_Validation_Is_Pinned_RSA2048`
-  ([ADR-0020 § Architecture tests](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md))
+  ([ADR-0020 § Architecture tests](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md))
   asserts it.
 - Private key lives in the Hub's secret store at
   `secret/learnstack-hub/license-signing-key`, read through `ISecretProvider`. It is never
@@ -62,14 +62,14 @@ Issuing and revoking are both MUST-class audited operator actions
   window, and a key retired mid-window still validates licences issued before its
   `RetiredAt`. The rotation *procedure* — key generation ceremony, custody, the release
   that ships the new public key — is
-  [LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md).
+  [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md).
   What ships here is the data model that makes rotation possible without a format change.
 
 ### The `.lic` file
 
 Wire format is `<base64url(header)>.<base64url(payload)>.<base64url(signature)>` — JWT
 shape, distinguished by the header `typ: "LSL"` ("LearnStack License"), per
-[Hybrid License Model § 1](../../../LearnStack/docs/architecture/26-hybrid-license-model.md).
+[Hybrid License Model § 1](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/26-hybrid-license-model.md).
 
 Header: `{ "alg": "RS256", "typ": "LSL", "kid": "lsl-signing-key-v1" }`.
 
@@ -92,7 +92,7 @@ Payload claims:
 
 The documented payload does not have one, and everything downstream assumes it does.
 
-[Hybrid License Model § 7](../../../LearnStack/docs/architecture/26-hybrid-license-model.md)
+[Hybrid License Model § 7](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/26-hybrid-license-model.md)
 publishes a revocation bundle whose body is a list of `revoked_license_ids`, and its
 verification sequence checks that the presented licence's `license_id` is not in that
 set. The payload in § 1 of the same document carries `iss`, `sub`, `iat`, `exp`,
@@ -115,7 +115,7 @@ P02c-6 fixes it:
   change. Two spellings of one fact is how the two sides end up disagreeing about when a
   licence expires.
 - The payload shape sits inside
-  [ADR-0020's](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md)
+  [ADR-0020's](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)
   Decision section, so the correction lands as a **dated Amendment** to that ADR, never as
   an edit to the Decision text.
 
@@ -134,10 +134,10 @@ a signed revocation bundle:
 
 **It is published as a signed static artefact at a fixed URL, not as an internal-API
 endpoint.**
-[ADR-0020](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md)
-describes it that way; [Hybrid License Model § 7](../../../LearnStack/docs/architecture/26-hybrid-license-model.md)
+[ADR-0020](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)
+describes it that way; [Hybrid License Model § 7](https://github.com/cemililik/LearnStack/blob/main/docs/architecture/26-hybrid-license-model.md)
 shows it under `/api/v1/internal/license/revocations`, which is a path
-[ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)'s
+[ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)'s
 enumerated LearnStack → Hub set does not contain. The static-artefact form is chosen
 because it keeps the contract surface unchanged and because it is the form an air-gapped
 customer can actually consume — a file they can carry in on media, verify offline, and
@@ -174,7 +174,7 @@ Revocation List Generator, Phone-Home Activity.
 
 `SignedLicenseKeyEntitlementProvider` ships in LearnStack as the third
 `IEntitlementProvider` implementation
-([ADR-0020](../../../LearnStack/docs/decisions/0020-triple-deployment-hybrid-license.md)),
+([ADR-0020](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0020-triple-deployment-hybrid-license.md)),
 doing the work that cannot be faked:
 
 - parse the `.lic` file, read `kid`, resolve it against the embedded public key set;
@@ -185,14 +185,14 @@ doing the work that cannot be faked:
 - honour `exp` and `grace_until` — functional before `exp`, degraded within grace,
   read-only past it. This is the **licence-expiry** ladder and it is deliberately not
   the same as the Hub-outage ladder that
-  [ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+  [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
   defines. An outage is a control-plane failure the tenant did not cause, so ADR-0034
   answers it with a durable grace window plus a per-key fail-open / fail-closed class;
   an expired licence is the licence working as intended, so it degrades to read-only and
   stays there. Do not sweep this paragraph to match the ADR-0034 wording.
 
-**Production hardening is [LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md)**,
-per [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md):
+**Production hardening is [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md)**,
+per [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md):
 
 - the signing-key rotation procedure and custody model;
 - signed revocation-list distribution, the daily refresh job, and its offline fallback;
@@ -218,7 +218,7 @@ operations.
 - Dated Amendment to ADR-0020 recording the claim-set correction.
 - Signed revocation bundle generator publishing to a fixed URL.
 - **Phone-home client certificate in the licence bundle.**
-  [ADR-0034 § One auth chain, both directions](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+  [ADR-0034 § One auth chain, both directions](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
   extends the mTLS + JWT + HMAC chain to the LearnStack → Hub direction, replacing the
   per-instance API key. A `SelfHostedOnline` instance therefore cannot phone home
   without a client certificate the Hub's CA will validate, and this packet is the only
@@ -289,7 +289,7 @@ operations.
   rotation procedure, the revocation refresh and the hot-reload runbook, `SelfHostedOnline`
   and `SelfHostedAirGapped` remain prepared seams rather than supported deployments, which
   is exactly what
-  [ADR-0035](../../../LearnStack/docs/decisions/0035-demand-gated-infrastructure.md)
+  [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md)
   says. Sales-facing material must say the same.
 
 ## Phase Exit Decision
@@ -301,7 +301,7 @@ and revoking it plus refreshing the bundle denies that instance before its expir
 
 The packet does **not** claim Self-Hosted as a supported deployment mode. That claim
 belongs to
-[LearnStack Phase 11](../../../LearnStack/docs/roadmap/phase-11-production-hardening.md),
+[LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md),
 when the rotation, distribution and hot-reload procedures exist and a signed contract has
 made them worth writing.
 

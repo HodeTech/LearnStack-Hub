@@ -21,7 +21,7 @@ grace-and-degradation path that turns non-payment into a graded response rather 
 outage.
 
 It runs in parallel with
-[LearnStack Phase 09](../../../LearnStack/docs/roadmap/phase-09-billing-integrations-analytics.md),
+[LearnStack Phase 09](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-09-billing-integrations-analytics.md),
 which builds a completely different billing system. The two never overlap:
 
 | Concern | Owner |
@@ -83,7 +83,7 @@ Pinned once, in one place, because getting it wrong is expensive and silent:
 ### Usage ingestion and aggregation
 
 - `POST /api/v1/usage/report` — already in
-  [ADR-0034's endpoint set](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md)
+  [ADR-0034's endpoint set](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
   and already handled since [P02c-2](p02c-2-internal-api-and-contract.md) — produces the
   raw stream from LearnStack's `IUsageReporter`.
 - A Hangfire job rolls raw reports into `UsageAggregate` daily.
@@ -134,7 +134,7 @@ Adding a fourth is a code edit, not an ADR.
 > `LearnStack.Hub.Infrastructure.Payments.{Stripe,Iyzico,Manual}`; LearnStack adapters live
 > in `LearnStack.Infrastructure.Payments.*` in the other repository. Running both in one
 > process is forbidden by the codebase separation invariant
-> ([ADR-0019](../../../LearnStack/docs/decisions/0019-learnstack-hub.md)).
+> ([ADR-0019](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md)).
 
 Provider SDK types never leave their adapter assembly; SDK exceptions are translated into
 `ProviderException` at the boundary, and `IProviderResilience<IHubPaymentProvider>` carries
@@ -162,7 +162,7 @@ state, recent invoices and next payment due, served by a thin LearnStack-side pr
 `IEntitlementProvider`'s billing-info extension.
 
 The migrated text justified this as "no new endpoint on the four-endpoint surface". Under
-[ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md) the
+[ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) the
 rule is stated differently and the justification is stronger: the crossing goes through a
 **named adapter**, and no type outside `IEntitlementProvider`, `IUsageReporter` and
 `IHubTenantSync` holds a Hub client — asserted by

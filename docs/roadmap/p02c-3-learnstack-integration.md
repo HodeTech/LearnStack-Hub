@@ -23,9 +23,9 @@ Failures on these pushes are retried through `IProviderResilience<TPort>` and ar
 
 ### LearnStack side
 
-Described in full in [LearnStack Phase 02c](../../../LearnStack/docs/roadmap/phase-02c-hub-foundation.md). Summarised here only so this document is readable on its own — that file is the authority for it:
+Described in full in [LearnStack Phase 02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md). Summarised here only so this document is readable on its own — that file is the authority for it:
 
-- Handlers for every Hub → LearnStack path in the [ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md) set, behind the same three-layer authentication chain.
+- Handlers for every Hub → LearnStack path in the [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) set, behind the same three-layer authentication chain.
 - The `HubEntitlementProvider`, `IUsageReporter` and `IHubTenantSync` adapters. These three are the **only** types in the LearnStack codebase permitted to hold a Hub client.
 - The entitlement read path in ADR-0034's normative order: in-process cache, then distributed cache, then the durable `platform_entitlement_cache` row with its `valid_until` and `grace_until`, then the Hub. A Hub outage on a cold cache falls through to the durable row and honours the recorded grace window — it does not throw out of a feature-flag check.
 - `entitlement-v1.schema.json` copied verbatim from the Hub and asserted by a snapshot test on the LearnStack side too.
@@ -33,7 +33,7 @@ Described in full in [LearnStack Phase 02c](../../../LearnStack/docs/roadmap/pha
 
 ### A boundary this packet must not cross
 
-**Host resolution never calls the Hub.** `IHostToTenantResolver` reads `platform_host_to_tenant` and nothing else. An anonymous page load must not depend on a control plane being reachable, or a Hub outage takes tenant marketing sites down. `IHubClient.LookupHostAsync` does not exist; [ADR-0034](../../../LearnStack/docs/decisions/0034-hub-contract-surface-invariant.md) deleted it.
+**Host resolution never calls the Hub.** `IHostToTenantResolver` reads `platform_host_to_tenant` and nothing else. An anonymous page load must not depend on a control plane being reachable, or a Hub outage takes tenant marketing sites down. `IHubClient.LookupHostAsync` does not exist; [ADR-0034](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) deleted it.
 
 ### Pull-request coordination protocol
 
