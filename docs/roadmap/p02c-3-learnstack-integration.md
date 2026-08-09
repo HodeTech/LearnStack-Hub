@@ -1,6 +1,6 @@
 # P02c-3: LearnStack Integration
 
-> **Status: ⏳ Not started.** The only packet in the P02c series that changes both repositories. Depends on [P02c-2](p02c-2-internal-api-and-contract.md) Hub-side, and on LearnStack's Phase 02a packets 5, 6, 7 and 9 on the other side — see [the cross-repo blocking table](README.md#cross-repo-blocking).
+> **Status: ⏳ Not started.** The first and largest of three packets that change both repositories; [P02c-5](p02c-5-custom-domain-lifecycle.md) and [P02c-6](p02c-6-license-key.md) each carry a smaller coordinated LearnStack-side half. It is the packet where the two-PR protocol matters most, and it states that protocol in full below. Depends on [P02c-2](p02c-2-internal-api-and-contract.md) Hub-side, and on LearnStack's Phase 02a packets 5, 6, 7 and 9 on the other side — see [the cross-repo blocking table](README.md#cross-repo-blocking).
 
 ## Goal
 
@@ -59,7 +59,7 @@ Adding or changing an endpoint in the contract surface requires a new ADR in Lea
 
 ## Completion Criteria
 
-- An operator creates a tenant in the Hub and, within seconds, the tenant exists in LearnStack with its default organization and its entitlement projection populated — same tenant id on both sides.
+- An operator creates a tenant in the Hub and, within seconds, the tenant exists in LearnStack with its default organization and its entitlement projection populated — same tenant id on both sides, and a request carrying `Host: {slug}.{platform-domain}` resolves to that tenant.
 - Flipping a feature on the tenant's plan in the Hub reaches LearnStack's feature-flag reads within seconds.
 - A projection push carrying an older `generation` than the one already stored is rejected rather than applied.
 - With the Hub down and every cache cold, a feature-flag check returns an answer from `platform_entitlement_cache` and respects its grace window. Past the grace window, the documented degraded behaviour applies — no unhandled exception at any point.

@@ -214,6 +214,11 @@ serving that host on a publicly trusted certificate at the edge.
 
 ## Deliverables
 
+- Inbound handler for `POST /api/v1/internal/tenants/{id}/custom-domains` — the submission
+  hop LearnStack's Admin Studio proxies, because a `learnstack` realm token is rejected
+  at the Hub ([ADR-0004](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)). Enumerated in
+  [ADR-0034 § The endpoint set](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
+
 - `LearnStack.Hub.Modules.CustomDomains` — aggregate, state machine, public-suffix
   validation, uniqueness constraints, commands and queries.
 - `LearnStack.Hub.Modules.Compliance` — `CompliancePolicy`, cap merge into the projection,
@@ -280,7 +285,8 @@ serving that host on a publicly trusted certificate at the edge.
   next to mapping state.
 - **Air-gapped deployments have no Hub at all.** Customer-provided certificates placed
   directly in the customer's own secret store are the path there
-  ([ADR-0022 Amendment 2](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md));
+  ([ADR-0022 Amendment 2](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0022-custom-domain-tls.md)
+  — its SaaS / Dedicated bullet is superseded by ADR-0034, the air-gapped half stands);
   none of this packet applies to `SelfHostedAirGapped`, and the `.lic` file's
   `custom_domains` claim is how that mode tells LearnStack which hosts to expect
   ([P02c-6](p02c-6-license-key.md)).

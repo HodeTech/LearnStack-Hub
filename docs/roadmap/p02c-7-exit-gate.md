@@ -232,7 +232,7 @@ What Phase 02c explicitly does **not** deliver, with owners:
 | Marketplace listings and installs | [hub-marketplace.md](hub-marketplace.md) |
 | Self-Hosted as a *supported* deployment mode — rotation, revocation distribution, hot-reload runbook | [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) |
 | Custom-domain TLS termination at the LearnStack edge | [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) |
-| Hub production deployment, HA, backup and restore | [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) |
+| Hub production deployment, HA, backup and restore | Hub Operations — unscheduled; see [the post-MVP tracks table](README.md#post-mvp-tracks). LearnStack Phase 11 scopes itself to LearnStack and does not cover the Hub's own database, realm or certificate chain. |
 
 LearnStack does not wait on any of it. Per
 [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) the

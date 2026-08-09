@@ -34,6 +34,9 @@ These are Hub-owned phases that sit outside the P02c series. LearnStack's [Phase
 | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ | ---------------------------- |
 | [Hub Billing](hub-billing.md)            | Stripe / Iyzico adapters, `Invoicing` module, `WebhookLedger`, dunning, proration, the storefront flow | Commercial billing is needed |
 | [Hub Marketplace](hub-marketplace.md)    | Shared customization packages, listing, install, revenue share                                         | Product-market evidence      |
+| Hub Operations (unscheduled)             | Hub production deployment, HA topology, backup and restore drill, release process, and the operational runbooks the [P02c-7](p02c-7-exit-gate.md) gate names | A Hub instance serves a paying tenant |
+
+Hub Operations has no plan document yet. It is listed so the work has a named owner in this repository rather than being handed to LearnStack Phase 11, which scopes itself to LearnStack ([Phase 11 § Release Engineering](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md)).
 
 ## Intra-Hub dependency map
 
@@ -86,10 +89,12 @@ Both repositories block each other in places. Neither table is a wish list — e
 | P02c-3     | [P02a-6 Tenancy schema](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md)         | `platform_entitlement_cache`, `platform_host_to_tenant` and `outbox_messages` tables                                     |
 | P02c-3     | [P02a-7 Resolution + isolation](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) | `IHostToTenantResolver`, `TenantResolverMiddleware`, and the `HubCorrelationMiddleware` seam that populates `ITenantContext` on `/api/internal/*` |
 | P02c-3     | [P02a-9 Audit + entitlement socket](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) | The `IEntitlementProvider` socket with `NullEntitlementProvider` as its only implementation                            |
+| P02c-3     | [Phase 02b Identity Integration + Events](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02b-events-auth.md) | The `OutboxProcessor` and its claim protocol, `IInboxGuard` and the per-module `inbox_messages` tables, and handler-scope tenant-context restoration. `IUsageReporter` dispatches through the outbox rather than inline, and the `learnstack.hub.entitlement` invalidation consumer is an ordinary `IIntegrationEventHandler<T>` behind the same inbox guard |
+| P02c-6     | [P02a-9 Audit + entitlement socket](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) | The `IEntitlementProvider` socket the LearnStack-side `SignedLicenseKeyEntitlementProvider` skeleton plugs into, in a coordinated pull request |
 | P02c-5     | [LearnStack Phase 02c](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) | The LearnStack-side `host-mappings` handler and its `platform_host_to_tenant` mirroring — the paired half of this packet, merged in the same session |
 | P02c-5     | [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) | The LearnStack **edge** half only: certificate installation at the gateway, demand-gated per [ADR-0035](https://github.com/cemililik/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md). P02c-5 does **not** wait on it — host resolution works from the `platform_host_to_tenant` row alone |
 
-P02c-0, P02c-1, P02c-2, P02c-4 and P02c-6 are **unblocked by LearnStack** — they touch no LearnStack code and can proceed whenever the Hub track resumes.
+P02c-0, P02c-1, P02c-2 and P02c-4 are **unblocked by LearnStack** — they touch no LearnStack code and can proceed whenever the Hub track resumes. P02c-3, P02c-5 and P02c-6 each land as two coordinated pull requests; see the tables above and [Coordination protocol](#coordination-protocol). P02c-3 is the only packet gated on the LearnStack spine reaching **Phase 02b**, not merely Phase 02a.
 
 ### LearnStack waits on Hub
 
@@ -101,7 +106,7 @@ P02c-0, P02c-1, P02c-2, P02c-4 and P02c-6 are **unblocked by LearnStack** — th
 | LearnStack `/api/internal/*` handlers (Phase 02c)                | P02c-2     | The Hub PR carries the canonical request / response shapes and the mTLS + JWT + HMAC chain the handlers validate against.               |
 | `NullEntitlementProvider_NotRegistered_OutsideDevelopment`       | P02c-3     | The rule is vacuous until a second `IEntitlementProvider` implementation exists.                                                        |
 | `platform_host_to_tenant` mirror handler (Phase 02c)            | P02c-5     | The Hub is the certificate issuer and authors the `PUT /api/internal/tenants/{id}/host-mappings` payload shape.                         |
-| `SignedLicenseKeyEntitlementProvider` skeleton (Phase 11)        | P02c-6     | Needs the `.lic` format, the claim set, and the public key the Self-Hosted instance ships with.                                         |
+| `SignedLicenseKeyEntitlementProvider` skeleton                    | P02c-6 (coordinated LearnStack PR) | Needs the `.lic` format, the claim set, and the `kid`-addressed public key set the Self-Hosted instance ships with. Hardened later in [LearnStack Phase 11](https://github.com/cemililik/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md). |
 
 ### Coordination protocol
 
