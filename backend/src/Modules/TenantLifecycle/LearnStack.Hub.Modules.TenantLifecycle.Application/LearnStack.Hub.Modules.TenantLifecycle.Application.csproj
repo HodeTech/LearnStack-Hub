@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Modules.TenantLifecycle.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.TenantLifecycle.Domain\LearnStack.Hub.Modules.TenantLifecycle.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts\LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts.csproj" />
+
+    <!-- CreateTenant orchestrates the trial subscription (StartTrialCommand),
+         which itself triggers the initial entitlement recompute. -->
+    <ProjectReference Include="..\..\Subscriptions\LearnStack.Hub.Modules.Subscriptions.Application.Contracts\LearnStack.Hub.Modules.Subscriptions.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+</Project>

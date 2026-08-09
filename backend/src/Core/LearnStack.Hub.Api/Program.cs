@@ -1,24 +1,69 @@
-// TODO(2026-05-21, @platform, phase-02c-1): wire the cross-cutting foundation
-// (mirror of LearnStack core P02a-3) — IExceptionHandler, 8-step MediatR
-// pipeline, Result<T>.ToActionResult(), Serilog + OTLP, IErrorTrackingProvider,
-// IProviderResilience<TPort>. The OpenTelemetry.* packages are reserved in
-// Directory.Packages.props.
-//
-// TODO(2026-05-21, @platform, phase-02c-2): wire the four-endpoint Hub HTTPS
-// contract surface — `POST /api/v1/internal/license/verify` and
-// `POST /api/v1/usage/report` are HOSTED here; the outbound
-// `POST /api/internal/tenants` + `PUT /api/internal/tenants/{id}/entitlements`
-// calls live in LearnStack.Hub.Infrastructure.LearnStackApiClient.
-//
-// TODO(2026-05-21, @platform, phase-02c-2): bind /api/internal/* endpoints
-// only to the internal listener (separate Kestrel endpoint). Architecture
-// test `Internal_API_Endpoints_AreNot_Public` will fail otherwise.
+using LearnStack.Hub.Api.Common;
+using LearnStack.Hub.Api.Composition;
+using LearnStack.Hub.Application.Pipeline;
+using LearnStack.Hub.Infrastructure.Composition;
+using LearnStack.Hub.Modules.Entitlements.Infrastructure;
+using LearnStack.Hub.Modules.Plans.Infrastructure;
+using LearnStack.Hub.Modules.Subscriptions.Infrastructure;
+using LearnStack.Hub.Modules.TenantLifecycle.Infrastructure;
+using LearnStack.Hub.SharedKernel.Hosting;
+
+// TODO(P02c-2): wire the four-endpoint Hub HTTPS contract surface —
+// POST /api/v1/internal/license/verify and POST /api/v1/usage/report are HOSTED
+// here; the outbound POST /api/internal/tenants + PUT .../entitlements calls
+// live in LearnStack.Hub.Infrastructure.LearnStackApiClient. Bind /api/internal/*
+// to the internal listener only (Internal_API_Endpoints_AreNot_Public).
 
 var builder = WebApplication.CreateBuilder(args);
 
+// DeploymentMode is read exactly once, here at the composition root; modules
+// never read it (Modules_Do_Not_Reference_DeploymentMode).
+var deploymentMode = Enum.TryParse<DeploymentMode>(
+    builder.Configuration["Hub:DeploymentMode"],
+    ignoreCase: true,
+    out var parsed)
+    ? parsed
+    : DeploymentMode.Development;
+
+builder.AddHubSerilog();
+builder.AddHubOpenTelemetry();
+
 builder.Services.AddOpenApi();
 
+// L1 exception handling → RFC 7807 Problem Details.
+builder.Services.AddExceptionHandler<HubExceptionHandler>();
+builder.Services.AddProblemDetails();
+
+// Cross-cutting foundation: clock / guid / random / secrets, the
+// DeploymentMode-branched IErrorTrackingProvider, and the shared-connection
+// unit of work the live TransactionBehavior drives.
+builder.Services.AddHubFoundation(builder.Configuration, deploymentMode);
+
+// The 6-step MediatR pipeline + every module's handler assembly.
+builder.Services.AddHubMediatRPipeline(
+    typeof(LearnStack.Hub.Application.AssemblyMarker).Assembly,
+    typeof(LearnStack.Hub.Modules.TenantLifecycle.Application.AssemblyMarker).Assembly,
+    typeof(LearnStack.Hub.Modules.Plans.Application.AssemblyMarker).Assembly,
+    typeof(LearnStack.Hub.Modules.Subscriptions.Application.AssemblyMarker).Assembly,
+    typeof(LearnStack.Hub.Modules.Entitlements.Application.AssemblyMarker).Assembly);
+
+// The four domain modules.
+builder.Services.AddTenantLifecycleModule(builder.Configuration);
+builder.Services.AddPlansModule(builder.Configuration);
+builder.Services.AddSubscriptionsModule(builder.Configuration);
+builder.Services.AddEntitlementsModule(builder.Configuration);
+
 var app = builder.Build();
+
+// `dotnet run -- --seed` (make seed): apply migrations + seed the plan catalogue
+// and a demo tenant idempotently, then exit without starting the web host.
+if (args.Contains("--seed", StringComparer.Ordinal))
+{
+    await LearnStack.Hub.Api.Composition.HubSeeder.SeedAsync(app.Services);
+    return;
+}
+
+app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
@@ -30,13 +75,7 @@ app.MapGet("/healthz", () => Results.Ok(new { status = "healthy", service = "lea
 
 app.Run();
 
-// `public partial class Program` serves two purposes:
-//   1. Entry-point escape hatch: WebApplicationFactory<Program> in the test
-//      assemblies resolves the entry-point type via this declaration.
-//   2. Assembly marker: this is the intentional public type that pins the
-//      LearnStack.Hub.Api assembly's IL TypeRef surface for NetArchTest
-//      scanning. The other six core projects ship a separate `AssemblyMarker`
-//      class because they have no entry point; the Api project does not need
-//      a duplicate marker — `Program` already plays that role. Same posture
-//      as LearnStack core's `LearnStack.Api/Program.cs`.
+// `public partial class Program` exposes the entry-point type for
+// WebApplicationFactory<Program> in the test assemblies and pins the
+// LearnStack.Hub.Api assembly's IL TypeRef surface for NetArchTest scanning.
 public partial class Program;

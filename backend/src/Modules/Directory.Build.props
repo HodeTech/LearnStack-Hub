@@ -1,0 +1,42 @@
+<Project>
+
+  <!--
+    MSBuild stops at the first Directory.Build.props it finds walking up from a
+    project file — it does NOT merge with ancestor files. Import the parent
+    backend/Directory.Build.props explicitly so the TargetFramework, analyzer
+    posture, and central package management settings still apply to every
+    Modules.<X>.<Layer> project.
+  -->
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)../'))" />
+
+  <!--
+    Per ADR-0023: every Modules.<X>.Domain project hosts the module's
+    [ValueObject<>] declarations (aggregate-root IDs). Source generators only
+    run in projects that reference the generator package; transitive references
+    do not carry it. Wiring Vogen + EF Core (for Vogen's emitted
+    EfCoreValueConverter type) here keeps the per-module addition automatic.
+    The EndsWith condition scopes them to Domain projects only.
+  -->
+  <ItemGroup Condition="$(MSBuildProjectName.EndsWith('.Domain'))">
+    <!--
+      PrivateAssets excludes only the generator/analyzer assets from flowing
+      and from output — the `runtime` asset (Vogen.SharedTypes.dll, which the
+      emitted EfCoreValueConverter references at run time + design time) MUST
+      flow to consumers and be copied to output. A blanket PrivateAssets="all"
+      drops Vogen.SharedTypes.dll and breaks EF converter materialisation.
+    -->
+    <PackageReference Include="Vogen" PrivateAssets="analyzers;build;buildtransitive;compile;contentfiles" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+  </ItemGroup>
+
+  <!--
+    Both MediatR and LearnStack.Hub.SharedKernel.Results declare a `Unit` type.
+    Module command/query contracts return Result<Unit> using *our* Unit; alias it
+    globally so `Unit` is unambiguous in every module project (MediatR.Unit is
+    never used directly — handlers return IRequest<Result<...>>).
+  -->
+  <ItemGroup>
+    <Using Include="LearnStack.Hub.SharedKernel.Results.Unit" Alias="Unit" />
+  </ItemGroup>
+
+</Project>

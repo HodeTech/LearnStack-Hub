@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>LearnStack.Hub.Modules.Subscriptions.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Core\LearnStack.Hub.SharedKernel\LearnStack.Hub.SharedKernel.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.Subscriptions.Domain\LearnStack.Hub.Modules.Subscriptions.Domain.csproj" />
+    <ProjectReference Include="..\LearnStack.Hub.Modules.Subscriptions.Application.Contracts\LearnStack.Hub.Modules.Subscriptions.Application.Contracts.csproj" />
+
+    <!-- Cross-module contract calls (never another module's Domain): validate
+         the plan (Plans), confirm the tenant (TenantLifecycle), trigger the
+         recompute (Entitlements). -->
+    <ProjectReference Include="..\..\Plans\LearnStack.Hub.Modules.Plans.Application.Contracts\LearnStack.Hub.Modules.Plans.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\TenantLifecycle\LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts\LearnStack.Hub.Modules.TenantLifecycle.Application.Contracts.csproj" />
+    <ProjectReference Include="..\..\Entitlements\LearnStack.Hub.Modules.Entitlements.Application.Contracts\LearnStack.Hub.Modules.Entitlements.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+  </ItemGroup>
+
+</Project>

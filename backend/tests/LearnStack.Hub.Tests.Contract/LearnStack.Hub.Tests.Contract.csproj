@@ -1,9 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    OpenAPI contract assertions for the Hub-side internal API surface
-    (lands in P02c-2). P02c-0 ships an empty project so CI can register the
-    job target; the first contract test arrives with the first endpoint.
+    Contract tests for the Hub-side surface. P02c-1 lands
+    EntitlementProjection_Shape_IsStable, which snapshots the serialised
+    EntitlementProjectionDto against the checked-in entitlement-v1.schema.json.
+    The OpenAPI contract assertions for the internal API arrive in P02c-2.
   -->
 
   <PropertyGroup>
@@ -14,6 +15,14 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Core\LearnStack.Hub.Api\LearnStack.Hub.Api.csproj" />
+    <ProjectReference Include="..\..\src\Modules\Entitlements\LearnStack.Hub.Modules.Entitlements.Application.Contracts\LearnStack.Hub.Modules.Entitlements.Application.Contracts.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The contract artifact must sit next to the test at run time. -->
+    <Content Include="entitlement-v1.schema.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>

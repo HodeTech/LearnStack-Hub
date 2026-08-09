@@ -49,10 +49,94 @@ public sealed class ModuleDependencyTests
     // reference produces the IL TypeRef NetArchTest scans.
     private static readonly Type _plantedDependency = typeof(LearnStack.Hub.Domain.AssemblyMarker);
 
-    // TODO(2026-05-21, @platform, phase-02c-1): Once modules land in
-    // src/Modules/<X>/, extend with the Hub equivalent of LearnStack core's
-    // module-isolation rules:
-    //   - ModuleDomain_DoesNotDependOn_OtherModuleDomain
-    //   - ModuleDomain_DoesNotDependOn_AnyApplicationOrInfrastructure
-    //   - Hub_Modules_DoNotReference_LearnStack_Internals
+    [Theory]
+    [InlineData("TenantLifecycle")]
+    [InlineData("Plans")]
+    [InlineData("Subscriptions")]
+    [InlineData("Entitlements")]
+    public void ModuleDomain_DoesNotDependOn_OtherModuleDomain(string module)
+    {
+        var domain = HubAssemblies.ModuleDomains
+            .Single(a => a.GetName().Name!.Contains($".{module}.", StringComparison.Ordinal));
+
+        var forbidden = HubAssemblies.OtherModuleDomainNamespaces(module);
+
+        var result = Types.InAssembly(domain)
+            .Should()
+            .NotHaveDependencyOnAll([.. forbidden])
+            .GetResult();
+
+        result.IsSuccessful.Should().BeTrue(
+            $"{module}.Domain must not depend on another module's Domain. Offenders: " +
+            $"{string.Join(", ", result.FailingTypeNames ?? [])}. Cross-module communication goes " +
+            "through Application.Contracts, not Domain (module-topology.md § Dependency direction).");
+    }
+
+    [Theory]
+    [InlineData("TenantLifecycle")]
+    [InlineData("Plans")]
+    [InlineData("Subscriptions")]
+    [InlineData("Entitlements")]
+    public void ModuleDomain_DoesNotDependOn_ApplicationOrInfrastructure(string module)
+    {
+        var domain = HubAssemblies.ModuleDomains
+            .Single(a => a.GetName().Name!.Contains($".{module}.", StringComparison.Ordinal));
+
+        // NB: EF Core itself is NOT forbidden — the Vogen-emitted EfCoreValueConverter
+        // nested in a module's strongly-typed id legitimately lives in Domain
+        // (ADR-0023 / Standards 01 § Build-time-only exceptions). The rule bans the
+        // application + DB-driver concerns: MediatR, FluentValidation, Npgsql.
+        var result = Types.InAssembly(domain)
+            .Should()
+            .NotHaveDependencyOnAny(
+                "MediatR",
+                "FluentValidation",
+                "Npgsql")
+            .GetResult();
+
+        result.IsSuccessful.Should().BeTrue(
+            $"{module}.Domain must depend only on the SharedKernel (+ the Vogen EF converter) — no MediatR / " +
+            $"FluentValidation / Npgsql. Offenders: {string.Join(", ", result.FailingTypeNames ?? [])}.");
+    }
+
+    /// <summary>
+    /// Every aggregate root inherits Entity&lt;TId&gt; / AuditableEntity&lt;TId&gt; over a
+    /// Vogen strongly-typed id (ADR-0023) — no aggregate keyed on a raw Guid.
+    /// </summary>
+    [Fact]
+    public void Aggregate_Roots_Use_StronglyTypedId()
+    {
+        Type[] aggregates =
+        [
+            typeof(LearnStack.Hub.Modules.TenantLifecycle.Domain.LearnStackTenant),
+            typeof(LearnStack.Hub.Modules.Plans.Domain.Plan),
+            typeof(LearnStack.Hub.Modules.Subscriptions.Domain.HubSubscription),
+            typeof(LearnStack.Hub.Modules.Entitlements.Domain.Entitlement),
+        ];
+
+        foreach (var aggregate in aggregates)
+        {
+            var entityBase = WalkToEntityBase(aggregate);
+            entityBase.Should().NotBeNull($"{aggregate.Name} must inherit Entity<TId> / AuditableEntity<TId>.");
+
+            var idType = entityBase!.GetGenericArguments()[0];
+            typeof(LearnStack.Hub.SharedKernel.Identifiers.IStronglyTypedId<Guid>)
+                .IsAssignableFrom(idType)
+                .Should().BeTrue($"{aggregate.Name}'s id type {idType.Name} must be a Vogen IStronglyTypedId<Guid>.");
+        }
+    }
+
+    private static Type? WalkToEntityBase(Type type)
+    {
+        for (var current = type.BaseType; current is not null; current = current.BaseType)
+        {
+            if (current.IsGenericType
+                && current.GetGenericTypeDefinition() == typeof(LearnStack.Hub.SharedKernel.Domain.Entity<>))
+            {
+                return current;
+            }
+        }
+
+        return null;
+    }
 }

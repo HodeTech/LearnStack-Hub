@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://errors.hub.learnstack.dev/schemas/entitlement-v1.schema.json",
+  "title": "Hub entitlement projection v1",
+  "description": "The wire contract LearnStack core consumes (entitlement-projection.md). A breaking change requires a schema-version bump.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "tenant_id",
+    "tier",
+    "features",
+    "limits",
+    "compliance",
+    "expires_at",
+    "grace_until",
+    "generation"
+  ],
+  "properties": {
+    "tenant_id": { "type": "string", "format": "uuid" },
+    "tier": { "type": "string" },
+    "features": {
+      "type": "object",
+      "additionalProperties": { "type": "boolean" }
+    },
+    "limits": {
+      "type": "object",
+      "additionalProperties": { "type": "integer" }
+    },
+    "compliance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["caps"],
+      "properties": {
+        "caps": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["allowed", "forced"],
+            "properties": {
+              "allowed": { "type": "boolean" },
+              "forced": { "type": "boolean" },
+              "value": { "type": ["string", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "expires_at": { "type": ["string", "null"], "format": "date-time" },
+    "grace_until": { "type": ["string", "null"], "format": "date-time" },
+    "generation": { "type": "integer" }
+  }
+}

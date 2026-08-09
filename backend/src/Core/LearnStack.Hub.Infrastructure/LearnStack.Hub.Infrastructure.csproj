@@ -1,9 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    EF Core DbContexts, provider adapters (Stripe / Iyzico land in Phase 09b),
-    and the outbound LearnStackApiClient (mTLS + JWT + HMAC chain — lands
-    P02c-2). P02c-0 ships an empty assembly.
+    Cross-cutting infrastructure: IErrorTrackingProvider implementations
+    (NoOp / Sentry shell / LocalFile), the Polly v8 IProviderResilience
+    decorator, the shared-connection NpgsqlUnitOfWork that the live
+    TransactionBehavior drives, and the AddHubFoundation composition-root
+    extension. Provider adapters (Stripe / Iyzico) and the outbound
+    LearnStackApiClient land in later packets.
   -->
 
   <PropertyGroup>
@@ -15,6 +18,16 @@
     <ProjectReference Include="..\LearnStack.Hub.Domain\LearnStack.Hub.Domain.csproj" />
     <ProjectReference Include="..\LearnStack.Hub.Application.Contracts\LearnStack.Hub.Application.Contracts.csproj" />
     <ProjectReference Include="..\LearnStack.Hub.Application\LearnStack.Hub.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Polly" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.Options" />
   </ItemGroup>
 
 </Project>
