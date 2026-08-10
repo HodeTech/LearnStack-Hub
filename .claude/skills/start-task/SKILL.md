@@ -43,8 +43,9 @@ Read, don't skim. If `git log` shows recent edits to the surface, read the commi
 
 ### Step 2 — Check packet fit
 
-**The Hub track is frozen from P02c-2 onward** (owner decision 2026-08-08). Before
-anything else, check the task against [CLAUDE.md § What state this is in](../../../CLAUDE.md)
+**The Hub track is frozen from P02c-2 onward** (owner decision 2026-08-08). At the start of
+Step 2 — after Step 1's reading, which is what tells you which packet the task belongs to —
+check the task against [CLAUDE.md § What state this is in](../../../CLAUDE.md)
 and [the freeze](../../../docs/roadmap/README.md): if it belongs to P02c-2 or any packet
 after it, **say so and stop** — the two conditions that resume the track are named there,
 and neither has fired.

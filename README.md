@@ -55,8 +55,12 @@ cd ../LearnStack-Hub
 make dev
 
 # 3. LearnStack core API
+# Both projects pin .NET 10 in global.json, and the system `dotnet` on this
+# workstation is .NET 9 — so invoke the SDK explicitly. `export PATH="$HOME/.dotnet:$PATH"`
+# once per shell works too; the explicit path is used here so a copy-pasted
+# line works on its own.
 cd ../LearnStack/backend
-dotnet run --project src/LearnStack.Api
+~/.dotnet/dotnet run --project src/LearnStack.Api
 
 # 4. Hub API
 # The host does not load .env itself, so export it first — otherwise the
@@ -65,7 +69,7 @@ cd ../LearnStack-Hub
 set -a; . ./.env; set +a
 export POSTGRES_HOST=localhost
 cd backend
-dotnet run --project src/Core/LearnStack.Hub.Api
+~/.dotnet/dotnet run --project src/Core/LearnStack.Hub.Api
 ```
 
 In production, the two repos deploy independently — the shared compose is a dev-time convenience only.

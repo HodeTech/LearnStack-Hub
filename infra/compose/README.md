@@ -21,11 +21,21 @@ cd ../LearnStack && make dev
 cd ../LearnStack-Hub && make dev
 
 # 3. LearnStack core API
-cd ../LearnStack/backend && dotnet run --project src/LearnStack.Api
+# `~/.dotnet/dotnet`, not plain `dotnet`: both projects pin .NET 10 in
+# global.json and the system dotnet on this workstation is .NET 9.
+cd ../LearnStack/backend && ~/.dotnet/dotnet run --project src/LearnStack.Api
 
-# 4. Hub API
-cd ../LearnStack-Hub/backend && dotnet run --project src/Core/LearnStack.Hub.Api
+# 4. Hub API — see the note below; this line is not the whole step.
+cd ../LearnStack-Hub/backend && ~/.dotnet/dotnet run --project src/Core/LearnStack.Hub.Api
 ```
+
+**Step 4 needs `.env` exported into the shell first.** The Hub host does not load `.env`
+itself, so without it the connection string falls back to defaults and the API cannot
+reach Postgres. The full step — the `set -a; . ./.env; set +a` sequence and the
+`POSTGRES_HOST=localhost` override — is written once, in
+[the repository README's Dev Workflow](../../README.md#dev-workflow). Follow it there
+rather than reconstructing it here; a second copy is what let this file drift out of step
+in the first place.
 
 The boot-order dependency is dev-only. Production deploys the two stacks independently.
 
