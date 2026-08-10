@@ -135,7 +135,7 @@ Every skill repeats these; they are listed here as the kickoff checklist.
 - **FeatureKey/LimitKey wire-strings match LearnStack core's registry exactly.**
 - **`hub` schema, `learnstack_hub` database.** Every DbContext `HasDefaultSchema("hub")`.
 - **One DbContext per module.** Cross-module FKs are plain `uuid` + index, not EF navigations.
-- **English docs; Conventional Commits; AI co-author trailer** — one `Co-Authored-By:` line per agent that materially contributed, each naming that agent's own identity rather than a fixed string ([AGENTS.md § Differences from CLAUDE.md](../../AGENTS.md) carries the per-runtime strings).
+- **English docs; Conventional Commits; AI co-author trailer** — one `Co-Authored-By:` line per agent that materially contributed, each naming that agent's own identity rather than a fixed string ([CLAUDE.md § Commit conventions](../../CLAUDE.md#commit-conventions) carries the per-runtime strings).
 
 ## 6. Verification
 

@@ -61,6 +61,43 @@ names: a domain that resolves but does not serve. An active domain renews in pla
 be revoked; a failed domain is retried by an operator — re-verifying if the challenge
 failed, re-propagating if only the push or the replication did — or revoked.
 
+#### What `MarkPropagated()` requires
+
+"Both acknowledged" is a **durable** claim, not an in-memory one, or a restart between the
+two acknowledgements silently loses one and the domain either sticks in `Propagating`
+forever or activates on half a propagation.
+
+- **One propagation attempt id per entry into `Propagating`.** A `propagation_id`
+  (UUIDv7, minted by `IGuidFactory`) is written on the aggregate when it enters the state,
+  and both channels carry it: the host-mapping push sends it as its idempotency key, and
+  the replication request is tagged with it. It is the correlation key in logs and in the
+  operator queue, and it changes on each `RetryPropagation()` so a late acknowledgement
+  from a superseded attempt is recognised and discarded rather than counted.
+- **Two acknowledgement columns, written in the transaction that receives them.**
+  `host_mapping_acked_at` and `cert_replication_acked_at` are nullable timestamps on the
+  aggregate, each set exactly once per `propagation_id`. An acknowledgement that arrives
+  twice for the same id is a no-op — the write is conditional on the column being null and
+  the id matching — so a redelivered acknowledgement cannot double-count.
+- **`MarkPropagated()` is a guard, not a signal.** It returns
+  `Result.Fail(business_rule_violation)` unless both columns are non-null for the current
+  `propagation_id`. It is invoked after each acknowledgement lands, so whichever arrives
+  second is the one that opens the gate — neither channel needs to know about the other.
+- **Restart recovery is a query, not a memory.** On startup, and on every run of the
+  propagation job, domains in `Propagating` are re-driven from the two columns: a null
+  column means that channel is re-sent under the same `propagation_id`, which is safe
+  because both sides are idempotent on it. Nothing is reconstructed from process state.
+- **A timeout is a state, not a hang.** A `Propagating` domain whose attempt budget or
+  wall-clock window expires with either column still null moves to `Failed` with
+  `LastPropagationError` naming *which* channel did not acknowledge — the difference
+  between a LearnStack-side push failure and a secret-store replication failure is the
+  whole diagnostic, and an operator queue that only says "propagation failed" sends
+  someone to the wrong system.
+- **The event follows the committed transition.** `learnstack.hub.custom-domain.activated`
+  is enqueued on the outbox **in the same transaction** as the `Propagating → Active`
+  write, so it is published if and only if that transition committed. It is never emitted
+  from an acknowledgement handler, which would announce an activation that a later
+  rollback un-did.
+
 Every transition is a method returning `Result` and emitting a domain event. Invalid
 transitions return `Result.Fail(business_rule_violation)` and never throw
 `DomainException`.
@@ -94,13 +131,22 @@ authenticated context, never from a submitted field.
   ordering; DNS-01 has no such problem, which is why it is the default rather than a
   preference.
 - A Hangfire recurring job runs the verification poll with a bounded attempt budget and
-  backoff (ADR-0022's default: every 60 seconds, up to 60 attempts). **What it polls is
-  selected by the domain's challenge mode**, not fixed: the default DNS-01 flow queries the
-  `_acme-challenge.{domain}` TXT record and compares it against the expected token, while
-  the HTTP-01 fallback resolves the domain's CNAME and checks that it points at the
-  LearnStack edge. A job that only ever did one of the two would silently never succeed for
-  domains in the other mode. `VerificationAttempts` and `LastVerificationError` are on the
-  aggregate so the operator queue can show *why* a domain is stuck, not just that it is.
+  backoff (ADR-0022's default: every 60 seconds, up to 60 attempts). **What it checks is
+  selected by the domain's challenge mode**, not fixed — a job that only ever did one of
+  the two would silently never succeed for domains in the other mode:
+  - **DNS-01** — query the `_acme-challenge.{domain}` TXT record and compare it against the
+    expected token.
+  - **HTTP-01** — request `http://{domain}/.well-known/acme-challenge/{token}` **on port
+    80** and compare the response body against the expected key authorization. The CNAME
+    pointing at the LearnStack edge is a *precondition* for that request reaching us, not
+    the check itself: a correct CNAME with no token served is a failed challenge, and
+    treating the CNAME as sufficient would mark a domain verified that the CA will refuse.
+    Redirects are followed only to `https://` on the **same** host (which is what a
+    HTTP→HTTPS edge does, and what RFC 8555 permits); a redirect to any other host is a
+    failure, because following one would let a third party answer the challenge.
+
+  `VerificationAttempts` and `LastVerificationError` are on the aggregate so the operator
+  queue can show *why* a domain is stuck, not just that it is.
 - A second recurring job renews certificates inside their 30-day pre-expiry window.
 
 ### `ITlsCertificateProvider` and the ACME adapter
@@ -244,14 +290,34 @@ serving that host on a publicly trusted certificate at the edge.
   at the Hub ([ADR-0004](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)). Enumerated in
   [ADR-0034 § The endpoint set](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
 
-  The LearnStack side of that hop goes through **`IHubTenantSync`** — the named adapter
-  for tenant-administration crossings, and under ADR-0034's second invariant the only
-  type on that side permitted to hold a Hub client for it. The Studio proxy calls the
-  adapter; the adapter calls the Hub. `Hub_Client_Referenced_Only_By_Named_Adapters`
-  fails the LearnStack build if anything else does. This packet's Hub pull request fixes
-  the request and response contract — the submitted FQDN and challenge mode in, the
-  created `CustomDomain` id and its initial state out — **before** the LearnStack-side
-  adapter method is written against it, per the coordination protocol below.
+  **Its security boundary is settled before a line of it is written**, because it is the
+  one endpoint on this surface that carries a tenant-originated request:
+
+  - It sits under the Hub's existing protected internal prefix, `/api/v1/internal/*`,
+    bound to the internal listener and never the internet-facing one. That prefix is
+    covered by `Internal_API_Endpoints_AreNot_Public` — the rule matches **both** internal
+    patterns, not only LearnStack's `/api/internal/*`, per
+    [P02c-2 § The authentication chain](p02c-2-internal-api-and-contract.md).
+  - It carries the full three-layer chain — mTLS, RS256 JWT (`aud=learnstack-internal`,
+    ≤ 5 min, `jti` replay-protected) and HMAC-SHA256 body signature — like every other
+    endpoint in the ADR-0034 set. No exemption for being "just a form submission".
+  - It **rejects `learnstack` realm tokens.** That is the whole reason the hop exists: the
+    tenant admin authenticates to Studio against the tenant realm, and Studio proxies with
+    its own service credentials rather than forwarding the tenant's token
+    ([ADR-0004 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)).
+    An implementation that forwarded the tenant token and accepted it here would dissolve
+    the two-realm boundary at exactly the endpoint that decides which tenant owns a host.
+  - The tenant is taken from the authenticated context and the route, never from the body
+    (`CustomDomain_TenantId_NeverReadFrom_RequestBody`).
+
+  The LearnStack side of the hop goes through **`IHubTenantSync`** — the named adapter for
+  tenant-administration crossings, and under ADR-0034's second invariant the only type on
+  that side permitted to hold a Hub client for it. The Studio proxy calls the adapter; the
+  adapter calls the Hub. `Hub_Client_Referenced_Only_By_Named_Adapters` fails the
+  LearnStack build if anything else does. This packet's Hub pull request fixes the request
+  and response contract — the submitted FQDN and challenge mode in, the created
+  `CustomDomain` id and its initial state out — **before** the LearnStack-side adapter
+  method is written against it, per the coordination protocol below.
 
 - `LearnStack.Hub.Modules.CustomDomains` — aggregate, state machine, public-suffix
   validation, uniqueness constraints, commands and queries.
@@ -260,19 +326,29 @@ serving that host on a publicly trusted certificate at the edge.
 - `ITlsCertificateProvider` port plus the `LearnStack.Hub.Infrastructure.Acme` adapter,
   resilience-decorated, with a distinct rate-limited outcome.
 - DNS-01 and HTTP-01 challenge runners; the verification recurring job covering **both**
-  the TXT-record poll (DNS-01) and the CNAME check (HTTP-01); the renewal recurring job.
+  the TXT-record poll (DNS-01) and the `/.well-known/acme-challenge/{token}` fetch on port
+  80 (HTTP-01); the renewal recurring job.
 - `PUT /api/internal/tenants/{id}/host-mappings` on the outbound `LearnStackApiClient`,
   carrying host tuples and certificate references only.
 - Secret-store replication path from `learnstack-hub/certs/{domain}` to the LearnStack-side
   path, with the LearnStack side referencing by path.
 - The three `learnstack.hub.custom-domain.*` integration events.
 - Operator portal: pending queue, active list, renewal watch, caps editor.
-- Tests: unit tests for every state transition and every rejection at `Create`, including
-  the `Propagating → Active` gate refusing to open on one acknowledgement; unit tests for
-  the recurring job on **both** verification paths — the DNS-01 TXT poll and the HTTP-01
-  CNAME check, each covering the found, absent and mismatched cases; an integration test
-  issuing against an ACME staging directory end to end; a contract test asserting
-  `entitlement-v1.schema.json` contains no host or certificate fields.
+- Tests:
+  - Unit tests for every state transition and every rejection at `Create`.
+  - Propagation: `MarkPropagated()` refused with one acknowledgement and accepted with
+    both; a duplicate acknowledgement for the same `propagation_id` changing nothing; an
+    acknowledgement carrying a superseded `propagation_id` discarded; recovery re-sending
+    only the unacknowledged channel after a simulated restart; a timeout landing in
+    `Failed` with `LastPropagationError` naming the channel that did not acknowledge; and
+    the `.activated` outbox row existing only when the transition committed.
+  - Verification job, **both** paths: DNS-01 TXT poll over found / absent / mismatched;
+    HTTP-01 token fetch over valid body, absent (404), mismatched body, failed request
+    (connection refused or timeout), same-host `https://` redirect (followed, succeeds)
+    and cross-host redirect (not followed, fails).
+  - An integration test issuing against an ACME staging directory end to end.
+  - A contract test asserting `entitlement-v1.schema.json` contains no host or certificate
+    fields.
 
 ## Completion Criteria
 

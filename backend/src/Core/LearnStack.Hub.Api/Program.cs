@@ -29,30 +29,15 @@ using LearnStack.Hub.SharedKernel.Hosting;
 var builder = WebApplication.CreateBuilder(args);
 
 // DeploymentMode is read exactly once, here at the composition root; modules
-// never read it (Modules_Do_Not_Reference_DeploymentMode). It fails closed:
-// only the Development environment may leave it unset, and an unparseable or
-// undefined value is never silently coerced to Development — that fallback
+// never read it (Modules_Do_Not_Reference_DeploymentMode). The resolution rule
+// fails closed and is unit-tested in DeploymentModeResolverTests: only the
+// Development environment may leave it unset, and only an exact member name is
+// accepted. Silently coercing an unset or unrecognised value to Development
 // would hand a production host the development error-tracking and resilience
 // providers without a word in the log.
-var configuredDeploymentMode = builder.Configuration["Hub:DeploymentMode"];
-DeploymentMode deploymentMode;
-
-if (string.IsNullOrWhiteSpace(configuredDeploymentMode))
-{
-    if (!builder.Environment.IsDevelopment())
-    {
-        throw new InvalidOperationException(
-            "Hub:DeploymentMode is not configured. It is required outside the Development environment.");
-    }
-
-    deploymentMode = DeploymentMode.Development;
-}
-else if (!Enum.TryParse(configuredDeploymentMode, ignoreCase: true, out deploymentMode)
-    || !Enum.IsDefined(deploymentMode))
-{
-    throw new InvalidOperationException(
-        $"Hub:DeploymentMode '{configuredDeploymentMode}' is not a valid DeploymentMode. Expected one of: {string.Join(", ", Enum.GetNames<DeploymentMode>())}.");
-}
+var deploymentMode = DeploymentModeResolver.Resolve(
+    builder.Configuration["Hub:DeploymentMode"],
+    builder.Environment.IsDevelopment());
 
 builder.AddHubSerilog();
 builder.AddHubOpenTelemetry();

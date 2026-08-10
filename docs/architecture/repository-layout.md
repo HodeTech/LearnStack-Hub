@@ -5,7 +5,7 @@ repositories sit side by side on disk as `LearnStack/` and `LearnStack-Hub/`, wi
 exact capitalisations. That layout governs **filesystem paths and shell commands**
 (`cd ../LearnStack`) only; cross-repo documentation **links** from this file are absolute
 GitHub URLs (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`), because a
-relative path does not cross a repository boundary on github.com.
+relative path does not cross a repository boundary on GitHub.
 
 This tree describes what is on `main`. `backend/src/Modules/` carries the four
 [P02c-1](../roadmap/p02c-1-hub-domain-core.md) modules — `TenantLifecycle`, `Plans`,

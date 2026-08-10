@@ -131,8 +131,14 @@ Hub follows LearnStack's engineering standards by reference unless explicitly ov
 
 - Conventional Commits: `type(scope): subject`. Subject in imperative mood; ≤ 72 chars.
 - Hub-specific scopes: `hub`, `hub-portal`, `hub-domain`, `hub-infra`, `hub-docs`.
-- Commits made with AI assistance carry the trailer:
-  `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
+- Commits made with AI assistance carry a `Co-Authored-By:` trailer — **one per agent that
+  materially contributed**, each naming that agent's own runtime-specific identity, never a
+  fixed string standing in for whichever agent actually ran:
+  - Claude Code sessions: `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
+  - OpenAI Codex sessions: `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
+
+  [LearnStack's Git Workflow Standards § Trailers](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/14-git-workflow.md#trailers)
+  is the authority for the strings; if this list and that section disagree, that section wins.
 
 ## Cross-repo coordination
 

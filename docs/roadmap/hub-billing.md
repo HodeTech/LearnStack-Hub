@@ -1,9 +1,17 @@
 # Hub Billing and Invoicing
 
 > **This is the authoritative plan.** It was migrated out of LearnStack's
-> [phase-09b-hub-billing.md](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-09b-hub-billing.md),
-> which is now a pointer at this file. Hub billing is Hub work and belongs in the
-> repository that ships it.
+> [phase-09b-hub-billing.md](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-09b-hub-billing.md).
+> Hub billing is Hub work and belongs in the repository that ships it.
+>
+> ⚠️ **Coordination owed, and this note comes down when it is discharged.** That LearnStack
+> file is still the full plan on LearnStack's `main`; its conversion to a pointer is
+> prepared but unmerged. Until it lands, two documents claim to be authoritative for the
+> same track and the link above leads to the competing one. The ordering is not optional:
+> **the LearnStack pointer conversion merges first, or in the same session as** any Hub-side
+> change that depends on this file being the single source — including the usage-ingestion
+> status and the adapter project names below. A Hub-only merge leaves a reader who follows
+> the link with a stale plan and no way to tell which one governs.
 >
 > Identifier note: the track keeps the **09b** slot in LearnStack's phase numbering
 > because that identifier appears in commit messages, branch names and cross-repository

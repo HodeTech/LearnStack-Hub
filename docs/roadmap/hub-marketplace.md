@@ -1,10 +1,16 @@
 # Hub Marketplace
 
 > **This is the authoritative plan.** It was migrated out of LearnStack's
-> [phase-12-hub-marketplace.md](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-12-hub-marketplace.md),
-> which is now a pointer at this file. The **12** slot stays in LearnStack's phase
-> numbering because the identifier is referenced across both repositories; the plan lives
-> here.
+> [phase-12-hub-marketplace.md](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-12-hub-marketplace.md).
+> The **12** slot stays in LearnStack's phase numbering because the identifier is
+> referenced across both repositories; the plan lives here.
+>
+> ⚠️ **Coordination owed, and this note comes down when it is discharged.** That LearnStack
+> file is still the full plan on LearnStack's `main`; its conversion to a pointer is
+> prepared but unmerged. **The LearnStack pointer conversion merges first, or in the same
+> session as** any Hub-side change that depends on this file being the single source —
+> including the ADR-ownership rule and the activation gate below. Until it lands, two
+> documents claim the same track and the link above leads to the competing one.
 >
 > **Status: post-MVP and optional.** The platform works fully without it. If the
 > marketplace never ships, no LearnStack feature breaks. The track exists because

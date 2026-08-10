@@ -6,15 +6,8 @@
 
 ## Differences from CLAUDE.md
 
-There are no rule differences. The only thing that varies between agent runtimes is the **`Co-Authored-By` commit trailer**, which names the assistant that contributed:
-
-- Claude Code sessions:
-  `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
-- OpenAI Codex sessions:
-  `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
-
-If multiple agents contributed materially to the same commit, include one trailer per agent. [LearnStack's Git Workflow Standards § Trailers](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/14-git-workflow.md#trailers) is the authority for both strings; if this file and that section disagree, that section wins.
+There are no rule differences, and the one thing that varies between agent runtimes — the **`Co-Authored-By` commit trailer**, which names the agent that actually contributed — is defined in [CLAUDE.md § Commit conventions](CLAUDE.md#commit-conventions) along with the per-runtime strings and the one-trailer-per-contributing-agent rule. It is not restated here, because two copies of a string that must match a third ([LearnStack's Git Workflow Standards § Trailers](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/14-git-workflow.md#trailers), which is the authority) is how the copies drift.
 
 ## Maintaining this file
 
-Do **not** copy CLAUDE.md content into AGENTS.md. If a guidance rule needs to change, change CLAUDE.md; the rule applies everywhere by virtue of the redirect above. The section above is the only content that legitimately lives here, because it describes this file's own runtime rather than the project's rules. Everything else — the skill catalogue and its entry points, the sibling on-disk layout, and the absolute-URL rule for cross-repository links — is in [CLAUDE.md](CLAUDE.md) and is not restated here.
+Do **not** copy CLAUDE.md content into AGENTS.md. If a guidance rule needs to change, change CLAUDE.md; the rule applies everywhere by virtue of the redirect above. Nothing in this file is a rule of its own — the sections above describe only why this filename exists and where to read instead.

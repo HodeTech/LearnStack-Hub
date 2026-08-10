@@ -87,7 +87,7 @@ protection) + HMAC body signature, applied to every endpoint in
 
 | Leg | Variant, each its own test | Expected |
 |---|---|---|
-| mTLS | Client certificate absent | Connection refused at the TLS layer; no application handler runs |
+| mTLS | Client certificate absent | The **TLS handshake fails** while the listener is up and accepting — the client sees a handshake-level rejection, not a TCP `connection refused`. A refused connection would pass this test with the listener simply down, which proves nothing about mTLS. No application handler runs, and no HTTP response is produced |
 | JWT | Absent | `401`, request not processed |
 | JWT | Past its five-minute expiry | `401`, request not processed |
 | JWT | Wrong `aud` | `401`, request not processed |
@@ -96,10 +96,19 @@ protection) + HMAC body signature, applied to every endpoint in
 | HMAC | Signature over a tampered body | `401`, request not processed |
 
 Run against **both** internal surfaces: LearnStack's `/api/internal/*` (Hub → LearnStack)
-and the Hub's `/api/v1/internal/*` (LearnStack → Hub). Each rejection is logged with the
-correlation id and the failed check; the response body says nothing about which leg
-failed, because an attacker probing the chain should learn nothing from the shape of the
-refusal.
+and the Hub's `/api/v1/internal/*` (LearnStack → Hub).
+
+Each rejection is logged with the failed check and a correlation id — but the mTLS leg
+fails **before HTTP exists**, so there is no request, no header, and no application
+correlation id to log. That leg is logged at the transport level instead: the connection
+id the server assigns, plus the remote endpoint and the handshake failure reason. A gate
+that demanded an application correlation id on a handshake failure would be asking for a
+value that cannot exist, and the usual way that requirement gets "satisfied" is by moving
+the certificate check into the application, which is the opposite of what this gate
+protects.
+
+For the JWT and HMAC legs the response body says nothing about which leg failed, because
+an attacker probing the chain should learn nothing from the shape of the refusal.
 
 `Internal_API_Endpoints_AreNot_Public` stays green: neither internal surface is bound to
 an internet-facing listener.
