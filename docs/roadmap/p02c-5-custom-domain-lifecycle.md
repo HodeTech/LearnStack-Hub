@@ -225,9 +225,12 @@ The LearnStack **edge** half is demand-gated. Per
 [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md), both
 the APISIX adapter and custom-domain TLS automation land in
 [LearnStack Phase 11](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md),
-with the trigger *"a tenant needs its own domain in production"*. Before that trigger
-fires, LearnStack terminates TLS with its default ASP.NET hosting rather than APISIX SSL
-objects.
+on their two **separate** triggers — TLS automation on *"a tenant needs its own domain in
+production"*, APISIX on *"a non-dev deployment needs edge rate limiting, host routing, or
+JWT pre-validation"*. The first custom domain in production satisfies both, which is why
+they land together, but they are two rows with two conditions and neither implies the
+other. Before those triggers fire, LearnStack terminates TLS with its default ASP.NET
+hosting rather than APISIX SSL objects.
 
 The split is clean because routing and termination are separable: host **resolution**
 works as soon as `platform_host_to_tenant` carries the row, so a request with a custom
