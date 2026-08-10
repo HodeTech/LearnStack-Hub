@@ -2,7 +2,7 @@
 
 `LearnStack.Hub.Modules.TenantLifecycle` owns the Hub-side mirror of LearnStack's `Tenant` aggregate. It is the root of the Hub domain graph: every subscription, entitlement, custom domain, compliance policy, and usage aggregate hangs off a `LearnStackTenant`.
 
-Authoritative sources: [ADR-0019 § Hub data model](../../../learnstack/docs/decisions/0019-learnstack-hub.md), [Architecture 24 § 2 ERD](../../../learnstack/docs/architecture/24-learnstack-hub.md).
+Authoritative sources: [ADR-0019 § Hub data model](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md), [Architecture 24 § 2 ERD](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md).
 
 ## Aggregate: `LearnStackTenant`
 
@@ -55,7 +55,7 @@ Transition rules enforced as aggregate methods (each returns `Result` and emits 
 - `Activate()` — `Trial | Suspended → Active`. Emits `TenantActivatedDomainEvent`.
 - `Suspend(reason)` — `Active → Suspended`. Emits `TenantSuspendedDomainEvent`.
 - `Archive()` — `Active | Suspended → Archived`. Emits `TenantArchivedDomainEvent`.
-- `Terminate()` — `Archived → Terminated`. Emits `TenantTerminatedDomainEvent`. (Hard-delete-with-confirmation flow lands in a later packet; P02c-1 only needs the status transition.)
+- `Terminate()` — `Archived → Terminated`. Emits `TenantTerminatedDomainEvent`. (The hard-delete-with-confirmation flow lands in [P02c-4](../roadmap/p02c-4-operator-portal.md), which builds the operator surface that confirms it; P02c-1 only needs the status transition.)
 - `RecordPhoneHome(at)` — sets `last_phone_home_at` (no status change). P02c-6 caller; method shape ships now.
 
 Each status change is a **trigger for entitlement recompute** when it affects the projection's `status`/`tier` (Activate, Suspend) — the handler calls the Entitlements projection service after a successful transition. See [../architecture/entitlement-projection.md](../architecture/entitlement-projection.md).
@@ -96,5 +96,5 @@ The Hub operator-audit pipeline lands in P02c-4 (`LearnStack.Hub.Modules.Audit`)
 
 - The `POST /api/internal/tenants` push to LearnStack core (P02c-3).
 - Keycloak `learnstack` realm provisioning of the tenant admin (P02c-3 / Phase 03).
-- Hard-delete-with-confirmation termination flow (later packet).
+- Hard-delete-with-confirmation termination flow — [P02c-4](../roadmap/p02c-4-operator-portal.md).
 - Phone-home `last_phone_home_at` updates from a live caller (P02c-6).

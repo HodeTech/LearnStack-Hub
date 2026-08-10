@@ -1,6 +1,6 @@
 # Contributing to LearnStack Hub
 
-LearnStack Hub follows the same engineering rigour as [LearnStack core](../learnstack). Most engineering standards are defined once in LearnStack's [Standards corpus](../learnstack/docs/standards/) and apply here by reference.
+LearnStack Hub follows the same engineering rigour as [LearnStack core](https://github.com/HodeTech/LearnStack/blob/main/). Most engineering standards are defined once in LearnStack's [Standards corpus](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/) and apply here by reference.
 
 ## Branch protection
 
@@ -11,7 +11,7 @@ Required status checks on `main`:
 - `meta` — `make lint`-style format verification + Markdown link audit
 - `secret-scan` — Leakwatch scan (gates per LearnStack Standards 12 § Secrets Management)
 
-`backend-integration` is **deferred** with `if: false` until P02c-2 lands the first Testcontainers-backed test.
+`backend-integration` runs from **P02c-1**, which landed the first Testcontainers-backed tests (the entitlement-rebuild round trip). It was gated `if: false` from P02c-0 until then.
 
 ## Commit conventions
 
@@ -23,8 +23,8 @@ Required status checks on `main`:
   - `hub-domain` — Hub domain model
   - `hub-infra` — Hub infrastructure (compose, APISIX, Dapr, Vault)
   - `hub-docs` — Hub documentation
-- AI co-author trailer (per [LearnStack AGENTS.md § Trailers](../learnstack/AGENTS.md)):
-  - Claude Code: `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>`
+- AI co-author trailer (per [LearnStack AGENTS.md § Trailers](https://github.com/HodeTech/LearnStack/blob/main/AGENTS.md)):
+  - Claude Code: `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
   - Codex: `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
 
 Example commit message:
@@ -36,7 +36,7 @@ P02c-1 brings the Hub-side mirror of LearnStack's Tenant aggregate.
 Hub holds only metadata fields (id, slug, display_name, status,
 deployment_mode, created_at, last_phone_home_at).
 
-Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>
+Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
 ```
 
 ## Cross-repo PRs
@@ -47,7 +47,7 @@ When a packet changes both `learnstack` and `learnstack-hub` (e.g. P02c-3 lands 
 2. Open the LearnStack-side PR referencing the Hub PR's commit hash.
 3. Merge both in the same session — either-side merge alone leaves the contract dangling.
 
-Adding or changing a cross-repo contract endpoint requires a **new ADR in `learnstack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](../learnstack/docs/standards/20-infrastructure-stack.md).
+Adding or changing a cross-repo contract endpoint requires a **new ADR in `../LearnStack/docs/decisions/`** (per the Hub HTTPS Contract Surface rule). See [Standards 20 § Hub HTTPS Contract Surface](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/20-infrastructure-stack.md).
 
 ## Pre-commit hook
 
@@ -88,7 +88,7 @@ Hub's `LearnStack.Hub.SharedKernel` mirrors LearnStack core's `LearnStack.Shared
 
 ### Hub Keycloak realm JSON lives in the LearnStack core repo
 
-The `learnstack-hub` realm export (`../learnstack/infra/keycloak/realms/learnstack-hub.json`) physically lives in the sibling repo because LearnStack core's compose stack imports both realms at first boot. See [`infra/keycloak/README.md`](infra/keycloak/README.md) for the operational topology.
+The `learnstack-hub` realm export (`../LearnStack/infra/keycloak/realms/learnstack-hub.json`) physically lives in the sibling repo because LearnStack core's compose stack imports both realms at first boot. See [`infra/keycloak/README.md`](infra/keycloak/README.md) for the operational topology.
 
 ### Pre-commit Leakwatch is a repo-root scan, not a staged-files-only scan
 

@@ -2,7 +2,7 @@
 
 Reusable, task-focused instruction packs ("skills") for AI coding agents working on **LearnStack Hub**. Each subdirectory is one skill; its `SKILL.md` carries YAML frontmatter (`name`, `description`) so the agent runtime can pick or skip it without reading the whole body.
 
-Skills are **project-local** to this repo (`.claude/skills/`). An agent running from the `learnstack-hub` root loads them automatically. They cite LearnStack core's standards / ADRs by sibling path (`../learnstack/docs/...`) for cross-cutting authority and carry only the **Hub-specific delta** on top — they never duplicate the LearnStack standards corpus.
+Skills are **project-local** to this repo (`.claude/skills/`). An agent running from the `learnstack-hub` root loads them automatically. They cite LearnStack core's standards / ADRs by sibling path (`../LearnStack/docs/...`) for cross-cutting authority and carry only the **Hub-specific delta** on top — they never duplicate the LearnStack standards corpus.
 
 ## The Hub deltas every skill assumes
 
@@ -38,7 +38,7 @@ Pick the entry point matching the user's intent. Only **one** entry point runs p
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | [implement-task](implement-task/SKILL.md)   | The default entry point for substantive work — scope, implement, self-check, test, docs, commit, review prompt.           |
 | [start-task](start-task/SKILL.md)           | Lightweight scoping-only entry point. Reading order + alignment check.                                                    |
-| [write-adr](write-adr/SKILL.md)             | Capturing a **Hub-internal** decision (`HUB-NNNN` series). Cross-cutting decisions go in `../learnstack/docs/decisions/`. |
+| [write-adr](write-adr/SKILL.md)             | Capturing a **Hub-internal** decision (`HUB-NNNN` series). Cross-cutting decisions go in `../LearnStack/docs/decisions/`. |
 | [update-glossary](update-glossary/SKILL.md) | Introducing a Hub-specific term in `docs/glossary.md`.                                                                    |
 | [commit-and-pr](commit-and-pr/SKILL.md)     | Conventional Commit + AI trailer + Hub PR conventions (incl. cross-repo coordination).                                    |
 
@@ -102,6 +102,6 @@ Body structure: **Purpose**, **When to use** / **When not to use**, **Inputs**, 
 
 ## What skills are not
 
-- **Not duplicates of standards.** A skill is a _workflow_. LearnStack's [Standards corpus](../../../learnstack/docs/standards/) is the authority; skills cite it.
-- **Not decisions.** Decisions live in ADRs (LearnStack `../learnstack/docs/decisions/` for cross-cutting; this repo's `docs/decisions/` for `HUB-NNNN`).
+- **Not duplicates of standards.** A skill is a _workflow_. LearnStack's [Standards corpus](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/) is the authority; skills cite it.
+- **Not decisions.** Decisions live in ADRs (LearnStack `../LearnStack/docs/decisions/` for cross-cutting; this repo's `docs/decisions/` for `HUB-NNNN`).
 - **Not scratch space.** Exploratory notes go in `docs/analysis/` (gitignored).

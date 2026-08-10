@@ -29,7 +29,7 @@ Wire a cross-boundary event the right way: outbox-written in the same transactio
 ## When not to use
 
 - Intra-module notification → plain MediatR `INotification` (`IDomainEvent`), in-process, same transaction. No outbox.
-- A request/response contract → that's one of the four HTTPS endpoints (a fifth needs an ADR in `../learnstack/docs/decisions/`).
+- A request/response contract → that's one of the four HTTPS endpoints (a fifth needs an ADR in `../LearnStack/docs/decisions/`).
 
 ## Workflow
 

@@ -5,8 +5,8 @@
 #   - Solution is `LearnStack.Hub.slnx`.
 #   - Frontend monorepo runs `pnpm -r typecheck/lint/build/test` against
 #     `apps/operator-portal` + `packages/{config,sdk,ui}`.
-#   - `backend-integration` job is `if: false` until P02c-2 lands the first
-#     Testcontainers-backed test.
+#   - `backend-integration` runs from P02c-1, which landed the first
+#     Testcontainers-backed tests (the entitlement-rebuild round trip).
 #   - `openapi-diff` job is `if: false` until P02c-2 produces the first
 #     generated OpenAPI spec.
 #   - No `lighthouse-budget` job — operator portal is internal-only; the
@@ -206,11 +206,11 @@ jobs:
 
       - name: Markdown link audit (changed docs)
         # Mirror of LearnStack core's link audit. Skips externals + anchors.
-        # Hub's docs cross-link to LearnStack core via `../learnstack/...`
+        # Hub's docs cross-link to LearnStack core via `../LearnStack/...`
         # relative paths — those links resolve only on the developer's
         # workstation (sibling layout). CI can't validate them because the
         # LearnStack core repo isn't checked out alongside; the audit skips
-        # `../learnstack/` paths explicitly.
+        # `../LearnStack/` paths explicitly.
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
@@ -233,23 +233,14 @@ jobs:
                   case "$link" in
                       http://*|https://*|mailto:*|tel:*|ftp://*) continue ;;
                   esac
-                  # Sibling-relative LearnStack link at any `../` depth.
-                  # Hub docs reference LearnStack core at varying depths
-                  # depending on the source file's own location:
-                  #   - root files (README, CLAUDE.md):       ../learnstack/...
-                  #   - docs/*.md:                            ../../learnstack/...
-                  #   - docs/{architecture,decisions}/*.md:   ../../../learnstack/...
-                  #   - backend/src/Modules/README.md:        ../../../../learnstack/...
-                  # The trailing piece is optional — `../learnstack` (a bare
-                  # directory link to the sibling repo's root) is just as
-                  # legitimate as `../learnstack/docs/...`. CI cannot reach
-                  # the sibling repo, so skip the file-existence check for
-                  # any `(../)+learnstack` link, with or without a trailing
-                  # path. The links are validated locally on the developer's
-                  # workstation.
-                  if [[ "$link" =~ ^(\.\./)+learnstack(/|$) ]]; then
-                      continue
-                  fi
+                  # There is deliberately NO exemption for cross-repo links.
+                  # Hub docs link into LearnStack core by absolute URL
+                  # (https://github.com/HodeTech/LearnStack/blob/main/...),
+                  # which the external-URL skip above already covers. A
+                  # sibling-relative `../LearnStack/...` link is a defect: it
+                  # 404s on github.com and depends on a local checkout that is
+                  # present and identically capitalised. It now fails here
+                  # instead of reaching a reader.
                   link_path="${link%%#*}"
                   link_path="${link_path%%\?*}"
                   [[ -z "$link_path" ]] && continue

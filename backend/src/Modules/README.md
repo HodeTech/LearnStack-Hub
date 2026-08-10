@@ -4,7 +4,7 @@ This directory is intentionally **empty** in P02c-0. Hub-side module aggregates 
 
 ## Planned module topology
 
-The 11 Hub modules ([ADR-0019 § Hub data model](../../../../learnstack/docs/decisions/0019-learnstack-hub.md)) arrive across multiple Phase 02c packets:
+The 11 Hub modules ([ADR-0019 § Hub data model](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md)) arrive across multiple Phase 02c packets:
 
 | Module                                   | Lands in      | Aggregates                                                                   |
 | ---------------------------------------- | ------------- | ---------------------------------------------------------------------------- |

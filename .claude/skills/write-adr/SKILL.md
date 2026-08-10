@@ -7,7 +7,7 @@ description: >
   background-job orchestration, operator-portal-specific pattern). DO NOT USE FOR:
   cross-cutting decisions that touch the Hub↔LearnStack contract, entitlement
   projection shape, custom-domain lifecycle, two-realm boundary, or deployment model
-  (those are LearnStack ADRs — file in ../learnstack/docs/decisions/), editing an
+  (those are LearnStack ADRs — file in ../LearnStack/docs/decisions/), editing an
   Accepted ADR's decision section (write a superseding ADR), or day-to-day choices
   (those go in code review / commit messages).
 ---
@@ -25,7 +25,7 @@ Capture a Hub-only architectural decision durably, with its drivers and the opti
 
 ## When not to use
 
-- The decision touches the Hub↔LearnStack contract / entitlement shape / custom-domain lifecycle / two-realm boundary / deployment model → it's a **LearnStack** ADR; file under `../learnstack/docs/decisions/` (coordinated, with user permission).
+- The decision touches the Hub↔LearnStack contract / entitlement shape / custom-domain lifecycle / two-realm boundary / deployment model → it's a **LearnStack** ADR; file under `../LearnStack/docs/decisions/` (coordinated, with user permission).
 - Editing an Accepted ADR's Decision section → write a new ADR that supersedes it.
 - A routine implementation choice → commit message / code review.
 

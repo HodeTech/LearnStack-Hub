@@ -33,9 +33,9 @@ When a module ships, its deep-dive carries:
 - **MediatR contracts** — commands + queries the module exposes, with idempotency keys where applicable.
 - **Integration events** — Dapr topic names (`learnstack.hub.<module>.*`), payload shape, consumer modules.
 - **Permission keys** — operator-scope permissions the module declares.
-- **Audit-coverage matrix** — MUST / SHOULD / MAY classification per operation (mirrors LearnStack [Standards 18 § Audit Coverage](../../../learnstack/docs/standards/18-audit-coverage.md)).
+- **Audit-coverage matrix** — MUST / SHOULD / MAY classification per operation (mirrors LearnStack [Standards 18 § Audit Coverage](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/18-audit-coverage.md)).
 - **Architecture-test rules** — module-specific NetArchTest assertions.
 
 ## Audit-coverage matrices
 
-Until the Hub operator-audit pipeline lands in **P02c-4** (`LearnStack.Hub.Modules.Audit`), each module doc carries its MUST/SHOULD/MAY audit table **inline** (see the "Audit coverage" section in each module's `.md`). When P02c-4 wires the live audit writer, these inline matrices either move to a per-module `audit.md` or are consumed in place — that split is a P02c-4 decision. The matrices follow the same shape as LearnStack core ([Standards 18 § Audit Coverage](../../../learnstack/docs/standards/18-audit-coverage.md)).
+Until the Hub operator-audit pipeline lands in **P02c-4** (`LearnStack.Hub.Modules.Audit`), each module doc carries its MUST/SHOULD/MAY audit table **inline** (see the "Audit coverage" section in each module's `.md`). When P02c-4 wires the live audit writer, these inline matrices either move to a per-module `audit.md` or are consumed in place — that split is a P02c-4 decision. The matrices follow the same shape as LearnStack core ([Standards 18 § Audit Coverage](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/18-audit-coverage.md)).

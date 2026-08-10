@@ -29,7 +29,7 @@ public sealed class RepositoryLayoutTests
 
         offenders.Should().BeEmpty(
             "ADR-0018 (LearnStack core) applies to Hub by reference: tenant-specific shapes " +
-            "live as data, not code. See ../learnstack/docs/decisions/0018-tenant-driven-customization-model.md.");
+            "live as data, not code. See ../LearnStack/docs/decisions/0018-tenant-driven-customization-model.md.");
     }
 
     /// <summary>

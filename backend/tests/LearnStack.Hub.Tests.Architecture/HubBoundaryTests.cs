@@ -5,7 +5,7 @@ namespace LearnStack.Hub.Tests.Architecture;
 
 /// <summary>
 /// Hub-specific boundary rules. The authoritative list of Hub-side architecture
-/// tests is in `../learnstack/docs/architecture/24-learnstack-hub.md` § 10
+/// tests is in `../LearnStack/docs/architecture/24-learnstack-hub.md` § 10
 /// (six tests):
 ///
 ///   1. `Hub_NeverStores_TenantContent` (Architecture 24 spelling; ADR-0019

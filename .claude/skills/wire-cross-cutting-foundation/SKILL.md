@@ -31,7 +31,7 @@ Stand up the Hub's foundation so domain code programs against the same `Result<T
 
 ### Step 1 — Mirror the Hub SharedKernel
 
-Reproduce `../learnstack/backend/src/LearnStack.SharedKernel/` into `backend/src/Core/LearnStack.Hub.SharedKernel/`, folder-for-folder, with namespace `LearnStack.Hub.SharedKernel.*` and **two substitutions**:
+Reproduce `../LearnStack/backend/src/LearnStack.SharedKernel/` into `backend/src/Core/LearnStack.Hub.SharedKernel/`, folder-for-folder, with namespace `LearnStack.Hub.SharedKernel.*` and **two substitutions**:
 
 - **`OperatorId`** replaces `UserId` everywhere (the Vogen ID in `Identifiers/`, the `AuditableEntity<TId>` audit columns, `CapturedContext`). There is no tenant `UserId` in Hub.
 - **`HubException`** replaces `LearnStackException` as the base exception (namespace `LearnStack.Hub.SharedKernel.Errors`); `DomainException` / `InfrastructureException` / `ProviderException` derive from it.
@@ -92,4 +92,4 @@ Mirroring LearnStack's `DomainExceptionThrowAnalyzer` as `LearnStack.Hub.Analyze
 - **Leaving `UserId` in the mirror.** Substitute `OperatorId` everywhere.
 - **Registering the OTel LoggerProvider alongside Serilog.** Double-exports every log line.
 - **Reading `DeploymentMode` inside a module.** Branch once at the composition root.
-- **Improvising shapes.** Open `../learnstack/backend/src/LearnStack.SharedKernel/` + `LearnStack.Api/Common/` + `LearnStack.Application/Pipeline/` and reproduce.
+- **Improvising shapes.** Open `../LearnStack/backend/src/LearnStack.SharedKernel/` + `LearnStack.Api/Common/` + `LearnStack.Application/Pipeline/` and reproduce.

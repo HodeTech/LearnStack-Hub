@@ -1,6 +1,6 @@
 # Hub Architecture
 
-Hub-internal architecture documentation. Cross-cutting architectural decisions (LearnStack ↔ Hub contracts, deployment models, entitlement projection, custom-domain lifecycle) live in the [LearnStack core architecture corpus](../../../learnstack/docs/architecture/) — not duplicated here.
+Hub-internal architecture documentation. Cross-cutting architectural decisions (LearnStack ↔ Hub contracts, deployment models, entitlement projection, custom-domain lifecycle) live in the [LearnStack core architecture corpus](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/) — not duplicated here.
 
 ## Contents
 

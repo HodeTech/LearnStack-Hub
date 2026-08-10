@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Core application layer: the 6-step Hub MediatR pipeline (mirror of
-    LearnStack core's 8-step pipeline minus the two tenant-isolation steps Hub
-    does not have) + the cross-module application handlers that orchestrate
+    Core application layer: the Hub MediatR pipeline — six behaviors, a mirror
+    of LearnStack core's seven minus the one tenant-isolation behavior Hub does
+    not have (TenantContextBehavior) + the cross-module application handlers that orchestrate
     work spanning modules.
   -->
 

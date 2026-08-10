@@ -5,8 +5,8 @@ using Xunit;
 namespace LearnStack.Hub.Tests.Architecture;
 
 /// <summary>
-/// Asserts the Hub MediatR pipeline is the canonical <strong>6-step</strong>
-/// sequence (LearnStack core's 8 minus the two tenant-isolation steps), in
+/// Asserts the Hub MediatR pipeline is the canonical <strong>six-behavior</strong>
+/// sequence — LearnStack core's seven minus <c>TenantContextBehavior</c> — in
 /// order — Validation → Logging → AuditLog → Authorization → Transaction →
 /// OutboxFlush. No TenantContextBehavior. See cross-cutting-foundation.md § 2.
 /// </summary>

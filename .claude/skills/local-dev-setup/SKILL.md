@@ -30,7 +30,7 @@ Get the Hub stack running. Hub's compose is deliberately minimal — it runs onl
 
 ## Prerequisites
 
-- The sibling repo at `../learnstack` (Hub depends on it for shared backends + the Keycloak realms).
+- The sibling repo at `../LearnStack` (Hub depends on it for shared backends + the Keycloak realms).
 - Docker daemon (OrbStack / Docker Desktop).
 - **.NET 10 SDK** at `~/.dotnet/dotnet` (system `dotnet` is .NET 9). `export PATH="$HOME/.dotnet:$PATH"`.
 - pnpm 9.12.3 + Node ≥ 20.11 for the operator portal.
@@ -47,15 +47,15 @@ make install      # restores backend NuGet + frontend pnpm + activates .githooks
 ### Step 2 — LearnStack core compose FIRST (shared backends)
 
 ```bash
-cd ../learnstack && make dev
+cd ../LearnStack && make dev
 ```
 
-This brings up Postgres (5432), Valkey (6379), Vault (8200), Kafka (9092), Keycloak (8080, with **both** the `learnstack` and `learnstack-hub` realms imported from `../learnstack/infra/keycloak/realms/`), and Mailpit. Hub does NOT run these — it reaches them via `host.docker.internal`.
+This brings up Postgres (5432), Valkey (6379), Vault (8200), Kafka (9092), Keycloak (8080, with **both** the `learnstack` and `learnstack-hub` realms imported from `../LearnStack/infra/keycloak/realms/`), and Mailpit. Hub does NOT run these — it reaches them via `host.docker.internal`.
 
 ### Step 3 — Hub compose
 
 ```bash
-cd ../learnstack-hub && make dev
+cd ../LearnStack-Hub && make dev
 ```
 
 Brings up the Hub-only services: Dapr placement (50006), Dapr sidecar (3501/50002), Hub APISIX (9180/9543/9191), and the `postgres-hub-init` one-shot that creates the `learnstack_hub` database in the shared Postgres. If LearnStack core compose isn't up, `postgres-hub-init` waits up to 120s then fails with an actionable message — start LearnStack core first.
@@ -63,20 +63,20 @@ Brings up the Hub-only services: Dapr placement (50006), Dapr sidecar (3501/5000
 ### Step 4 — Hub API
 
 ```bash
-cd ../learnstack-hub/backend
+cd ../LearnStack-Hub/backend
 ~/.dotnet/dotnet run --project src/Core/LearnStack.Hub.Api    # binds 0.0.0.0:5181
 ```
 
 ### Step 5 — Operator portal (when working on it)
 
 ```bash
-cd ../learnstack-hub/frontend && pnpm dev    # operator-portal on 3100
+cd ../LearnStack-Hub/frontend && pnpm dev    # operator-portal on 3100
 ```
 
 ### Step 6 — Seed (optional)
 
 ```bash
-cd ../learnstack-hub && make seed    # demo plans + demo tenant + demo operator (P02c-1+ fills real data)
+cd ../LearnStack-Hub && make seed    # demo plans + demo tenant + demo operator (P02c-1+ fills real data)
 ```
 
 ## Health verification
@@ -86,7 +86,7 @@ curl -i http://localhost:9180/healthz                         # Hub APISIX
 curl -i http://localhost:5181/healthz                         # Hub API direct
 curl -s http://localhost:8080/realms/learnstack-hub/.well-known/openid-configuration | jq .issuer
 # expect "http://localhost:8080/realms/learnstack-hub"
-docker compose -f ../learnstack/infra/compose/dev.yml exec postgres psql -U learnstack -lqt | grep learnstack_hub
+docker compose -f ../LearnStack/infra/compose/dev.yml exec postgres psql -U learnstack -lqt | grep learnstack_hub
 ```
 
 ## Port map (no collisions with LearnStack core)
@@ -103,7 +103,7 @@ Shared (Hub consumes via `host.docker.internal`): Postgres 5432, Valkey 6379, Va
 
 ## Common pitfalls
 
-- **Starting Hub compose before LearnStack core.** `postgres-hub-init` hangs ~120s then fails. Start `../learnstack` first.
+- **Starting Hub compose before LearnStack core.** `postgres-hub-init` hangs ~120s then fails. Start `../LearnStack` first.
 - **The dotnet PATH trap.** `dotnet run` fails on the SDK pin without `~/.dotnet` on PATH.
-- **Expecting Hub to run its own Keycloak.** It doesn't — the `learnstack-hub` realm lives in LearnStack core's Keycloak (the realm JSON is in `../learnstack/infra/keycloak/realms/`).
+- **Expecting Hub to run its own Keycloak.** It doesn't — the `learnstack-hub` realm lives in LearnStack core's Keycloak (the realm JSON is in `../LearnStack/infra/keycloak/realms/`).
 - **Port confusion.** Hub deliberately offsets every port from LearnStack core; check the map above.

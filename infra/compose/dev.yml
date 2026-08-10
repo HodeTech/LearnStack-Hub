@@ -8,7 +8,7 @@
 # via `host.docker.internal`.
 #
 # PRE-REQUISITE: LearnStack core compose MUST be running before this stack
-# starts. Run `cd ../learnstack && make dev` first.
+# starts. Run `cd ../LearnStack && make dev` first.
 #
 # Env vars (HUB_*, POSTGRES_*, VAULT_*) come from the repo-root `.env` file
 # (template: `.env.example`). Every `${VAR:-default}` reference falls back
@@ -53,7 +53,7 @@ services:
           attempts=$((attempts + 1))
           if [ $attempts -ge 60 ]; then
             echo "ERROR: shared Postgres not reachable on host.docker.internal:5432 after 120s." >&2
-            echo "       Start LearnStack core compose first: cd ../learnstack && make dev" >&2
+            echo "       Start LearnStack core compose first: cd ../LearnStack && make dev" >&2
             exit 1
           fi
           sleep 2

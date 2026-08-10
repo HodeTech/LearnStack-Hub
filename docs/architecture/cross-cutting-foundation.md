@@ -1,6 +1,6 @@
 # Hub cross-cutting foundation
 
-This document specs the Hub-side cross-cutting foundation that lands in **P02c-1**. It mirrors LearnStack core's Phase 02a Packet 3 ([ADR-0032](../../../learnstack/docs/decisions/0032-exception-handling-logging-and-observability.md)) — same shapes, Hub-adjusted where Hub's operator-scoped (not tenant-scoped) model demands it.
+This document specs the Hub-side cross-cutting foundation that lands in **P02c-1**. It mirrors LearnStack core's Phase 02a Packet 3 ([ADR-0032](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)) — same shapes, Hub-adjusted where Hub's operator-scoped (not tenant-scoped) model demands it.
 
 The intent: when domain code starts landing in Hub modules, it programs against the _same_ `Result<T>` / MediatR-pipeline / exception-handling / observability surface a LearnStack core developer already knows. Patterns are copied, not invented.
 
@@ -27,7 +27,7 @@ The intent: when domain code starts landing in Hub modules, it programs against 
 | `Hosting/`       | `DeploymentMode`                                                                                                                      | Same five values: Development, SaaS, Dedicated, SelfHostedOnline, SelfHostedAirGapped                                                                       |
 | (root)           | `LearnStackHubVogenDefaults.IdMask`                                                                                                   | `EfCoreValueConverter \| SystemTextJson \| TypeConverter`                                                                                                   |
 
-The exact public API shapes are LearnStack core's — reproduce them verbatim (adjusting the namespace + the `OperatorId` substitution). The agent prompt points the implementer at the live LearnStack source under `../learnstack/backend/src/LearnStack.SharedKernel/` for the canonical signatures.
+The exact public API shapes are LearnStack core's — reproduce them verbatim (adjusting the namespace + the `OperatorId` substitution). The agent prompt points the implementer at the live LearnStack source under `../LearnStack/backend/src/LearnStack.SharedKernel/` for the canonical signatures.
 
 ### `HubException` naming
 
@@ -44,9 +44,9 @@ This is the load-bearing Hub adjustment. LearnStack core's `AuditableEntity<TId>
 
 ## 2. MediatR pipeline — Hub's behavior set
 
-LearnStack core runs an 8-step pipeline: Validation → Logging → AuditLog → TenantContext → Authorization → Transaction → OutboxFlush → Handler.
+LearnStack core registers **seven** pipeline behaviors: Validation → Logging → AuditLog → TenantContext → Authorization → Transaction → OutboxFlush, then the Handler. [ADR-0032 § Sub-decision 2](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md) writes that as an eight-step list because it counts the Handler; this document counts behaviors, so the numbers below are behavior counts throughout.
 
-Hub runs a **6-step** pipeline. The two LearnStack steps that drop out are tenant-isolation concerns Hub does not have:
+Hub registers **six**. The one behavior that drops out is a tenant-isolation concern Hub does not have:
 
 | #   | Behavior                | P02c-1 state                    | Why                                                                                                                                                                                                                               |
 | --- | ----------------------- | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -62,14 +62,14 @@ Hub runs a **6-step** pipeline. The two LearnStack steps that drop out are tenan
 
 - **`TenantContextBehavior`** — REMOVED. Hub has no per-request tenant context to assert / no RLS GUC to set. Hub requests are operator-scoped; the operator identity rides on the JWT, resolved by an `OperatorContext` (P02c-4), not by a tenant resolver.
 
-The `MediatR_Pipeline_Order_Matches_Canonical_Sequence` architecture test (if mirrored) asserts the 6-step Hub order, not LearnStack's 8.
+The `MediatR_Pipeline_Order_Matches_Canonical_Sequence` architecture test (if mirrored) asserts the six-behavior Hub order, not LearnStack's seven.
 
 ## 3. Exception handling
 
 - **L1 handler:** `HubExceptionHandler : IExceptionHandler` in `LearnStack.Hub.Api/Common/` — mirror of `LearnStackExceptionHandler`. Captures via `IErrorTrackingProvider`, reads `CapturedContext` (operator + correlation), maps to RFC 7807 Problem Details, logs through `ILogger`.
 - **`Result<T>.ToActionResult()`** in `LearnStack.Hub.Api/Common/ResultExtensions.cs` — explicit at every controller endpoint (no action filter). Success → `OkObjectResult`; failure → `ProblemDetailsActionResult(error)`.
 - **`ProblemDetailsFactory` + `HttpStatusMap`** — mirror of LearnStack core's. Problem-type prefix `https://errors.hub.learnstack.dev/` (Hub's own error domain).
-- **Exception hierarchy:** `HubException` (base) → `DomainException`, `InfrastructureException`, `ProviderException`. `DomainException` is reserved for programmer errors / aggregate-invariant bugs; expected business-rule violations return `Result.Fail(...)` (mirror of [ADR-0032 § Sub-decision 4](../../../learnstack/docs/decisions/0032-exception-handling-logging-and-observability.md)).
+- **Exception hierarchy:** `HubException` (base) → `DomainException`, `InfrastructureException`, `ProviderException`. `DomainException` is reserved for programmer errors / aggregate-invariant bugs; expected business-rule violations return `Result.Fail(...)` (mirror of [ADR-0032 § Sub-decision 4](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0032-exception-handling-logging-and-observability.md)).
 - **No `ExceptionHandlingBehavior` in the pipeline** — `AuditLogBehavior` (catch + rethrow) plus the L1 `HubExceptionHandler` cover every exception path, same as LearnStack core.
 
 ## 4. Observability
@@ -95,7 +95,7 @@ P02c-1 grows `Program.cs` from the P02c-0 minimal `/healthz` host into the found
 1. `builder.Host.UseSerilog(...)` (console + OTLP).
 2. `builder.Services.AddOpenTelemetry()...` (tracing + metrics; no LoggerProvider).
 3. `builder.Services.AddExceptionHandler<HubExceptionHandler>()` + `AddProblemDetails()`.
-4. MediatR registration with the 6-step pipeline in canonical order.
+4. MediatR registration with the six-behavior pipeline in canonical order.
 5. `IClock` / `IGuidFactory` / `IRandom` / `ISecretProvider` / `IErrorTrackingProvider` / `IProviderResilience<>` registered, `DeploymentMode`-branched at the composition root (modules never read `DeploymentMode`).
 6. Each module's `Add<Module>Module(...)` extension (DbContext + handlers + validators).
 7. `/healthz` stays; real endpoints arrive in P02c-2.

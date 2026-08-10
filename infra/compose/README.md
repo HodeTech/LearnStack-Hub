@@ -15,16 +15,16 @@ Total: ~4 services. By contrast, LearnStack core's compose stack runs 15 service
 
 ```bash
 # 1. LearnStack core compose (shared backends)
-cd ../learnstack && make dev
+cd ../LearnStack && make dev
 
 # 2. Hub-side compose
-cd ../learnstack-hub && make dev
+cd ../LearnStack-Hub && make dev
 
 # 3. LearnStack core API
-cd ../learnstack/backend && dotnet run --project src/LearnStack.Api
+cd ../LearnStack/backend && dotnet run --project src/LearnStack.Api
 
 # 4. Hub API
-cd ../learnstack-hub/backend && dotnet run --project src/LearnStack.Hub.Api
+cd ../LearnStack-Hub/backend && dotnet run --project src/LearnStack.Hub.Api
 ```
 
 The boot-order dependency is dev-only. Production deploys the two stacks independently.
@@ -44,7 +44,7 @@ curl -s http://localhost:8080/realms/learnstack-hub/.well-known/openid-configura
 
 ## Demo operator credentials
 
-Loaded from `../learnstack/infra/keycloak/realms/learnstack-hub.json` at LearnStack core's Keycloak first boot:
+Loaded from `../LearnStack/infra/keycloak/realms/learnstack-hub.json` at LearnStack core's Keycloak first boot:
 
 - Username: `demo-operator@learnstack.test`
 - Password: `demo-dev-secret`

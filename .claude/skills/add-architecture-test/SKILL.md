@@ -30,7 +30,7 @@ Make a structural rule mechanical + non-skippable. Hub's architecture suite is t
 
 ## The Hub architecture-test set
 
-The tests `LearnStack.Hub.Tests.Architecture` should carry as P02c-1 lands modules (authoritative list: [Architecture 24 § 10](../../../../learnstack/docs/architecture/24-learnstack-hub.md), Hub-side):
+The tests `LearnStack.Hub.Tests.Architecture` should carry as P02c-1 lands modules (authoritative list: [Architecture 24 § 10](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md), Hub-side):
 
 | Test                                                                | Asserts                                                                                                                                                                                                                                                       |
 | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

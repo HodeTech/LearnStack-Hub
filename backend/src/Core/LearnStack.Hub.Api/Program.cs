@@ -8,11 +8,23 @@ using LearnStack.Hub.Modules.Subscriptions.Infrastructure;
 using LearnStack.Hub.Modules.TenantLifecycle.Infrastructure;
 using LearnStack.Hub.SharedKernel.Hosting;
 
-// TODO(P02c-2): wire the four-endpoint Hub HTTPS contract surface —
-// POST /api/v1/internal/license/verify and POST /api/v1/usage/report are HOSTED
-// here; the outbound POST /api/internal/tenants + PUT .../entitlements calls
-// live in LearnStack.Hub.Infrastructure.LearnStackApiClient. Bind /api/internal/*
-// to the internal listener only (Internal_API_Endpoints_AreNot_Public).
+// TODO(P02c-2): wire the Hub HTTPS contract surface. It is governed by the two
+// invariants in ADR-0034 — the Hub stores no tenant content, and every crossing
+// goes through a named adapter — NOT by an endpoint count. Do not build "the four
+// endpoints": ADR-0034 records that protecting that count is what caused TLS
+// private keys to be tunnelled through the entitlement payload in the first place.
+//
+// HOSTED here (Hub receives): POST /api/v1/internal/license/verify,
+// POST /api/v1/internal/license/refresh, POST /api/v1/usage/report, and
+// POST /api/v1/internal/tenants/{id}/custom-domains.
+// OUTBOUND (LearnStack.Hub.Infrastructure.LearnStackApiClient): POST /api/internal/tenants,
+// PUT .../entitlements, PUT .../status, PUT .../host-mappings, DELETE /tenants/{id},
+// GET .../usage. The host-mappings push is the endpoint that exists so certificate
+// material stops riding the entitlement payload — do not omit it.
+//
+// Bind /api/internal/* to the internal listener only (Internal_API_Endpoints_AreNot_Public).
+// Authoritative set:
+// https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -5,11 +5,11 @@ using Microsoft.Extensions.DependencyInjection;
 namespace LearnStack.Hub.Application.Pipeline;
 
 /// <summary>
-/// Composition-root extension that registers the canonical <strong>6-step</strong>
-/// Hub MediatR pipeline. Hub drops the two tenant-isolation steps LearnStack
-/// core's 8-step pipeline carries (<c>TenantContextBehavior</c> and the
-/// tenant-scoped concerns) because Hub is operator-administered, not
-/// tenant-isolated. Outermost (validation) first, innermost (handler) last; the
+/// Composition-root extension that registers the canonical <strong>six-behavior</strong>
+/// Hub MediatR pipeline. Hub drops exactly one behavior LearnStack core's seven
+/// carry — <c>TenantContextBehavior</c> — because Hub is operator-administered,
+/// not tenant-isolated. (ADR-0032 writes core's as an eight-step list because it
+/// counts the Handler; this file counts behaviors.) Outermost (validation) first, innermost (handler) last; the
 /// <c>MediatR_Pipeline_Order_Matches_Canonical_Sequence</c> architecture test
 /// asserts this DI registration order.
 /// </summary>
