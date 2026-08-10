@@ -37,7 +37,7 @@ This is the JSON the projection serialises to (per [Architecture 24 § 4](https:
   "compliance": {
     "caps": {
       "gdpr.hard_delete.enabled": { "allowed": true, "forced": false },
-      "audit.retention.days": { "allowed": true, "forced": true, "value": 365 },
+      "audit.retention.days": { "allowed": true, "forced": true, "value": "365" },
       "data.residency.region": {
         "allowed": false,
         "forced": true,
@@ -56,6 +56,14 @@ This is the JSON the projection serialises to (per [Architecture 24 § 4](https:
 - **Feature keys** use the dotted snake_case form with **no `.enabled` suffix** (dropped in [ADR-0021 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)). Every feature is implicitly boolean. e.g. `classroom.recording`, `tenancy.custom_domain`, `identity.sso.saml`.
 - **Limit keys** carry the `limits.` prefix; value `-1` = unlimited, `0` = not available. e.g. `limits.max_users`.
 - **Compliance-cap keys** keep their own `.enabled` portion as part of the cap name (it is NOT a redundant suffix), and the value is a `{ allowed, forced, value? }` object — not a bare bool.
+- Inside that object, **`value` is always a string on the wire, or null** — never a
+  number. A numeric cap such as `audit.retention.days` is carried as `"365"` and parsed
+  by the consumer. `entitlement-v1.schema.json` declares
+  `"value": { "type": ["string", "null"] }` and the envelope is
+  `additionalProperties: false`, so a numeric literal is rejected outright — and
+  `ComplianceCapDto.Value` is `string?`, so the serialiser cannot emit one anyway. An
+  example here showing `365` unquoted described a payload that would fail its own
+  contract test.
 - The `tier` mirrors the `Plan.tier` (`starter | growth | scale | enterprise | custom`).
 
 P02c-1 stores `features` / `limits` / `compliance_caps` as **JSONB columns** on the `entitlements` table. The projection serialiser produces exactly the JSON above.
