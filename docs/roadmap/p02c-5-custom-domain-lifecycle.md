@@ -73,19 +73,35 @@ forever or activates on half a propagation.
   the replication request is tagged with it. It is the correlation key in logs and in the
   operator queue, and it changes on each `RetryPropagation()` so a late acknowledgement
   from a superseded attempt is recognised and discarded rather than counted.
-- **Two acknowledgement columns, written in the transaction that receives them.**
+- **Two acknowledgement columns, scoped to the attempt that produced them.**
   `host_mapping_acked_at` and `cert_replication_acked_at` are nullable timestamps on the
-  aggregate, each set exactly once per `propagation_id`. An acknowledgement that arrives
-  twice for the same id is a no-op — the write is conditional on the column being null and
-  the id matching — so a redelivered acknowledgement cannot double-count.
+  aggregate. A timestamp alone cannot say *which* attempt acknowledged, so the scoping is
+  made explicit at both ends:
+  - Every acknowledgement carries the `propagation_id` it answers, and the write is
+    conditional on that id equalling the aggregate's **current** one and on the column
+    being null. An acknowledgement for a superseded attempt is discarded, and a
+    redelivered acknowledgement for the current one is a no-op — neither can double-count.
+  - `RetryPropagation()` mints a new `propagation_id` **and clears both columns in the
+    same transaction**. A new attempt therefore starts from two nulls and cannot inherit a
+    half-acknowledgement from the attempt it replaces, which would let one channel's old
+    success stand in for a channel that never answered this time.
 - **`MarkPropagated()` is a guard, not a signal.** It returns
-  `Result.Fail(business_rule_violation)` unless both columns are non-null for the current
-  `propagation_id`. It is invoked after each acknowledgement lands, so whichever arrives
-  second is the one that opens the gate — neither channel needs to know about the other.
+  `Result.Fail(business_rule_violation)` unless both columns are non-null under the
+  current `propagation_id`. It is invoked after each acknowledgement lands, so whichever
+  arrives second is the one that opens the gate — neither channel needs to know about the
+  other.
 - **Restart recovery is a query, not a memory.** On startup, and on every run of the
-  propagation job, domains in `Propagating` are re-driven from the two columns: a null
-  column means that channel is re-sent under the same `propagation_id`, which is safe
-  because both sides are idempotent on it. Nothing is reconstructed from process state.
+  propagation job, domains in `Propagating` are re-driven from the two columns:
+  - Either column null → that channel alone is re-sent under the current
+    `propagation_id`, which is safe because both sides are idempotent on it. The
+    already-acknowledged channel is **not** re-sent.
+  - Both columns non-null → the acknowledgements landed but the transition did not
+    commit, so recovery calls `MarkPropagated()` and completes it. Without this branch a
+    crash in the window between the second acknowledgement and the state write would leave
+    a fully propagated domain stuck in `Propagating` until its timeout expired, and it
+    would then be reported as a propagation failure that never happened.
+
+  Nothing is reconstructed from process state.
 - **A timeout is a state, not a hang.** A `Propagating` domain whose attempt budget or
   wall-clock window expires with either column still null moves to `Failed` with
   `LastPropagationError` naming *which* channel did not acknowledge — the difference
@@ -301,14 +317,28 @@ serving that host on a publicly trusted certificate at the edge.
   - It carries the full three-layer chain — mTLS, RS256 JWT (`aud=learnstack-internal`,
     ≤ 5 min, `jti` replay-protected) and HMAC-SHA256 body signature — like every other
     endpoint in the ADR-0034 set. No exemption for being "just a form submission".
-  - It **rejects `learnstack` realm tokens.** That is the whole reason the hop exists: the
-    tenant admin authenticates to Studio against the tenant realm, and Studio proxies with
-    its own service credentials rather than forwarding the tenant's token
-    ([ADR-0004 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)).
-    An implementation that forwarded the tenant token and accepted it here would dissolve
-    the two-realm boundary at exactly the endpoint that decides which tenant owns a host.
-  - The tenant is taken from the authenticated context and the route, never from the body
-    (`CustomDomain_TenantId_NeverReadFrom_RequestBody`).
+  - **The accepted issuer set is an allow-list of exactly one:** the `learnstack-hub`
+    realm. The token's `iss` must equal that realm's issuer URL, and **every** other
+    issuer is rejected — the `learnstack` tenant realm among them, but not only it. This
+    is stated as an allow-list rather than as "reject `learnstack`" on purpose: a
+    deny-list naming one realm says nothing about a third realm, a renamed realm, or a
+    second Keycloak someone stands up, and each of those would be accepted by a rule that
+    only knows what to refuse. Hub authenticates against the `learnstack-hub` realm
+    **only** ([ADR-0004 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)).
+    That is also why the hop exists: the tenant admin authenticates to Studio against the
+    tenant realm, and Studio proxies with its own `learnstack-hub` service credentials
+    rather than forwarding the tenant's token. Forwarding it would dissolve the two-realm
+    boundary at exactly the endpoint that decides which tenant owns a host.
+  - **The route `{id}` is the only tenant selector, and it is checked, not trusted.** The
+    request body carries no tenant field at all — one that appears is rejected as
+    malformed rather than ignored, because silently ignoring it lets a caller believe a
+    submission was scoped the way it wrote it. The token is scoped to the tenant it acts
+    for, and the handler asserts that the route `{id}` equals that scope **before**
+    `Create` runs, refusing a mismatch with `403`. A service credential that can reach the
+    endpoint at all must not thereby be able to attach a domain to any tenant it names in
+    the path. `CustomDomain_TenantId_NeverReadFrom_RequestBody` covers the body half of
+    this; the route-versus-scope check is handler behaviour and is covered by its own
+    negative test.
 
   The LearnStack side of the hop goes through **`IHubTenantSync`** — the named adapter for
   tenant-administration crossings, and under ADR-0034's second invariant the only type on
@@ -338,10 +368,18 @@ serving that host on a publicly trusted certificate at the edge.
   - Unit tests for every state transition and every rejection at `Create`.
   - Propagation: `MarkPropagated()` refused with one acknowledgement and accepted with
     both; a duplicate acknowledgement for the same `propagation_id` changing nothing; an
-    acknowledgement carrying a superseded `propagation_id` discarded; recovery re-sending
-    only the unacknowledged channel after a simulated restart; a timeout landing in
-    `Failed` with `LastPropagationError` naming the channel that did not acknowledge; and
-    the `.activated` outbox row existing only when the transition committed.
+    acknowledgement carrying a superseded `propagation_id` discarded; **partial-ack
+    retry** — one channel acknowledges, `RetryPropagation()` mints a new id and clears
+    both columns, and the new attempt is not opened by the previous attempt's
+    acknowledgement; **crash recovery** in both shapes — one column null re-sends only
+    that channel, and both columns non-null with the domain still `Propagating` completes
+    the transition rather than waiting for the timeout; a timeout landing in `Failed` with
+    `LastPropagationError` naming the channel that did not acknowledge; and the
+    `.activated` outbox row existing only when the transition committed.
+  - Submission endpoint: a token from the `learnstack` realm rejected, and a token from
+    any issuer outside the single-entry allow-list rejected; a route `{id}` that does not
+    match the token's tenant scope refused with `403` before `Create` runs; a body
+    carrying a tenant field rejected as malformed.
   - Verification job, **both** paths: DNS-01 TXT poll over found / absent / mismatched;
     HTTP-01 token fetch over valid body, absent (404), mismatched body, failed request
     (connection refused or timeout), same-host `https://` redirect (followed, succeeds)
