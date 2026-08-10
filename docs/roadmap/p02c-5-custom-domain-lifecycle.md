@@ -36,18 +36,83 @@ stateDiagram-v2
     Pending --> Verifying: StartVerification()
     Verifying --> Verifying: RecordVerificationFailure(error)
     Verifying --> Failed: attempts exhausted
-    Verifying --> Active: MarkVerified(certRef, issuedAt, expiresAt)
+    Verifying --> Propagating: MarkVerified(certRef, issuedAt, expiresAt)
+    Propagating --> Propagating: RecordPropagationFailure(error)
+    Propagating --> Failed: attempts exhausted
+    Propagating --> Active: MarkPropagated() (push + replication both acknowledged)
     Active --> Active: Renew(newExpiresAt)
     Active --> Revoked: Revoke()
     Failed --> Verifying: StartVerification() (operator retry)
+    Failed --> Propagating: RetryPropagation() (operator retry, cert already issued)
     Failed --> Revoked: Revoke()
 ```
 
-States: `Pending | Verifying | Active | Failed | Revoked`. Text fallback — a submitted
-domain is `Pending`; verification moves it to `Verifying`, where failures accumulate
-until the attempt budget is exhausted (`Failed`) or the challenge succeeds (`Active`);
-an active domain renews in place and can be revoked; a failed domain can be retried by an
-operator or revoked.
+States: `Pending | Verifying | Propagating | Active | Failed | Revoked`. Text fallback — a
+submitted domain is `Pending`; verification moves it to `Verifying`, where failures
+accumulate until the attempt budget is exhausted (`Failed`) or the challenge succeeds.
+A successful challenge does **not** reach `Active`: it moves to `Propagating`, where the
+domain waits on both halves of § Propagation — the `PUT .../host-mappings` push
+acknowledged by LearnStack, and the certificate replication into the LearnStack-owned
+secret store acknowledged by the secret store. Only when both acknowledge does
+`MarkPropagated()` move it to `Active`, and only that transition emits
+`learnstack.hub.custom-domain.activated`. The intermediate state exists because
+`Verifying → Active` on a certificate alone is exactly the split brain the § Risks entry
+names: a domain that resolves but does not serve. An active domain renews in place and can
+be revoked; a failed domain is retried by an operator — re-verifying if the challenge
+failed, re-propagating if only the push or the replication did — or revoked.
+
+#### What `MarkPropagated()` requires
+
+"Both acknowledged" is a **durable** claim, not an in-memory one, or a restart between the
+two acknowledgements silently loses one and the domain either sticks in `Propagating`
+forever or activates on half a propagation.
+
+- **One propagation attempt id per entry into `Propagating`.** A `propagation_id`
+  (UUIDv7, minted by `IGuidFactory`) is written on the aggregate when it enters the state,
+  and both channels carry it: the host-mapping push sends it as its idempotency key, and
+  the replication request is tagged with it. It is the correlation key in logs and in the
+  operator queue, and it changes on each `RetryPropagation()` so a late acknowledgement
+  from a superseded attempt is recognised and discarded rather than counted.
+- **Two acknowledgement columns, scoped to the attempt that produced them.**
+  `host_mapping_acked_at` and `cert_replication_acked_at` are nullable timestamps on the
+  aggregate. A timestamp alone cannot say *which* attempt acknowledged, so the scoping is
+  made explicit at both ends:
+  - Every acknowledgement carries the `propagation_id` it answers, and the write is
+    conditional on that id equalling the aggregate's **current** one and on the column
+    being null. An acknowledgement for a superseded attempt is discarded, and a
+    redelivered acknowledgement for the current one is a no-op — neither can double-count.
+  - `RetryPropagation()` mints a new `propagation_id` **and clears both columns in the
+    same transaction**. A new attempt therefore starts from two nulls and cannot inherit a
+    half-acknowledgement from the attempt it replaces, which would let one channel's old
+    success stand in for a channel that never answered this time.
+- **`MarkPropagated()` is a guard, not a signal.** It returns
+  `Result.Fail(business_rule_violation)` unless both columns are non-null under the
+  current `propagation_id`. It is invoked after each acknowledgement lands, so whichever
+  arrives second is the one that opens the gate — neither channel needs to know about the
+  other.
+- **Restart recovery is a query, not a memory.** On startup, and on every run of the
+  propagation job, domains in `Propagating` are re-driven from the two columns:
+  - Either column null → that channel alone is re-sent under the current
+    `propagation_id`, which is safe because both sides are idempotent on it. The
+    already-acknowledged channel is **not** re-sent.
+  - Both columns non-null → the acknowledgements landed but the transition did not
+    commit, so recovery calls `MarkPropagated()` and completes it. Without this branch a
+    crash in the window between the second acknowledgement and the state write would leave
+    a fully propagated domain stuck in `Propagating` until its timeout expired, and it
+    would then be reported as a propagation failure that never happened.
+
+  Nothing is reconstructed from process state.
+- **A timeout is a state, not a hang.** A `Propagating` domain whose attempt budget or
+  wall-clock window expires with either column still null moves to `Failed` with
+  `LastPropagationError` naming *which* channel did not acknowledge — the difference
+  between a LearnStack-side push failure and a secret-store replication failure is the
+  whole diagnostic, and an operator queue that only says "propagation failed" sends
+  someone to the wrong system.
+- **The event follows the committed transition.** `learnstack.hub.custom-domain.activated`
+  is enqueued on the outbox **in the same transaction** as the `Propagating → Active`
+  write, so it is published if and only if that transition committed. It is never emitted
+  from an acknowledgement handler, which would announce an activation that a later
+  rollback un-did.
 
 Every transition is a method returning `Result` and emitting a domain event. Invalid
 transitions return `Result.Fail(business_rule_violation)` and never throw
@@ -81,10 +146,23 @@ authenticated context, never from a submitted field.
   first request after cutover and before issuance fails. The submission UI states this
   ordering; DNS-01 has no such problem, which is why it is the default rather than a
   preference.
-- A Hangfire recurring job runs CNAME verification with a bounded attempt budget and
-  backoff (ADR-0022's default: every 60 seconds, up to 60 attempts). `VerificationAttempts`
-  and `LastVerificationError` are on the aggregate so the operator queue can show *why* a
-  domain is stuck, not just that it is.
+- A Hangfire recurring job runs the verification poll with a bounded attempt budget and
+  backoff (ADR-0022's default: every 60 seconds, up to 60 attempts). **What it checks is
+  selected by the domain's challenge mode**, not fixed — a job that only ever did one of
+  the two would silently never succeed for domains in the other mode:
+  - **DNS-01** — query the `_acme-challenge.{domain}` TXT record and compare it against the
+    expected token.
+  - **HTTP-01** — request `http://{domain}/.well-known/acme-challenge/{token}` **on port
+    80** and compare the response body against the expected key authorization. The CNAME
+    pointing at the LearnStack edge is a *precondition* for that request reaching us, not
+    the check itself: a correct CNAME with no token served is a failed challenge, and
+    treating the CNAME as sufficient would mark a domain verified that the CA will refuse.
+    Redirects are followed only to `https://` on the **same** host (which is what a
+    HTTP→HTTPS edge does, and what RFC 8555 permits); a redirect to any other host is a
+    failure, because following one would let a third party answer the challenge.
+
+  `VerificationAttempts` and `LastVerificationError` are on the aggregate so the operator
+  queue can show *why* a domain is stuck, not just that it is.
 - A second recurring job renews certificates inside their 30-day pre-expiry window.
 
 ### `ITlsCertificateProvider` and the ACME adapter
@@ -114,7 +192,7 @@ names:
 
 | Topic | Emitted when | LearnStack-side effect |
 |---|---|---|
-| `learnstack.hub.custom-domain.activated` | `MarkVerified` succeeds | **Invalidate** the resolver cache entry for the host. The mapping itself arrives over `PUT /api/internal/tenants/{id}/host-mappings` — see § Propagation below |
+| `learnstack.hub.custom-domain.activated` | `MarkPropagated` succeeds — i.e. on entering `Active`, after both the host-mapping push and the certificate replication have acknowledged. Never on `MarkVerified` alone | **Invalidate** the resolver cache entry for the host. The mapping itself arrives over `PUT /api/internal/tenants/{id}/host-mappings` — see § Propagation below |
 | `learnstack.hub.custom-domain.deactivated` | `Revoke` succeeds | **Invalidate** the resolver cache entry for the host. The row is removed by the same push endpoint |
 | `learnstack.hub.custom-domain.renewed` | `Renew` succeeds | Refresh the certificate reference; no mapping change |
 
@@ -198,16 +276,23 @@ Added to the P02c-4 shell: Custom Domains → Pending Queue, Active List, Renewa
 
 The LearnStack-side event consumer, the `host-mappings` handler and the
 `platform_host_to_tenant` writes are the paired half of this packet and live in LearnStack
-[Phase 02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md), merged in the
-same session per [CLAUDE.md § Cross-repo coordination](../../CLAUDE.md).
+[Phase 02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md). They land as
+two pull requests in one session, per [CLAUDE.md § Cross-repo coordination](../../CLAUDE.md):
+the **Hub pull request opens first** and carries the canonical contract shape, the
+**LearnStack pull request references the Hub PR's commit hash** and is written against
+that shape, and **both merge in the same session** — either-side merge alone leaves the
+contract dangling.
 
 The LearnStack **edge** half is demand-gated. Per
 [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md), both
 the APISIX adapter and custom-domain TLS automation land in
 [LearnStack Phase 11](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md),
-with the trigger *"a tenant needs its own domain in production"*. Before that trigger
-fires, LearnStack terminates TLS with its default ASP.NET hosting rather than APISIX SSL
-objects.
+on their two **separate** triggers — TLS automation on *"a tenant needs its own domain in
+production"*, APISIX on *"a non-dev deployment needs edge rate limiting, host routing, or
+JWT pre-validation"*. The first custom domain in production satisfies both, which is why
+they land together, but they are two rows with two conditions and neither implies the
+other. Before those triggers fire, LearnStack terminates TLS with its default ASP.NET
+hosting rather than APISIX SSL objects.
 
 The split is clean because routing and termination are separable: host **resolution**
 works as soon as `platform_host_to_tenant` carries the row, so a request with a custom
@@ -221,23 +306,87 @@ serving that host on a publicly trusted certificate at the edge.
   at the Hub ([ADR-0004](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)). Enumerated in
   [ADR-0034 § The endpoint set](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
 
+  **Its security boundary is settled before a line of it is written**, because it is the
+  one endpoint on this surface that carries a tenant-originated request:
+
+  - It sits under the Hub's existing protected internal prefix, `/api/v1/internal/*`,
+    bound to the internal listener and never the internet-facing one. That prefix is
+    covered by `Internal_API_Endpoints_AreNot_Public` — the rule matches **both** internal
+    patterns, not only LearnStack's `/api/internal/*`, per
+    [P02c-2 § The authentication chain](p02c-2-internal-api-and-contract.md).
+  - It carries the full three-layer chain — mTLS, RS256 JWT (`aud=learnstack-internal`,
+    ≤ 5 min, `jti` replay-protected) and HMAC-SHA256 body signature — like every other
+    endpoint in the ADR-0034 set. No exemption for being "just a form submission".
+  - **The accepted issuer set is an allow-list of exactly one:** the `learnstack-hub`
+    realm. The token's `iss` must equal that realm's issuer URL, and **every** other
+    issuer is rejected — the `learnstack` tenant realm among them, but not only it. This
+    is stated as an allow-list rather than as "reject `learnstack`" on purpose: a
+    deny-list naming one realm says nothing about a third realm, a renamed realm, or a
+    second Keycloak someone stands up, and each of those would be accepted by a rule that
+    only knows what to refuse. Hub authenticates against the `learnstack-hub` realm
+    **only** ([ADR-0004 Amendment 1](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)).
+    That is also why the hop exists: the tenant admin authenticates to Studio against the
+    tenant realm, and Studio proxies with its own `learnstack-hub` service credentials
+    rather than forwarding the tenant's token. Forwarding it would dissolve the two-realm
+    boundary at exactly the endpoint that decides which tenant owns a host.
+  - **The route `{id}` is the only tenant selector, and it is checked, not trusted.** The
+    request body carries no tenant field at all — one that appears is rejected as
+    malformed rather than ignored, because silently ignoring it lets a caller believe a
+    submission was scoped the way it wrote it. The token is scoped to the tenant it acts
+    for, and the handler asserts that the route `{id}` equals that scope **before**
+    `Create` runs, refusing a mismatch with `403`. A service credential that can reach the
+    endpoint at all must not thereby be able to attach a domain to any tenant it names in
+    the path. `CustomDomain_TenantId_NeverReadFrom_RequestBody` covers the body half of
+    this; the route-versus-scope check is handler behaviour and is covered by its own
+    negative test.
+
+  The LearnStack side of the hop goes through **`IHubTenantSync`** — the named adapter for
+  tenant-administration crossings, and under ADR-0034's second invariant the only type on
+  that side permitted to hold a Hub client for it. The Studio proxy calls the adapter; the
+  adapter calls the Hub. `Hub_Client_Referenced_Only_By_Named_Adapters` fails the
+  LearnStack build if anything else does. This packet's Hub pull request fixes the request
+  and response contract — the submitted FQDN and challenge mode in, the created
+  `CustomDomain` id and its initial state out — **before** the LearnStack-side adapter
+  method is written against it, per the coordination protocol below.
+
 - `LearnStack.Hub.Modules.CustomDomains` — aggregate, state machine, public-suffix
   validation, uniqueness constraints, commands and queries.
 - `LearnStack.Hub.Modules.Compliance` — `CompliancePolicy`, cap merge into the projection,
   recompute trigger.
 - `ITlsCertificateProvider` port plus the `LearnStack.Hub.Infrastructure.Acme` adapter,
   resilience-decorated, with a distinct rate-limited outcome.
-- DNS-01 and HTTP-01 challenge runners; the CNAME verification recurring job; the renewal
-  recurring job.
+- DNS-01 and HTTP-01 challenge runners; the verification recurring job covering **both**
+  the TXT-record poll (DNS-01) and the `/.well-known/acme-challenge/{token}` fetch on port
+  80 (HTTP-01); the renewal recurring job.
 - `PUT /api/internal/tenants/{id}/host-mappings` on the outbound `LearnStackApiClient`,
   carrying host tuples and certificate references only.
 - Secret-store replication path from `learnstack-hub/certs/{domain}` to the LearnStack-side
   path, with the LearnStack side referencing by path.
 - The three `learnstack.hub.custom-domain.*` integration events.
 - Operator portal: pending queue, active list, renewal watch, caps editor.
-- Tests: unit tests for every state transition and every rejection at `Create`; an
-  integration test issuing against an ACME staging directory end to end; a contract test
-  asserting `entitlement-v1.schema.json` contains no host or certificate fields.
+- Tests:
+  - Unit tests for every state transition and every rejection at `Create`.
+  - Propagation: `MarkPropagated()` refused with one acknowledgement and accepted with
+    both; a duplicate acknowledgement for the same `propagation_id` changing nothing; an
+    acknowledgement carrying a superseded `propagation_id` discarded; **partial-ack
+    retry** — one channel acknowledges, `RetryPropagation()` mints a new id and clears
+    both columns, and the new attempt is not opened by the previous attempt's
+    acknowledgement; **crash recovery** in both shapes — one column null re-sends only
+    that channel, and both columns non-null with the domain still `Propagating` completes
+    the transition rather than waiting for the timeout; a timeout landing in `Failed` with
+    `LastPropagationError` naming the channel that did not acknowledge; and the
+    `.activated` outbox row existing only when the transition committed.
+  - Submission endpoint: a token from the `learnstack` realm rejected, and a token from
+    any issuer outside the single-entry allow-list rejected; a route `{id}` that does not
+    match the token's tenant scope refused with `403` before `Create` runs; a body
+    carrying a tenant field rejected as malformed.
+  - Verification job, **both** paths: DNS-01 TXT poll over found / absent / mismatched;
+    HTTP-01 token fetch over valid body, absent (404), mismatched body, failed request
+    (connection refused or timeout), same-host `https://` redirect (followed, succeeds)
+    and cross-host redirect (not followed, fails).
+  - An integration test issuing against an ACME staging directory end to end.
+  - A contract test asserting `entitlement-v1.schema.json` contains no host or certificate
+    fields.
 
 ## Completion Criteria
 

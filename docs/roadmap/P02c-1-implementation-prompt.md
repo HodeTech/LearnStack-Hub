@@ -3,7 +3,8 @@
 > **Purpose.** A copy-paste kickoff prompt for the agent that implements Phase 02c
 > Packet 1 (Hub Domain Core). Hand this whole file to the agent at session start.
 >
-> **The agent runs from `learnstack-hub` root.** Sibling LearnStack core repo is at `../LearnStack/`.
+> **The agent runs from `LearnStack-Hub/` root** — that exact capitalisation; a lower-cased
+> spelling works on macOS and fails on Linux. Sibling LearnStack core repo is at `../LearnStack/`.
 >
 > **Use the project's own workflow skills.** This repo carries a Hub-tailored
 > `.claude/skills/` catalogue (see [`.claude/skills/README.md`](../../.claude/skills/README.md)).
@@ -134,7 +135,7 @@ Every skill repeats these; they are listed here as the kickoff checklist.
 - **FeatureKey/LimitKey wire-strings match LearnStack core's registry exactly.**
 - **`hub` schema, `learnstack_hub` database.** Every DbContext `HasDefaultSchema("hub")`.
 - **One DbContext per module.** Cross-module FKs are plain `uuid` + index, not EF navigations.
-- **English docs; Conventional Commits; AI co-author trailer** (`Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`).
+- **English docs; Conventional Commits; AI co-author trailer** — one `Co-Authored-By:` line per agent that materially contributed, each naming that agent's own identity rather than a fixed string ([CLAUDE.md § Commit conventions](../../CLAUDE.md#commit-conventions) carries the per-runtime strings).
 
 ## 6. Verification
 

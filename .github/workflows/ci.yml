@@ -206,11 +206,12 @@ jobs:
 
       - name: Markdown link audit (changed docs)
         # Mirror of LearnStack core's link audit. Skips externals + anchors.
-        # Hub's docs cross-link to LearnStack core via `../LearnStack/...`
-        # relative paths — those links resolve only on the developer's
-        # workstation (sibling layout). CI can't validate them because the
-        # LearnStack core repo isn't checked out alongside; the audit skips
-        # `../LearnStack/` paths explicitly.
+        # Hub's docs cross-link to LearnStack core by ABSOLUTE GitHub URL,
+        # which the external-URL skip already covers. A sibling-relative
+        # `../LearnStack/...` documentation link is **rejected**, not skipped:
+        # it 404s on github.com and depends on a local checkout. Sibling paths
+        # are reserved for shell commands and filesystem locations, which are
+        # not Markdown links and never reach this audit.
         env:
           EVENT_NAME: ${{ github.event_name }}
           PR_BASE_REF: ${{ github.event.pull_request.base.ref }}

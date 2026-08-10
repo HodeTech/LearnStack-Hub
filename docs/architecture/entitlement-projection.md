@@ -146,11 +146,11 @@ These are LearnStack-core-side behaviours that consume the projection; documente
   fail-closed keys are refused. It never throws out of a feature-flag check. See
   [ADR-0034 § The entitlement read path](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
   and [LearnStack Phase 02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md); this document
-  does not restate them. Superseded detail: serve cached projection until `expires_at`; within `grace_until` keep serving; past `grace_until` → read-only mode.
+  does not restate them.
 
 Hub's only obligation is to keep emitting a projection whose shape matches the contract above, with a correct monotonic `generation`.
 
 ## Architecture-test hooks
 
-- `EntitlementProjection_Shape_IsStable` (from [ADR-0021 § Architecture tests](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)) — snapshot-test the serialised projection JSON against a checked-in `entitlement-v1.schema.json`. A breaking change requires a schema-version bump. Recommended to land this in P02c-1 since the projection serialiser is the contract surface.
+- `EntitlementProjection_Shape_IsStable` (from [ADR-0021 § Architecture tests](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)) — snapshot-test the serialised projection JSON against a checked-in `entitlement-v1.schema.json`. A breaking change requires a schema-version bump. **Required, not recommended, and required in both repositories**: the schema file is byte-identical on each side and each side asserts its own serialiser against it, so a one-sided shape change fails a build rather than a customer's projection. Shipped with the P02c-1 serialiser; the two snapshots move together in a coordinated pair of pull requests.
 - `generation` monotonicity is not an architecture test (it's a runtime invariant) — cover it with a unit test on the `Entitlement.Recompute` method (generation strictly increases) and an integration test on the projection service.

@@ -45,15 +45,20 @@ In P02c-1 the service's final step — publishing `learnstack.hub.entitlement` v
 
 `EntitlementsDbContext` — `hub` schema, table `entitlements`. `HasDefaultSchema("hub")`. JSONB columns for `features` / `limits` / `compliance_caps`. PK = `tenant_id` (the `LearnStackTenantId` Vogen converter registered). No RLS.
 
-## Architecture / contract tests (recommended in P02c-1)
+## Architecture / contract tests (P02c-1)
 
-- `EntitlementProjection_Shape_IsStable` ([ADR-0021 § Architecture tests](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)) — snapshot-test the serialised `EntitlementProjectionDto` JSON against a checked-in `entitlement-v1.schema.json` under `LearnStack.Hub.Tests.Contract`. This is the contract guard; land it here because P02c-1 is where the projection serialiser is born.
+- `EntitlementProjection_Shape_IsStable` ([ADR-0021 § Architecture tests](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0021-feature-based-entitlement.md)) — snapshot-test the serialised `EntitlementProjectionDto` JSON against a checked-in `entitlement-v1.schema.json`. This is the contract guard, and it is **mandatory in both repositories**, not optional in either: `backend/tests/LearnStack.Hub.Tests.Contract/entitlement-v1.schema.json` with `EntitlementProjectionShapeTests` here, and the byte-identical schema with LearnStack's own snapshot test on that side, per [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md). The wire shape has one author and two asserters — both snapshots move in the same coordinated pair of pull requests, or the contract has drifted and one build fails instead of a customer's projection.
 - Unit test: `generation` strictly increases across successive `Recompute` calls; starts at 1.
 - Integration test (Testcontainers, lights up the `backend-integration` CI job): create tenant → trial subscription → recompute → assert `Entitlement` row exists with generation 1, correct tier/features/limits; change plan → recompute → assert generation 2 + updated fields.
 
-## Audit coverage
+## Audit coverage (formal matrix lands in P02c-4)
 
-Recompute is a system operation, not an operator action — it is **not** in the operator-audit MUST list (the operator actions that _trigger_ recompute — plan change, subscription change — are audited in their own modules). `GetEntitlementQuery` is MAY.
+Recompute is a system operation, not an operator action, so no operation in this module is MUST-class — the operator actions that _trigger_ recompute are audited in [plans.md](plans.md) and [subscriptions.md](subscriptions.md).
+
+| Operation                     | Class | Snapshot                                                                 |
+| ----------------------------- | ----- | ------------------------------------------------------------------------ |
+| `RecomputeEntitlementCommand` | MAY   | system-initiated; the triggering operator command carries the MUST entry |
+| `GetEntitlementQuery`         | MAY   | —                                                                        |
 
 ## Out of scope for P02c-1
 

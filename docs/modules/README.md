@@ -1,26 +1,28 @@
 # Hub Module Deep Dives
 
-Per-module documentation lands here as modules ship in P02c-1+ and Phase 09b. P02c-0 ships only this placeholder.
+One deep dive per module. The four [P02c-1](../roadmap/p02c-1-hub-domain-core.md) modules — `TenantLifecycle`, `Plans`, `Subscriptions`, `Entitlements` — are implemented on `main` under `backend/src/Modules/` and documented here. The remaining seven land with their owning packets.
 
 ## Module topology
 
-| Module            | Aggregates                                      | Phase     | Doc status                                           |
-| ----------------- | ----------------------------------------------- | --------- | ---------------------------------------------------- |
-| `TenantLifecycle` | `LearnStackTenant` (mirror)                     | P02c-1    | ✅ [tenant-lifecycle.md](tenant-lifecycle.md) (spec) |
-| `Plans`           | `Plan`, `PlanTier`                              | P02c-1    | ✅ [plans.md](plans.md) (spec)                       |
-| `Subscriptions`   | `HubSubscription`                               | P02c-1    | ✅ [subscriptions.md](subscriptions.md) (spec)       |
-| `Entitlements`    | `Entitlement` (projection)                      | P02c-1    | ✅ [entitlements.md](entitlements.md) (spec)         |
-| `CustomDomains`   | `CustomDomain`                                  | P02c-5    | ⏳                                                   |
-| `Compliance`      | `CompliancePolicy`                              | P02c-5    | ⏳                                                   |
-| `Usage`           | `UsageAggregate`                                | P02c-2    | ⏳                                                   |
-| `LicenseKeys`     | `LicenseKey`                                    | P02c-6    | ⏳                                                   |
-| `Invoicing`       | `HubInvoice`, `HubInvoiceLine`, `WebhookLedger` | Phase 09b | ⏳                                                   |
-| `Audit`           | `AuditEntry` (operator audit)                   | P02c-4    | ⏳                                                   |
-| `Operators`       | (Keycloak-backed; permission mapping)           | P02c-4    | ⏳                                                   |
+| Module            | Aggregates                                      | Phase     | Doc status                                    |
+| ----------------- | ----------------------------------------------- | --------- | --------------------------------------------- |
+| `TenantLifecycle` | `LearnStackTenant` (mirror)                     | P02c-1    | ✅ [tenant-lifecycle.md](tenant-lifecycle.md) |
+| `Plans`           | `Plan`                                          | P02c-1    | ✅ [plans.md](plans.md)                       |
+| `Subscriptions`   | `HubSubscription`                               | P02c-1    | ✅ [subscriptions.md](subscriptions.md)       |
+| `Entitlements`    | `Entitlement` (projection)                      | P02c-1    | ✅ [entitlements.md](entitlements.md)         |
+| `CustomDomains`   | `CustomDomain`                                  | P02c-5    | ⏳                                            |
+| `Compliance`      | `CompliancePolicy`                              | P02c-5    | ⏳                                            |
+| `Usage`           | `UsageAggregate`                                | P02c-2    | ⏳                                            |
+| `LicenseKeys`     | `LicenseKey`                                    | P02c-6    | ⏳                                            |
+| `Invoicing`       | `HubInvoice`, `HubInvoiceLine`, `WebhookLedger` | Phase 09b | ⏳                                            |
+| `Audit`           | `AuditEntry` (operator audit)                   | P02c-4    | ⏳                                            |
+| `Operators`       | (Keycloak-backed; permission mapping)           | P02c-4    | ⏳                                            |
 
-> **"(spec)" status:** the P02c-1 module docs were authored as the design specification
-> _before_ implementation. The P02c-1 agent implements against them. The cross-cutting
-> design they depend on lives in [../architecture/module-topology.md](../architecture/module-topology.md),
+> **On the four P02c-1 docs:** they were authored as the design specification _before_
+> implementation, and the P02c-1 agent implemented against them. Since P02c-1 merged
+> (2026-08-09) they are the living description of code on `main`, and a change to the
+> code changes them. The cross-cutting design they depend on lives in
+> [../architecture/module-topology.md](../architecture/module-topology.md),
 > [../architecture/cross-cutting-foundation.md](../architecture/cross-cutting-foundation.md),
 > and [../architecture/entitlement-projection.md](../architecture/entitlement-projection.md).
 

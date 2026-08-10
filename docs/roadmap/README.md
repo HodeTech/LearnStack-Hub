@@ -40,8 +40,9 @@ Packet 3b, which grows with every packet built on top.
 
 ### Reconciliations owed on the merged P02c-1
 
-Tracked here rather than in the packet document, because they are follow-ups on shipped
-code and P02c-1's own record is closed:
+Owned by [p02c-1-hub-domain-core.md § Phase Exit Decision](p02c-1-hub-domain-core.md);
+repeated here because they outlive the packet and a reader of this index should not have
+to open it to learn they exist:
 
 - **Audit seam (ADR-0033).** `AuditLogBehavior` is step 3 and wraps `TransactionBehavior`;
   its success-path TODO writes after commit. ADR-0033 puts the MUST-class write on the
@@ -153,7 +154,7 @@ A packet that changes both repositories lands as two pull requests in one sessio
 
 ## Status ledger
 
-**Updated 2026-08-08.** This ledger tracks the state of _artefacts_, not commits. A row changes when the artefact changes state, not when a commit touches it — the previous commit-bound version of this file went stale four commits after it was written.
+**Updated 2026-08-09.** This ledger tracks the state of _artefacts_, not commits. A row changes when the artefact changes state, not when a commit touches it — the previous commit-bound version of this file went stale four commits after it was written.
 
 | Artefact                                                | State                    | Where                                                                                                                                                                                                                       |
 | ------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

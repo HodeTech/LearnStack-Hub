@@ -6,7 +6,7 @@ LearnStack Hub is **not** an LMS, **not** a tenant-facing surface, and **never**
 
 ## Status
 
-**P02c-0 — Repository bootstrap** ✅. Solution scaffold, frontend monorepo, compose stack, CI, and the docs skeleton are in place. No Hub domain code is on `main`.
+**P02c-0 — Repository bootstrap** ✅. Solution scaffold, frontend monorepo, compose stack, CI, and the docs skeleton are in place.
 
 **P02c-1 (Hub Domain Core) shipped 2026-08-09.** It was reviewed against the restructured corpus first: although it was written before [ADR-0033](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0033-audit-durability-model.md), [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md) and [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md), it implements none of what they changed — its entitlement wire shape already carries `grace_until` and `generation`, it hosts no endpoint, and its audit behavior is a shell.
 
@@ -29,7 +29,7 @@ The architecture deep-dive lives in the sibling repo: [docs/architecture/24-lear
 
 Hub documentation **links** to LearnStack core by absolute URL (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`), per [Documentation Standards § Layout](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/13-documentation.md). A relative path does not cross a repository boundary on github.com and depends on a sibling checkout being present and identically capitalised; an absolute URL works everywhere. Shell commands and filesystem references still use `../LearnStack` — those are paths, not links — so the expected on-disk layout still matters:
 
-```
+```text
 <parent-dir>/
 ├── LearnStack/        (https://github.com/HodeTech/LearnStack)
 └── LearnStack-Hub/    (this repo)

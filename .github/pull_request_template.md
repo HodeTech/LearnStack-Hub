@@ -2,7 +2,8 @@
 
 <!--
 What does this PR change? Link the relevant Phase 02c packet
-(P02c-0..P02c-7) or LearnStack ADR (../LearnStack/docs/decisions/NNNN-*).
+(P02c-0..P02c-7) or LearnStack ADR — by absolute URL,
+https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/NNNN-*.md.
 For cross-repo work, link the paired LearnStack core PR.
 -->
 

@@ -1,9 +1,16 @@
 # Hub Marketplace
 
 > **This is the authoritative plan.** It was migrated out of LearnStack's
-> `phase-12-hub-marketplace.md`, which is now a pointer at this file. The **12** slot stays
-> in LearnStack's phase numbering because the identifier is referenced across both
-> repositories; the plan lives here.
+> [phase-12-hub-marketplace.md](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-12-hub-marketplace.md).
+> The **12** slot stays in LearnStack's phase numbering because the identifier is
+> referenced across both repositories; the plan lives here.
+>
+> ⚠️ **Coordination owed, and this note comes down when it is discharged.** That LearnStack
+> file is still the full plan on LearnStack's `main`; its conversion to a pointer is
+> prepared but unmerged. **The LearnStack pointer conversion merges first, or in the same
+> session as** any Hub-side change that depends on this file being the single source —
+> including the ADR-ownership rule and the activation gate below. Until it lands, two
+> documents claim the same track and the link above leads to the competing one.
 >
 > **Status: post-MVP and optional.** The platform works fully without it. If the
 > marketplace never ships, no LearnStack feature breaks. The track exists because
@@ -75,8 +82,19 @@ storing listings in the Hub violates the invariant that the whole Hub/LearnStack
 separation rests on.
 
 This is not a detail to be worked out during implementation. It is the design question the
-track opens with, and it must be answered by an ADR before any code. Three shapes worth
-considering, none of them chosen here:
+track opens with, and it must be answered by an ADR before any code.
+
+**That ADR is a LearnStack ADR, not a Hub one.** It amends or reinterprets ADR-0034 and it
+decides where tenant-authored data may live across the boundary, which makes it
+cross-cutting by definition — so it is filed in `../LearnStack/docs/decisions/` under the
+next free LearnStack number and owned by the cross-repository decision owner. It is **not**
+a `HUB-NNNN` decision: that series is reserved for decisions affecting only the Hub
+codebase, and a carve-out to a shared invariant is the opposite of that. Once the ADR is
+accepted, both roadmaps reference it by number — this document and LearnStack's
+[Phase 12 pointer](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-12-hub-marketplace.md) — so
+neither side can activate the track against an unrecorded answer.
+
+Three shapes worth considering, none of them chosen here:
 
 1. **Metadata in the Hub, body outside.** The Hub stores listing metadata — title, author
    tenant, version, review state, install count — and the bundle body lives in object

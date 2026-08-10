@@ -77,7 +77,7 @@ For any task in this repo, read in this order:
 
 Then pick an entry-point skill from **this repo's** catalogue at [`.claude/skills/`](.claude/skills/README.md). Hub maintains its own Hub-tailored skill set — the `add-hub-*` workflows encode Hub's deltas from LearnStack core (no RLS, `OperatorId` not `UserId`, the 6-step MediatR pipeline, the `hub` schema, the `learnstack_hub` database). The entry point for substantive work is [implement-task](.claude/skills/implement-task/SKILL.md); for scoping-only use [start-task](.claude/skills/start-task/SKILL.md); for review run [standards-check](.claude/skills/standards-check/SKILL.md) then [code-review](.claude/skills/code-review/SKILL.md).
 
-> Hub skills are project-local: an agent running from the `LearnStack-Hub` root loads them from `.claude/skills/`. They cite LearnStack core's standards / ADRs by sibling path (`../LearnStack/docs/...`) for the cross-cutting authority and carry only the Hub-specific workflow on top — they do not duplicate the standards.
+> Hub skills are project-local: an agent running from the `LearnStack-Hub` root loads them from `.claude/skills/`. They cite LearnStack core's standards / ADRs by absolute GitHub URL (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`) for the cross-cutting authority and carry only the Hub-specific workflow on top — they do not duplicate the standards.
 
 ## Hard rules
 
@@ -131,8 +131,14 @@ Hub follows LearnStack's engineering standards by reference unless explicitly ov
 
 - Conventional Commits: `type(scope): subject`. Subject in imperative mood; ≤ 72 chars.
 - Hub-specific scopes: `hub`, `hub-portal`, `hub-domain`, `hub-infra`, `hub-docs`.
-- Commits made with AI assistance carry the trailer:
-  `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
+- Commits made with AI assistance carry a `Co-Authored-By:` trailer — **one per agent that
+  materially contributed**, each naming that agent's own runtime-specific identity, never a
+  fixed string standing in for whichever agent actually ran:
+  - Claude Code sessions: `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
+  - OpenAI Codex sessions: `Co-Authored-By: Codex Opus 4.7 (1M context) <noreply@anthropic.com>`
+
+  [LearnStack's Git Workflow Standards § Trailers](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/14-git-workflow.md#trailers)
+  is the authority for the strings; if this list and that section disagree, that section wins.
 
 ## Cross-repo coordination
 

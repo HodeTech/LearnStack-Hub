@@ -2,15 +2,17 @@
 
 LearnStack Hub mirrors LearnStack core's modular-monolith repository pattern. The two
 repositories sit side by side on disk as `LearnStack/` and `LearnStack-Hub/`, with those
-exact capitalisations; cross-repo links from this file are written
-`../../../LearnStack/...`.
+exact capitalisations. That layout governs **filesystem paths and shell commands**
+(`cd ../LearnStack`) only; cross-repo documentation **links** from this file are absolute
+GitHub URLs (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`), because a
+relative path does not cross a repository boundary on GitHub.
 
 This tree describes what is on `main`. `backend/src/Modules/` carries the four
 [P02c-1](../roadmap/p02c-1-hub-domain-core.md) modules — `TenantLifecycle`, `Plans`,
 `Subscriptions`, `Entitlements` — merged 2026-08-09. The remaining seven land in later
 packets, which are frozen from P02c-2 onward.
 
-```
+```text
 LearnStack-Hub/
 ├── backend/
 │   ├── LearnStack.Hub.slnx              # .NET solution
@@ -27,16 +29,17 @@ LearnStack-Hub/
 │   │   │   ├── LearnStack.Hub.Infrastructure.Audit/ # Hub operator audit pipeline
 │   │   │   └── LearnStack.Hub.Api/                  # ASP.NET Core host
 │   │   └── Modules/                                 # 4 modules on main (P02c-1); 7 planned (see below)
-│   │       └── README.md                            # only file on disk today; describes planned topology
+│   │       ├── TenantLifecycle/ Plans/ Subscriptions/ Entitlements/   # four packages each
+│   │       └── README.md                            # the module topology table, co-located with the code
 │   └── tests/
-│       ├── LearnStack.Hub.Tests.Unit/               # domain + application unit tests (SmokeTests.cs)
-│       ├── LearnStack.Hub.Tests.Integration/        # Testcontainers — placeholder until P02c-2
+│       ├── LearnStack.Hub.Tests.Unit/               # domain + application unit tests
+│       ├── LearnStack.Hub.Tests.Integration/        # Testcontainers Postgres — the entitlement-rebuild round trip (P02c-1)
 │       ├── LearnStack.Hub.Tests.Architecture/       # NetArchTest + file-system rules (mandatory, non-skippable)
 │       │   ├── HubBoundaryTests.cs                  # Hub_NeverStores_TenantData, Hub_Modules_DoNotReference_LearnStack_Internals
 │       │   ├── ModuleDependencyTests.cs             # module dependency direction
 │       │   ├── RepositoryLayoutTests.cs             # No_Source_Folder_Named_Verticals, Frontend_Has_Only_The_OperatorPortal_App
 │       │   └── RepositoryPaths.cs                   # working-copy path resolution shared by the file-system rules
-│       └── LearnStack.Hub.Tests.Contract/           # OpenAPI contract assertions — placeholder until P02c-2
+│       └── LearnStack.Hub.Tests.Contract/           # entitlement-v1.schema.json + its snapshot test; OpenAPI assertions from P02c-2
 ├── frontend/
 │   ├── pnpm-workspace.yaml
 │   ├── pnpm-lock.yaml
@@ -76,7 +79,7 @@ LearnStack-Hub/
 │   ├── modules/                         # per-module deep dives — 4 shipped (see below)
 │   └── glossary.md                      # Hub-specific terms
 ├── scripts/
-│   └── seed.sh                          # idempotent dev seed (orchestrator only until P02c-1 unfreezes)
+│   └── seed.sh                          # idempotent dev seed — orchestrates `dotnet run -- --seed` (plan tiers + demo tenant)
 ├── .claude/
 │   └── skills/                          # 18 Hub-tailored skills + README; git-tracked via a .gitignore un-ignore rule
 ├── .github/
@@ -105,7 +108,7 @@ LearnStack-Hub/
 | Directory          | Files on disk                                                                                                              | State                                        |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
 | `docs/architecture/` | `README.md`, `contract-with-learnstack.md`, `cross-cutting-foundation.md`, `entitlement-projection.md`, `module-topology.md`, `repository-layout.md` | Five architecture docs plus the index. `learnstack-api-client.md` (P02c-2) and `operator-portal.md` (P02c-4) are still to come — see [architecture/README.md](README.md). |
-| `docs/modules/`    | `README.md`, `tenant-lifecycle.md`, `plans.md`, `subscriptions.md`, `entitlements.md`                                       | Four module specs shipped, one per P02c-1 module. They were authored as design specification ahead of the implementation; they become the living description when P02c-1 unfreezes and lands. |
+| `docs/modules/`    | `README.md`, `tenant-lifecycle.md`, `plans.md`, `subscriptions.md`, `entitlements.md`                                       | Four module deep dives, one per P02c-1 module. Authored as design specification ahead of the implementation; since P02c-1 merged (2026-08-09) they are the living description of the code on `main`. |
 | `docs/roadmap/`    | `README.md`, one document per packet, `P02c-1-implementation-prompt.md`                                                     | The authoritative Hub plan, owned in this repository. |
 | `docs/decisions/`  | `README.md`, `template.md`                                                                                                 | No `HUB-NNNN` ADR has been needed yet.       |
 | `docs/operations/` | `README.md`                                                                                                                | Runbooks land with the first non-dev deployment. |
@@ -117,10 +120,10 @@ The four [P02c-1](../roadmap/p02c-1-hub-domain-core.md) modules — `TenantLifec
 
 | Module subdirectory under `backend/src/Modules/` | Lands in                                     | Aggregates                                      |
 | ------------------------------------------------ | -------------------------------------------- | ----------------------------------------------- |
-| `TenantLifecycle/`                               | P02c-1 (spec written)                        | `LearnStackTenant` (mirror)                     |
-| `Plans/`                                         | P02c-1 (spec written)                        | `Plan`, `PlanTier`                              |
-| `Subscriptions/`                                 | P02c-1 (spec written)                        | `HubSubscription`                               |
-| `Entitlements/`                                  | P02c-1 (spec written)                        | `Entitlement` (projection)                      |
+| `TenantLifecycle/`                               | P02c-1 (on `main`)                           | `LearnStackTenant` (mirror)                     |
+| `Plans/`                                         | P02c-1 (on `main`)                           | `Plan`                                          |
+| `Subscriptions/`                                 | P02c-1 (on `main`)                           | `HubSubscription`                               |
+| `Entitlements/`                                  | P02c-1 (on `main`)                           | `Entitlement` (projection)                      |
 | `Usage/`                                         | P02c-2                                       | `UsageAggregate`                                |
 | `Audit/`                                         | P02c-4                                       | `AuditEntry` (operator audit)                   |
 | `Operators/`                                     | P02c-4                                       | Operator role + permission mapping              |

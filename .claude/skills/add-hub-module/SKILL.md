@@ -15,7 +15,7 @@ description: >
 
 ## Purpose
 
-Stand up a new Hub modular-monolith module that complies with the dependency-direction rules from day one: four packages, the right references, a registration extension, a DbContext in the `hub` schema (no RLS), and architecture-test coverage. Mirrors LearnStack's [add-backend-module](https://github.com/HodeTech/LearnStack/blob/main/.claude/skills/add-backend-module/SKILL.md) minus the tenant-isolation layer.
+Stand up a new Hub modular-monolith module that complies with the dependency-direction rules from day one: four packages, the right references, a registration extension, a DbContext in the `hub` schema (no RLS), and architecture-test coverage. The module pattern is defined in this repository by [module-topology.md](../../../docs/architecture/module-topology.md) and the four module directories already on `main` under `backend/src/Modules/`; copy the shape from those, not from a sibling-repo skill. It is LearnStack core's four-package layout **minus the entire tenant-isolation layer** — no RLS, no `[TenantOwned]`, no query filter, no `ITenantContext`.
 
 ## When to use
 

@@ -9,9 +9,11 @@ namespace LearnStack.Hub.Application.Pipeline;
 /// Hub MediatR pipeline. Hub drops exactly one behavior LearnStack core's seven
 /// carry — <c>TenantContextBehavior</c> — because Hub is operator-administered,
 /// not tenant-isolated. (ADR-0032 writes core's as an eight-step list because it
-/// counts the Handler; this file counts behaviors.) Outermost (validation) first, innermost (handler) last; the
-/// <c>MediatR_Pipeline_Order_Matches_Canonical_Sequence</c> architecture test
-/// asserts this DI registration order.
+/// counts the Handler; this file counts behaviors.) Outermost (validation) first, innermost (handler) last.
+/// <c>MediatR_Pipeline_Order_Matches_Canonical_Sequence</c> asserts the declared
+/// order in <see cref="CanonicalBehaviorOrder"/>, and
+/// <c>AddHubMediatRPipeline_Registers_The_Canonical_Order</c> asserts that
+/// <see cref="AddHubMediatRPipeline"/> registers exactly that sequence.
 /// </summary>
 public static class MediatRPipelineRegistration
 {

@@ -40,7 +40,7 @@ Conventional Commits `type(scope): subject`:
 - **Hub scopes:** `hub` (cross-cutting), `hub-domain` (aggregates / modules), `hub-infra` (compose / APISIX / Dapr / Vault / EF), `hub-portal` (operator portal), `hub-docs` (documentation).
 - **subject:** imperative, ≤ 72 chars.
 - **body:** one short paragraph saying _why_ (the diff is _what_). For a packet, name the packet (`P02c-1`).
-- **trailer:** `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>` (or `Codex …` for Codex sessions). HEREDOC every multi-line message.
+- **trailer:** one `Co-Authored-By:` line per agent that **materially contributed**, each naming that agent's own identity — never a hard-coded string for a session some other agent ran. [CLAUDE.md § Commit conventions](../../../CLAUDE.md#commit-conventions) carries the per-runtime strings; LearnStack's [Git Workflow Standards § Trailers](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/14-git-workflow.md#trailers) is the authority if the two disagree. HEREDOC every multi-line message.
 
 ```bash
 git commit -m "$(cat <<'EOF'
@@ -48,7 +48,7 @@ feat(hub-domain): P02c-1 — LearnStackTenant aggregate + DbContext + migration
 
 <why, 1-3 sentences>
 
-Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>
+Co-Authored-By: <this session's agent identity>
 EOF
 )"
 ```
