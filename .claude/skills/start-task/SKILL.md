@@ -33,7 +33,9 @@ Orient correctly before writing code: read the right docs, confirm the work fits
 
 1. [README.md](../../../README.md) — direction at a glance.
 2. The relevant Hub design spec: `docs/architecture/module-topology.md`, `docs/architecture/cross-cutting-foundation.md`, `docs/architecture/entitlement-projection.md`, and the `docs/modules/<name>.md` for the module(s) in scope.
-3. The LearnStack-side authority the spec derives from: the cited ADR(s) under `../LearnStack/docs/decisions/` and standard(s) under `../LearnStack/docs/standards/`.
+3. The LearnStack-side authority the spec derives from: the cited ADR(s) at
+   [https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/) and standard(s) at
+   [https://github.com/HodeTech/LearnStack/blob/main/docs/standards/](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/) — read on GitHub; no sibling checkout needed.
 4. [docs/roadmap/README.md](../../../docs/roadmap/README.md) — which packet owns this work.
 5. [docs/glossary.md](../../../docs/glossary.md) — terms.
 
@@ -41,7 +43,16 @@ Read, don't skim. If `git log` shows recent edits to the surface, read the commi
 
 ### Step 2 — Check packet fit
 
-Confirm the task belongs to the current/next packet (`docs/roadmap/README.md`). If it belongs to a later packet, say so and stop — don't pull future work forward. If it requires LearnStack-side changes, flag it as a cross-repo coordinated packet (it's not Hub-only).
+**The Hub track is frozen from P02c-2 onward** (owner decision 2026-08-08). Before
+anything else, check the task against [CLAUDE.md § What state this is in](../../../CLAUDE.md)
+and [the freeze](../../../docs/roadmap/README.md): if it belongs to P02c-2 or any packet
+after it, **say so and stop** — the two conditions that resume the track are named there,
+and neither has fired.
+
+If it is not frozen, confirm it belongs to the current packet (`docs/roadmap/README.md`).
+If it belongs to a later packet, say so and stop — don't pull future work forward. If it
+requires LearnStack-side changes, flag it as a cross-repo coordinated packet (it's not
+Hub-only) and follow the two-PR protocol.
 
 ### Step 3 — Walk the Hub deltas + hard rules
 

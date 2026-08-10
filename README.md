@@ -59,8 +59,13 @@ cd ../LearnStack/backend
 dotnet run --project src/LearnStack.Api
 
 # 4. Hub API
-cd ../LearnStack-Hub/backend
-dotnet run --project src/LearnStack.Hub.Api
+# The host does not load .env itself, so export it first — otherwise the
+# connection string resolves to defaults and the API cannot reach Postgres.
+cd ../LearnStack-Hub
+set -a; . ./.env; set +a
+export POSTGRES_HOST=localhost
+cd backend
+dotnet run --project src/Core/LearnStack.Hub.Api
 ```
 
 In production, the two repos deploy independently — the shared compose is a dev-time convenience only.

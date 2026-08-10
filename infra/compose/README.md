@@ -24,7 +24,7 @@ cd ../LearnStack-Hub && make dev
 cd ../LearnStack/backend && dotnet run --project src/LearnStack.Api
 
 # 4. Hub API
-cd ../LearnStack-Hub/backend && dotnet run --project src/LearnStack.Hub.Api
+cd ../LearnStack-Hub/backend && dotnet run --project src/Core/LearnStack.Hub.Api
 ```
 
 The boot-order dependency is dev-only. Production deploys the two stacks independently.

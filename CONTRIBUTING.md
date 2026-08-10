@@ -8,7 +8,8 @@ Required status checks on `main`:
 
 - `backend` — `dotnet build` + format verify + unit + architecture + contract tests
 - `frontend` — pnpm install + typecheck + lint + build + Vitest
-- `meta` — `make lint`-style format verification + Markdown link audit
+- `meta` — Markdown link audit on changed docs. Backend format verification runs in
+  `backend` (`dotnet format --verify-no-changes`); frontend lint runs in `frontend`.
 - `secret-scan` — Leakwatch scan (gates per LearnStack Standards 12 § Secrets Management)
 
 `backend-integration` runs from **P02c-1**, which landed the first Testcontainers-backed tests (the entitlement-rebuild round trip). It was gated `if: false` from P02c-0 until then.

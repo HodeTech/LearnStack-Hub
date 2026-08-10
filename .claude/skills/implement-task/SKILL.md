@@ -45,11 +45,14 @@ The ten steps are mandatory; skipping any is the bug this skill prevents.
 
 ### Step 1 — Scope and alignment
 
-Run [start-task](../start-task/SKILL.md): read the right docs in order (Hub docs under `docs/`, then LearnStack authority under `../LearnStack/docs/`), confirm phase fit against `docs/roadmap/README.md`, walk the [CLAUDE.md hard rules](../../../CLAUDE.md), and pick the specific workflow skill(s) you'll invoke ([add-hub-module](../add-hub-module/SKILL.md), [add-hub-aggregate](../add-hub-aggregate/SKILL.md), [add-mediatr-handler](../add-mediatr-handler/SKILL.md), [wire-cross-cutting-foundation](../wire-cross-cutting-foundation/SKILL.md), …). Output: a one-paragraph problem statement in your own words, the packet it belongs to, the standards that govern it, the skill(s) you'll use.
+Run [start-task](../start-task/SKILL.md): read the right docs in order (Hub docs under `docs/`, then LearnStack authority at [`https://github.com/HodeTech/LearnStack/blob/main/docs/`](https://github.com/HodeTech/LearnStack/blob/main/docs/) — read it on GitHub, no sibling checkout needed), confirm phase fit against `docs/roadmap/README.md`, walk the [CLAUDE.md hard rules](../../../CLAUDE.md), and pick the specific workflow skill(s) you'll invoke ([add-hub-module](../add-hub-module/SKILL.md), [add-hub-aggregate](../add-hub-aggregate/SKILL.md), [add-mediatr-handler](../add-mediatr-handler/SKILL.md), [wire-cross-cutting-foundation](../wire-cross-cutting-foundation/SKILL.md), …). Output: a one-paragraph problem statement in your own words, the packet it belongs to, the standards that govern it, the skill(s) you'll use.
 
 ### Step 2 — Inspect and understand
 
-Read every file the change touches **before** editing. Trace one hop out (who calls this, who reads this table, what events flow). Read the relevant Hub design spec (`docs/architecture/*.md`, `docs/modules/*.md`) and the LearnStack-side ADR/standard it derives from. If `git log` shows recent edits, read the commit messages for direction. **Mirror, don't invent:** if a pattern exists in `../LearnStack/backend/src/`, open it and reproduce it (adjusting for the Hub deltas), rather than improvising.
+Read every file the change touches **before** editing. Trace one hop out (who calls this, who reads this table, what events flow). Read the relevant Hub design spec (`docs/architecture/*.md`, `docs/modules/*.md`) and the LearnStack-side ADR/standard it derives from. If `git log` shows recent edits, read the commit messages for direction. **Mirror, don't invent:** the Hub's own `backend/src/Core/` and `backend/src/Modules/` are
+the first place to look — four modules and the SharedKernel are already on `main`. For a
+pattern that exists only in LearnStack, read it at
+[`https://github.com/HodeTech/LearnStack/blob/main/backend/src/`](https://github.com/HodeTech/LearnStack/blob/main/backend/src/) rather than assuming a local checkout.
 
 ### Step 3 — Plan
 
@@ -69,7 +72,7 @@ Use [run-tests-locally](../run-tests-locally/SKILL.md): `~/.dotnet/dotnet build 
 
 ### Step 7 — Update every related document
 
-Walk the list, leave nothing stale: `docs/roadmap/README.md` (packet status); the affected `docs/modules/<name>.md` / `docs/architecture/*.md`; `docs/glossary.md` (new term → [update-glossary](../update-glossary/SKILL.md)); a Hub-internal ADR if a new rule emerged → [write-adr](../write-adr/SKILL.md); the sibling-link audit (CI's `meta` job pattern — `(\.\./)+learnstack/` links are validated locally only).
+Walk the list, leave nothing stale: `docs/roadmap/README.md` (packet status); the affected `docs/modules/<name>.md` / `docs/architecture/*.md`; `docs/glossary.md` (new term → [update-glossary](../update-glossary/SKILL.md)); a Hub-internal ADR if a new rule emerged → [write-adr](../write-adr/SKILL.md); the link audit (CI's `meta` job **fails** on a sibling-relative `../LearnStack/...` Markdown link; use the absolute GitHub URL).
 
 ### Step 8 — Commit
 

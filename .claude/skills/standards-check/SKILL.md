@@ -61,7 +61,12 @@ Walk these against the diff. Each item is pass/fail; a fail blocks merge until f
 
 ### Contract surface + boundary ([CLAUDE.md hard rules](../../../CLAUDE.md))
 
-- [ ] No fifth Hub HTTPS endpoint without an ADR in `../LearnStack/docs/decisions/`.
+- [ ] The Hub stores no tenant content (`Hub_NeverStores_TenantData`), and every
+  LearnStack↔Hub crossing goes through `IEntitlementProvider` / `IUsageReporter` /
+  `IHubTenantSync` — nothing else holds a Hub client. Those are
+  [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)'s two invariants;
+  the surface is **not** governed by an endpoint count. Any endpoint added to the set
+  needs a merged LearnStack ADR first.
 - [ ] `/api/internal/*` not internet-exposed (when those endpoints land).
 - [ ] No Kubernetes-credential / K8s-state writes to LearnStack's cluster.
 - [ ] `learnstack-hub` realm boundary respected.
@@ -71,7 +76,10 @@ Walk these against the diff. Each item is pass/fail; a fail blocks merge until f
 ### Docs + corpus hygiene
 
 - [ ] Adjacent docs updated (module deep dive, glossary, roadmap status, ADR cross-link).
-- [ ] Sibling-relative links (`(\.\./)+learnstack/...`) resolve locally.
+- [ ] **No** sibling-relative Markdown link to LearnStack (`../LearnStack/...`) anywhere —
+  cross-repo references are absolute `https://github.com/HodeTech/LearnStack/blob/main/...` URLs, and CI's `meta` job **rejects** the
+  relative form. `../LearnStack` stays correct for shell paths only. Every other relative
+  link resolves from its own file's directory.
 - [ ] English docs; Mermaid diagrams readable as text.
 
 ## Output

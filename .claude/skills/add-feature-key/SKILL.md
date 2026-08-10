@@ -46,7 +46,7 @@ public static readonly LimitKey <Name>   = new("limits.<dotted.snake_case>");
 
 ### Step 3 — Keep it aligned with LearnStack core
 
-The wire-format string **must** match LearnStack core's `FeatureKeys`/`LimitKeys` registry (`../LearnStack/backend/src/LearnStack.SharedKernel/FeatureFlags/`) exactly — LearnStack core reads the key from the projection by string. A mismatch means LearnStack silently never sees the feature. If you add a key Hub authors but LearnStack core doesn't yet read, note the pending LearnStack-side addition (a cross-repo registry-sync follow-up; the durable fix is a shared `LearnStack.Contracts` package, Phase 11 — see [plans.md § Registry sync](../../../docs/modules/plans.md)).
+The wire-format string **must** match LearnStack core's `FeatureKeys` / `LimitKeys` registry exactly. That registry does **not exist yet** — it lands with [LearnStack Phase 02a Packet 9](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md), so until then the default action is to record the pending LearnStack-side addition rather than to cross-check. When it exists it will live under [`https://github.com/HodeTech/LearnStack/blob/main/backend/src/LearnStack.SharedKernel/`](https://github.com/HodeTech/LearnStack/blob/main/backend/src/LearnStack.SharedKernel/) — LearnStack core reads the key from the projection by string. A mismatch means LearnStack silently never sees the feature. If you add a key Hub authors but LearnStack core doesn't yet read, note the pending LearnStack-side addition (a cross-repo registry-sync follow-up; the durable fix is a shared `LearnStack.Contracts` package, Phase 11 — see [plans.md § Registry sync](../../../docs/modules/plans.md)).
 
 ### Step 4 — Plan validator
 
