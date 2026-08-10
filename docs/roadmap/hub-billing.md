@@ -1,8 +1,9 @@
 # Hub Billing and Invoicing
 
 > **This is the authoritative plan.** It was migrated out of LearnStack's
-> `phase-09b-hub-billing.md`, which is now a pointer at this file. Hub billing is Hub work
-> and belongs in the repository that ships it.
+> [phase-09b-hub-billing.md](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-09b-hub-billing.md),
+> which is now a pointer at this file. Hub billing is Hub work and belongs in the
+> repository that ships it.
 >
 > Identifier note: the track keeps the **09b** slot in LearnStack's phase numbering
 > because that identifier appears in commit messages, branch names and cross-repository
@@ -82,10 +83,11 @@ Pinned once, in one place, because getting it wrong is expensive and silent:
 
 ### Usage ingestion and aggregation
 
-- `POST /api/v1/usage/report` — already in
-  [ADR-0034's endpoint set](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
-  and already handled since [P02c-2](p02c-2-internal-api-and-contract.md) — produces the
-  raw stream from LearnStack's `IUsageReporter`.
+- `POST /api/v1/usage/report` — already enumerated in
+  [ADR-0034's endpoint set](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md),
+  and its handler **will be built by** [P02c-2](p02c-2-internal-api-and-contract.md) —
+  produces the raw stream from LearnStack's `IUsageReporter`. This track assumes that
+  ingestion exists; it does not build it.
 - A Hangfire job rolls raw reports into `UsageAggregate` daily.
 - Reports carry an idempotency key. A replayed report **must not double-count**: the
   ingestion path is idempotent on that key, and the daily rollup is recomputed from raw
@@ -99,7 +101,7 @@ Pinned once, in one place, because getting it wrong is expensive and silent:
   projection and emits `usage.alert.soft_limit_reached` over
   `POST /api/v1/usage/report`
   ([LearnStack Architecture 21 § Soft vs Hard Limits](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/21-feature-flags.md)).
-  [P02c-2](p02c-2-internal-api-and-contract.md) ingests that stream. **This track adds
+  [P02c-2](p02c-2-internal-api-and-contract.md) will ingest that stream. **This track adds
   the Hub half**: distinguishing an alert row from an ordinary usage row, retaining it,
   surfacing it in the operator portal, and optionally notifying the tenant admin.
 
@@ -136,11 +138,20 @@ Adding a fourth is a code edit, not an ADR.
 > `IPaymentProvider` (Phase 09, tenant-facing storefront). The two share a shape —
 > idempotency key, webhook signature verification, status mapping — but describe different
 > billing relationships: `IPaymentProvider` charges *learners* on behalf of a tenant;
-> `IHubPaymentProvider` charges *tenants* on behalf of LearnStack. Hub adapters live in
-> `LearnStack.Hub.Infrastructure.Payments.{Stripe,Iyzico,Manual}`; LearnStack adapters live
+> `IHubPaymentProvider` charges *tenants* on behalf of LearnStack. LearnStack adapters live
 > in `LearnStack.Infrastructure.Payments.*` in the other repository. Running both in one
 > process is forbidden by the codebase separation invariant
 > ([ADR-0019](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md)).
+>
+> **Hub adapter project names are fixed by the SDK import boundary** in
+> [CLAUDE.md](../../CLAUDE.md), which permits a vendor SDK type only inside the project
+> named for that vendor:
+>
+> | Adapter | Project | SDK |
+> |---|---|---|
+> | Stripe | `LearnStack.Hub.Infrastructure.Stripe` | Stripe.net — importable here and nowhere else |
+> | Iyzico | `LearnStack.Hub.Infrastructure.Iyzico` | Iyzipay — importable here and nowhere else |
+> | Manual / wire transfer | `LearnStack.Hub.Infrastructure.Payments.Manual` | none — it is an operator action plus an audit entry, so it carries no vendor dependency and sits outside the SDK boundary |
 
 Provider SDK types never leave their adapter assembly; SDK exceptions are translated into
 `ProviderException` at the boundary, and `IProviderResilience<IHubPaymentProvider>` carries

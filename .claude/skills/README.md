@@ -2,7 +2,7 @@
 
 Reusable, task-focused instruction packs ("skills") for AI coding agents working on **LearnStack Hub**. Each subdirectory is one skill; its `SKILL.md` carries YAML frontmatter (`name`, `description`) so the agent runtime can pick or skip it without reading the whole body.
 
-Skills are **project-local** to this repo (`.claude/skills/`). An agent running from the `learnstack-hub` root loads them automatically. They cite LearnStack core's standards / ADRs by sibling path (`../LearnStack/docs/...`) for cross-cutting authority and carry only the **Hub-specific delta** on top — they never duplicate the LearnStack standards corpus.
+Skills are **project-local** to this repo (`.claude/skills/`). An agent running from the `LearnStack-Hub` root loads them automatically. They cite LearnStack core's standards / ADRs by absolute GitHub URL (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`) for cross-cutting authority and carry only the **Hub-specific delta** on top — they never duplicate the LearnStack standards corpus. Sibling-relative `../LearnStack/...` paths remain correct for shell commands and filesystem locations, never for a Markdown link.
 
 ## The Hub deltas every skill assumes
 

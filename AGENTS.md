@@ -15,20 +15,6 @@ There are no rule differences. The only thing that varies between agent runtimes
 
 If multiple agents contributed materially to the same commit, include one trailer per agent. [LearnStack's Git Workflow Standards § Trailers](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/14-git-workflow.md#trailers) is the authority for both strings; if this file and that section disagree, that section wins.
 
-## Skills
-
-**This repository maintains its own skill catalogue** at [`.claude/skills/`](.claude/skills/README.md) — 18 skills, git-tracked through an un-ignore rule in `.gitignore`. Load them from here, not from the sibling LearnStack repo.
-
-The Hub catalogue is Hub-tailored: the `add-hub-*` workflows encode Hub's deltas from LearnStack core — no Row Level Security, `OperatorId` rather than `UserId`, a six-step MediatR pipeline rather than eight, the `hub` schema, the `learnstack_hub` database. Skills cite LearnStack's standards and ADRs by absolute URL (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`) for cross-cutting authority and carry only the Hub-specific workflow on top; they do not duplicate the standards.
-
-Entry-point selection is the same as in LearnStack core: [implement-task](.claude/skills/implement-task/SKILL.md) for substantive work, [start-task](.claude/skills/start-task/SKILL.md) for scoping only, [standards-check](.claude/skills/standards-check/SKILL.md) followed by [code-review](.claude/skills/code-review/SKILL.md) for review. Pick exactly one entry point; it dispatches the rest.
-
-## Sibling paths
-
-The two repositories sit side by side on disk as `LearnStack/` and `LearnStack-Hub/`, with those exact capitalisations. That layout governs **shell commands and filesystem paths** — `cd ../LearnStack`. A lower-cased spelling works on macOS's case-insensitive filesystem and fails on Linux CI.
-
-Documentation **links** into LearnStack are absolute URLs: `https://github.com/HodeTech/LearnStack/blob/main/docs/...`. A relative link does not cross a repository boundary on github.com, and the CI link audit no longer exempts cross-repo links — so a relative one now fails the build rather than reaching a reader.
-
 ## Maintaining this file
 
-Do **not** copy CLAUDE.md content into AGENTS.md. If a guidance rule needs to change, change CLAUDE.md; the rule applies everywhere by virtue of the redirect above. The two sections above are the only content that legitimately lives here, because they describe this file's own runtime rather than the project's rules.
+Do **not** copy CLAUDE.md content into AGENTS.md. If a guidance rule needs to change, change CLAUDE.md; the rule applies everywhere by virtue of the redirect above. The section above is the only content that legitimately lives here, because it describes this file's own runtime rather than the project's rules. Everything else — the skill catalogue and its entry points, the sibling on-disk layout, and the absolute-URL rule for cross-repository links — is in [CLAUDE.md](CLAUDE.md) and is not restated here.

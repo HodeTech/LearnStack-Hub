@@ -29,18 +29,25 @@ stream) — which is why several shells left open in P02c-1 close here rather th
   is enforced on both sides of the login — the portal validates issuer and `azp`, and the
   Hub API rejects any token whose issuer is the tenant realm.
 - **Backend-for-frontend session.** Tokens are held server-side by the Next.js route
-  handlers under `apps/operator-portal/src/app/api/` and surfaced to the browser only as
+  handlers under `frontend/apps/operator-portal/src/app/api/` and surfaced to the browser only as
   an `HttpOnly`, `Secure`, `SameSite=Lax` session cookie. No access token, refresh token
   or id token ever reaches `localStorage`, `sessionStorage`, or a client component. An
   operator session is a platform-administrator session; an XSS bug that could read a
   token would be a full control-plane compromise, so the token never sits where script
   can read it.
-- **MFA is enforced, not offered.** The realm's browser flow requires OTP, and the
-  `CONFIGURE_TOTP` required action is set on the operator realm role. The realm export
-  checked into `infra/keycloak/` carries this configuration, and an integration test
-  asserts that a login attempt that skips the OTP step does not produce a session. A
-  realm where MFA is optional is a misconfiguration the portal reports at startup rather
-  than tolerates.
+- **MFA is enforced, not offered.** The realm's browser flow requires OTP, and
+  `CONFIGURE_TOTP` is a `requiredAction` on **every user** in the realm — not on a role,
+  because a role-scoped required action leaves an operator who holds no role able to log
+  in without it. There is exactly one owning export,
+  `../LearnStack/infra/keycloak/realms/learnstack-hub.json`: the realm JSON lives in the
+  LearnStack repository because LearnStack's compose stack imports both realms at first
+  boot, and this repository's [`infra/keycloak/README.md`](../../infra/keycloak/README.md)
+  documents that ownership rather than holding a second copy. One integration test —
+  `OperatorLogin_SkippingOtp_ProducesNoSession`, in
+  `frontend/apps/operator-portal`'s test suite — reads that export and asserts both facts:
+  the required action is present, and a login attempt that skips the OTP step produces no
+  session. A realm where MFA is optional is a misconfiguration the portal reports at
+  startup rather than tolerates.
 - Refresh happens in the route handler on a short access-token lifetime; the session
   cookie's lifetime is bounded by the refresh token, and logout revokes at the realm.
 
@@ -126,7 +133,7 @@ The app is **`frontend/apps/operator-portal`**.
 LearnStack-side documents call it `learnstack-hub-web`
 ([Architecture 24 § 6](https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md) and
 LearnStack's `CLAUDE.md` among them). **That name is stale.** The Hub repository ships
-`apps/operator-portal`, and
+`frontend/apps/operator-portal`, and
 [`RepositoryLayoutTests.Frontend_Has_Only_The_OperatorPortal_App`](../../backend/tests/LearnStack.Hub.Tests.Architecture/RepositoryLayoutTests.cs)
 fails the build if a second frontend app appears or that directory is renamed. P02c-4
 corrects the LearnStack-side references in the coordinated cross-repo pass described in
@@ -177,8 +184,9 @@ until an ADR explains how a support read happens without the Hub touching tenant
 - `frontend/apps/operator-portal` — BFF session route handlers, dashboard, tenant list,
   tenant detail with the read-only entitlement viewer, plan list, audit stream.
 - `@learnstack-hub/ui` primitives; ESLint flat config; Next 16.
-- `infra/keycloak/` realm export carrying the MFA-required browser flow and the operator
-  roles.
+- The MFA-required browser flow and the operator roles added to the single owning realm
+  export, `../LearnStack/infra/keycloak/realms/learnstack-hub.json`, as a coordinated
+  cross-repo change per [`infra/keycloak/README.md`](../../infra/keycloak/README.md).
 - `OperatorContextSpanProcessor`.
 - Test coverage: unit tests for permission mapping; integration tests for the login flow
   (including the MFA-skip rejection and the wrong-realm rejection); an audit test
@@ -213,9 +221,10 @@ until an ADR explains how a support read happens without the Hub touching tenant
   one call", and the BFF boundary erodes. Mitigated by keeping the SDK client
   session-cookie-based with no token parameter, so there is no signature that accepts one.
 - **MFA becoming advisory.** A developer disables OTP locally for convenience and the
-  realm export follows. Mitigated by asserting the required action in an integration test
-  against the checked-in realm export, not against a running instance an operator
-  configured by hand.
+  realm export follows. Mitigated by `OperatorLogin_SkippingOtp_ProducesNoSession`
+  asserting the required action against the checked-in export at
+  `../LearnStack/infra/keycloak/realms/learnstack-hub.json`, not against a running
+  instance an operator configured by hand.
 - **The entitlement viewer becoming an editor.** The most requested next feature will be
   "let me just override this one flag for this one tenant". Doing so makes the projection
   no longer a projection and breaks `generation` monotonicity as a cache-coherency

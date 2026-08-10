@@ -36,18 +36,30 @@ stateDiagram-v2
     Pending --> Verifying: StartVerification()
     Verifying --> Verifying: RecordVerificationFailure(error)
     Verifying --> Failed: attempts exhausted
-    Verifying --> Active: MarkVerified(certRef, issuedAt, expiresAt)
+    Verifying --> Propagating: MarkVerified(certRef, issuedAt, expiresAt)
+    Propagating --> Propagating: RecordPropagationFailure(error)
+    Propagating --> Failed: attempts exhausted
+    Propagating --> Active: MarkPropagated() (push + replication both acknowledged)
     Active --> Active: Renew(newExpiresAt)
     Active --> Revoked: Revoke()
     Failed --> Verifying: StartVerification() (operator retry)
+    Failed --> Propagating: RetryPropagation() (operator retry, cert already issued)
     Failed --> Revoked: Revoke()
 ```
 
-States: `Pending | Verifying | Active | Failed | Revoked`. Text fallback — a submitted
-domain is `Pending`; verification moves it to `Verifying`, where failures accumulate
-until the attempt budget is exhausted (`Failed`) or the challenge succeeds (`Active`);
-an active domain renews in place and can be revoked; a failed domain can be retried by an
-operator or revoked.
+States: `Pending | Verifying | Propagating | Active | Failed | Revoked`. Text fallback — a
+submitted domain is `Pending`; verification moves it to `Verifying`, where failures
+accumulate until the attempt budget is exhausted (`Failed`) or the challenge succeeds.
+A successful challenge does **not** reach `Active`: it moves to `Propagating`, where the
+domain waits on both halves of § Propagation — the `PUT .../host-mappings` push
+acknowledged by LearnStack, and the certificate replication into the LearnStack-owned
+secret store acknowledged by the secret store. Only when both acknowledge does
+`MarkPropagated()` move it to `Active`, and only that transition emits
+`learnstack.hub.custom-domain.activated`. The intermediate state exists because
+`Verifying → Active` on a certificate alone is exactly the split brain the § Risks entry
+names: a domain that resolves but does not serve. An active domain renews in place and can
+be revoked; a failed domain is retried by an operator — re-verifying if the challenge
+failed, re-propagating if only the push or the replication did — or revoked.
 
 Every transition is a method returning `Result` and emitting a domain event. Invalid
 transitions return `Result.Fail(business_rule_violation)` and never throw
@@ -81,10 +93,14 @@ authenticated context, never from a submitted field.
   first request after cutover and before issuance fails. The submission UI states this
   ordering; DNS-01 has no such problem, which is why it is the default rather than a
   preference.
-- A Hangfire recurring job runs CNAME verification with a bounded attempt budget and
-  backoff (ADR-0022's default: every 60 seconds, up to 60 attempts). `VerificationAttempts`
-  and `LastVerificationError` are on the aggregate so the operator queue can show *why* a
-  domain is stuck, not just that it is.
+- A Hangfire recurring job runs the verification poll with a bounded attempt budget and
+  backoff (ADR-0022's default: every 60 seconds, up to 60 attempts). **What it polls is
+  selected by the domain's challenge mode**, not fixed: the default DNS-01 flow queries the
+  `_acme-challenge.{domain}` TXT record and compares it against the expected token, while
+  the HTTP-01 fallback resolves the domain's CNAME and checks that it points at the
+  LearnStack edge. A job that only ever did one of the two would silently never succeed for
+  domains in the other mode. `VerificationAttempts` and `LastVerificationError` are on the
+  aggregate so the operator queue can show *why* a domain is stuck, not just that it is.
 - A second recurring job renews certificates inside their 30-day pre-expiry window.
 
 ### `ITlsCertificateProvider` and the ACME adapter
@@ -114,7 +130,7 @@ names:
 
 | Topic | Emitted when | LearnStack-side effect |
 |---|---|---|
-| `learnstack.hub.custom-domain.activated` | `MarkVerified` succeeds | **Invalidate** the resolver cache entry for the host. The mapping itself arrives over `PUT /api/internal/tenants/{id}/host-mappings` — see § Propagation below |
+| `learnstack.hub.custom-domain.activated` | `MarkPropagated` succeeds — i.e. on entering `Active`, after both the host-mapping push and the certificate replication have acknowledged. Never on `MarkVerified` alone | **Invalidate** the resolver cache entry for the host. The mapping itself arrives over `PUT /api/internal/tenants/{id}/host-mappings` — see § Propagation below |
 | `learnstack.hub.custom-domain.deactivated` | `Revoke` succeeds | **Invalidate** the resolver cache entry for the host. The row is removed by the same push endpoint |
 | `learnstack.hub.custom-domain.renewed` | `Renew` succeeds | Refresh the certificate reference; no mapping change |
 
@@ -198,8 +214,12 @@ Added to the P02c-4 shell: Custom Domains → Pending Queue, Active List, Renewa
 
 The LearnStack-side event consumer, the `host-mappings` handler and the
 `platform_host_to_tenant` writes are the paired half of this packet and live in LearnStack
-[Phase 02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md), merged in the
-same session per [CLAUDE.md § Cross-repo coordination](../../CLAUDE.md).
+[Phase 02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md). They land as
+two pull requests in one session, per [CLAUDE.md § Cross-repo coordination](../../CLAUDE.md):
+the **Hub pull request opens first** and carries the canonical contract shape, the
+**LearnStack pull request references the Hub PR's commit hash** and is written against
+that shape, and **both merge in the same session** — either-side merge alone leaves the
+contract dangling.
 
 The LearnStack **edge** half is demand-gated. Per
 [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md), both
@@ -221,23 +241,35 @@ serving that host on a publicly trusted certificate at the edge.
   at the Hub ([ADR-0004](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0004-authentication-strategy.md)). Enumerated in
   [ADR-0034 § The endpoint set](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
 
+  The LearnStack side of that hop goes through **`IHubTenantSync`** — the named adapter
+  for tenant-administration crossings, and under ADR-0034's second invariant the only
+  type on that side permitted to hold a Hub client for it. The Studio proxy calls the
+  adapter; the adapter calls the Hub. `Hub_Client_Referenced_Only_By_Named_Adapters`
+  fails the LearnStack build if anything else does. This packet's Hub pull request fixes
+  the request and response contract — the submitted FQDN and challenge mode in, the
+  created `CustomDomain` id and its initial state out — **before** the LearnStack-side
+  adapter method is written against it, per the coordination protocol below.
+
 - `LearnStack.Hub.Modules.CustomDomains` — aggregate, state machine, public-suffix
   validation, uniqueness constraints, commands and queries.
 - `LearnStack.Hub.Modules.Compliance` — `CompliancePolicy`, cap merge into the projection,
   recompute trigger.
 - `ITlsCertificateProvider` port plus the `LearnStack.Hub.Infrastructure.Acme` adapter,
   resilience-decorated, with a distinct rate-limited outcome.
-- DNS-01 and HTTP-01 challenge runners; the CNAME verification recurring job; the renewal
-  recurring job.
+- DNS-01 and HTTP-01 challenge runners; the verification recurring job covering **both**
+  the TXT-record poll (DNS-01) and the CNAME check (HTTP-01); the renewal recurring job.
 - `PUT /api/internal/tenants/{id}/host-mappings` on the outbound `LearnStackApiClient`,
   carrying host tuples and certificate references only.
 - Secret-store replication path from `learnstack-hub/certs/{domain}` to the LearnStack-side
   path, with the LearnStack side referencing by path.
 - The three `learnstack.hub.custom-domain.*` integration events.
 - Operator portal: pending queue, active list, renewal watch, caps editor.
-- Tests: unit tests for every state transition and every rejection at `Create`; an
-  integration test issuing against an ACME staging directory end to end; a contract test
-  asserting `entitlement-v1.schema.json` contains no host or certificate fields.
+- Tests: unit tests for every state transition and every rejection at `Create`, including
+  the `Propagating → Active` gate refusing to open on one acknowledgement; unit tests for
+  the recurring job on **both** verification paths — the DNS-01 TXT poll and the HTTP-01
+  CNAME check, each covering the found, absent and mismatched cases; an integration test
+  issuing against an ACME staging directory end to end; a contract test asserting
+  `entitlement-v1.schema.json` contains no host or certificate fields.
 
 ## Completion Criteria
 

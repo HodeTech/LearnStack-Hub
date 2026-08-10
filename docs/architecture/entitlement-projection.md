@@ -146,7 +146,7 @@ These are LearnStack-core-side behaviours that consume the projection; documente
   fail-closed keys are refused. It never throws out of a feature-flag check. See
   [ADR-0034 § The entitlement read path](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)
   and [LearnStack Phase 02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md); this document
-  does not restate them. Superseded detail: serve cached projection until `expires_at`; within `grace_until` keep serving; past `grace_until` → read-only mode.
+  does not restate them.
 
 Hub's only obligation is to keep emitting a projection whose shape matches the contract above, with a correct monotonic `generation`.
 

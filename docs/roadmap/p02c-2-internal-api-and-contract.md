@@ -28,13 +28,13 @@ The Hub's own tenant-facing and operator-facing API (`/api/v1/tenants/*`, `/api/
 
 ### The authentication chain
 
-Three independent layers on every call in both directions, per [ADR-0019](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) and unchanged by ADR-0034:
+The current authority is [ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md), which carries the endpoint set and the single authentication chain that guards it in both directions; [ADR-0019](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0019-learnstack-hub.md) is where the chain originates. Three independent layers on every call, in both directions:
 
 - **mTLS** with client certificates signed by the LearnStack-internal CA.
 - **A signed RS256 JWT** with `aud=learnstack-internal` and an expiry of at most five minutes, replay-protected by a short-TTL inbox keyed on `jti`.
 - **An HMAC-SHA256 body signature** in `X-Signature`, using a per-deployment shared secret.
 
-All three secrets — the client certificate and key, the JWT signing key, the HMAC key — are read through `ISecretProvider`. None of them appears in configuration files, in logs, or in an error message. Rejecting a request that is missing any one layer is a tested behaviour, not an assumed one.
+All three secrets — the client certificate and key, the JWT signing key, the HMAC key — are read through `ISecretProvider`. **Production secret material** appears in no configuration file, log line, error message or trace attribute. The `HUB_INTERNAL_API_HMAC_KEY` placeholder in `.env.example` is not an exception to that rule: it is non-secret, development-only fixture data with an obvious placeholder shape, and it never names a production value. Rejecting a request that is missing any one layer is a tested behaviour, not an assumed one.
 
 `/api/internal/*` binds to an internal listener and is never reachable on the internet-facing one. `Internal_API_Endpoints_AreNot_Public` enforces it.
 
@@ -53,7 +53,9 @@ Two things travel when a projection is recomputed, and they are not the same thi
 - **The projection itself**, pushed over `PUT /api/internal/tenants/{id}/entitlements`. This is the contract-bearing path and it is HTTP. It carries the `generation` counter, which is what lets the receiver reject an out-of-order delivery instead of overwriting newer state with older.
 - **An eager-invalidation signal**, published as `learnstack.hub.entitlement`. This is an optimisation over waiting for a cache to expire, and it is the first genuine cross-process integration event in either system — which is precisely the trigger [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md) names for promoting `IEventBus` from its in-process default to a broker-backed adapter. This packet ships the publish behind `IOutbox` and `IEventBus` so that the transport choice stays at the composition root and is settled by that trigger, not by this packet.
 
-Correctness does not depend on the signal arriving. If it is lost, the projection is still authoritative and the receiver still converges on the next read.
+**They are two outbox records, not one.** A recompute enqueues one record for the HTTP push and one for the event, each with its own handler, its own idempotency key and its own retry schedule, so neither delivery can be dropped by the other's success and a partial failure retries only the half that failed. Coordinating both behind a single record would make them one delivery with two side effects: a handler that pushed and then failed to publish would either retry the push (duplicating it) or mark the record done (silently losing the event).
+
+Convergence follows from that split. The push is idempotent on `generation` — the receiver rejects anything older than what it holds, so a retry after an ambiguous timeout is safe. The event is idempotent on `(tenant_id, generation)` at the consumer's inbox guard, so a redelivery is a no-op. Correctness does not depend on the signal arriving at all: if the event is lost after its retries are exhausted, the projection is still authoritative and the receiver still converges on the next read.
 
 ### OpenAPI and SDK generation
 
@@ -86,7 +88,7 @@ Correctness does not depend on the signal arriving. If it is lost, the projectio
 - No secret used by the chain is readable from configuration, a log line, an error response, or a trace attribute.
 - `/api/internal/*` returns nothing on the internet-facing listener.
 - Reporting the same usage metric twice with the same idempotency key records it once.
-- Recomputing an entitlement enqueues exactly one outbox row, and flushing it produces one push carrying the current `generation`.
+- Recomputing an entitlement enqueues exactly two outbox rows — the `PUT .../entitlements` push and the `learnstack.hub.entitlement` publish — and flushing them produces exactly one push and one publish, both carrying the current `generation`. Failing one leaves the other's row untouched and retryable; replaying either produces no second effect.
 - The OpenAPI document generates an SDK that typechecks, and the contract test fails on an unannounced change.
 - `backend-integration` runs on every pull request and is a required check.
 

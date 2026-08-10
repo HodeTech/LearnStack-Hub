@@ -153,7 +153,7 @@ A packet that changes both repositories lands as two pull requests in one sessio
 
 ## Status ledger
 
-**Updated 2026-08-08.** This ledger tracks the state of _artefacts_, not commits. A row changes when the artefact changes state, not when a commit touches it — the previous commit-bound version of this file went stale four commits after it was written.
+**Updated 2026-08-09.** This ledger tracks the state of _artefacts_, not commits. A row changes when the artefact changes state, not when a commit touches it — the previous commit-bound version of this file went stale four commits after it was written.
 
 | Artefact                                                | State                    | Where                                                                                                                                                                                                                       |
 | ------------------------------------------------------- | ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

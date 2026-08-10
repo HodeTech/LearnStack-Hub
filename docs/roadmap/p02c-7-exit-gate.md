@@ -75,17 +75,25 @@ A domain goes from submitted to resolving, without an operator editing infrastru
 
 ### Gate 4 — The internal API rejects a request missing any leg of the auth chain
 
-Both directions, three negative tests each.
+Both directions, all **three authentication legs** — which is a count of legs, not a count
+of test cases. Each leg carries a separate, separately named negative test per variant
+below, so seven tests per direction, fourteen in total. A single "auth rejects bad
+requests" test covering one variant per leg would leave four of the seven variants
+unexercised.
 
 The chain is mTLS + RS256 JWT (`aud=learnstack-internal`, five-minute expiry, `jti` replay
 protection) + HMAC body signature, applied to every endpoint in
 [ADR-0034's set](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md).
 
-| Removed | Expected |
-|---|---|
-| Client certificate | Connection refused at the TLS layer; no application handler runs |
-| JWT (absent, expired, wrong audience, or replayed `jti`) | `401`, request not processed |
-| HMAC body signature (absent or over a tampered body) | `401`, request not processed |
+| Leg | Variant, each its own test | Expected |
+|---|---|---|
+| mTLS | Client certificate absent | Connection refused at the TLS layer; no application handler runs |
+| JWT | Absent | `401`, request not processed |
+| JWT | Past its five-minute expiry | `401`, request not processed |
+| JWT | Wrong `aud` | `401`, request not processed |
+| JWT | Replayed `jti` | `401`, request not processed |
+| HMAC | `X-Signature` absent | `401`, request not processed |
+| HMAC | Signature over a tampered body | `401`, request not processed |
 
 Run against **both** internal surfaces: LearnStack's `/api/internal/*` (Hub → LearnStack)
 and the Hub's `/api/v1/internal/*` (LearnStack → Hub). Each rejection is logged with the
@@ -164,7 +172,8 @@ the packet that owns it, and that packet's status is reopened. A defect found he
 - A cross-repository end-to-end suite that boots both stacks (Testcontainers for Postgres,
   the ACME staging directory, and both Keycloak realms) and runs Gates 1–5 as executable
   scenarios.
-- Negative-path tests for the auth chain, both directions, all three legs.
+- Negative-path tests for the auth chain: both directions, all three legs, one separately
+  named test per variant in the Gate 4 table (fourteen in total).
 - The registry-reconciliation check for `FeatureKey` / `LimitKey`.
 - A short runbook for running the gate locally, in
   [docs/operations/](../operations/README.md).

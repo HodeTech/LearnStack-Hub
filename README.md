@@ -29,7 +29,7 @@ The architecture deep-dive lives in the sibling repo: [docs/architecture/24-lear
 
 Hub documentation **links** to LearnStack core by absolute URL (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`), per [Documentation Standards § Layout](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/13-documentation.md). A relative path does not cross a repository boundary on github.com and depends on a sibling checkout being present and identically capitalised; an absolute URL works everywhere. Shell commands and filesystem references still use `../LearnStack` — those are paths, not links — so the expected on-disk layout still matters:
 
-```
+```text
 <parent-dir>/
 ├── LearnStack/        (https://github.com/HodeTech/LearnStack)
 └── LearnStack-Hub/    (this repo)

@@ -47,7 +47,7 @@ The full layout is documented in [repository-layout.md](../architecture/reposito
 
 ### Architecture-test placeholders
 
-Three tests land as structural placeholders that become real when module assemblies exist: the meta-test that keeps the suite non-skippable, `No_Source_Folder_Named_Verticals`, and `Hub_NeverStores_TenantData`.
+Four tests land, three of them as structural placeholders that become real when module assemblies exist: `Meta_NetArchTest_DetectsAPlantedViolation` (which keeps the suite non-skippable), `No_Source_Folder_Named_Verticals`, `Hub_NeverStores_TenantData`, and `Frontend_Has_Only_The_OperatorPortal_App` — the last already real, since it asserts against the frontend directory this packet ships.
 
 ## Deliverables
 

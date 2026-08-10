@@ -77,7 +77,7 @@ For any task in this repo, read in this order:
 
 Then pick an entry-point skill from **this repo's** catalogue at [`.claude/skills/`](.claude/skills/README.md). Hub maintains its own Hub-tailored skill set — the `add-hub-*` workflows encode Hub's deltas from LearnStack core (no RLS, `OperatorId` not `UserId`, the 6-step MediatR pipeline, the `hub` schema, the `learnstack_hub` database). The entry point for substantive work is [implement-task](.claude/skills/implement-task/SKILL.md); for scoping-only use [start-task](.claude/skills/start-task/SKILL.md); for review run [standards-check](.claude/skills/standards-check/SKILL.md) then [code-review](.claude/skills/code-review/SKILL.md).
 
-> Hub skills are project-local: an agent running from the `LearnStack-Hub` root loads them from `.claude/skills/`. They cite LearnStack core's standards / ADRs by sibling path (`../LearnStack/docs/...`) for the cross-cutting authority and carry only the Hub-specific workflow on top — they do not duplicate the standards.
+> Hub skills are project-local: an agent running from the `LearnStack-Hub` root loads them from `.claude/skills/`. They cite LearnStack core's standards / ADRs by absolute GitHub URL (`https://github.com/HodeTech/LearnStack/blob/main/docs/...`) for the cross-cutting authority and carry only the Hub-specific workflow on top — they do not duplicate the standards.
 
 ## Hard rules
 
