@@ -38,7 +38,7 @@ Pick the entry point matching the user's intent. Only **one** entry point runs p
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | [implement-task](implement-task/SKILL.md)   | The default entry point for substantive work — scope, implement, self-check, test, docs, commit, review prompt.           |
 | [start-task](start-task/SKILL.md)           | Lightweight scoping-only entry point. Reading order + alignment check.                                                    |
-| [write-adr](write-adr/SKILL.md)             | Capturing a **Hub-internal** decision (`HUB-NNNN` series). Cross-cutting decisions go in `../LearnStack/docs/decisions/`. |
+| [write-adr](write-adr/SKILL.md)             | Capturing a **Hub-internal** decision (`HUB-NNNN` series). Cross-cutting decisions go in [LearnStack's `docs/decisions/`](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/). |
 | [update-glossary](update-glossary/SKILL.md) | Introducing a Hub-specific term in `docs/glossary.md`.                                                                    |
 | [commit-and-pr](commit-and-pr/SKILL.md)     | Conventional Commit + AI trailer + Hub PR conventions (incl. cross-repo coordination).                                    |
 
@@ -81,10 +81,12 @@ These Hub workflows aren't needed yet; create the skill when the packet that nee
 
 | Skill                                        | Owning packet                                                                        | Mirror of                                         |
 | -------------------------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------- |
-| `add-provider-adapter`                       | P02c-2 (`LearnStackApiClient`) / P02c-5 (Let's Encrypt) / Phase 09b (Stripe, Iyzico) | LearnStack `add-provider-adapter`                 |
+| `add-provider-adapter`                       | P02c-2 (`LearnStackApiClient`) / P02c-5 (Let's Encrypt) / Phase 09b (Stripe, Iyzico) | [LearnStack `add-provider-adapter`](https://github.com/HodeTech/LearnStack/blob/main/.claude/skills/add-provider-adapter/SKILL.md) |
 | `add-hub-permission`                         | P02c-4 (Operators module)                                                            | LearnStack `add-permission` (operator-scope only) |
 | `add-audit-coverage`                         | P02c-4 (Audit module)                                                                | LearnStack `add-audit-coverage`                   |
 | `add-operator-portal-route` / `add-i18n-key` | P02c-4 (operator portal)                                                             | LearnStack `add-frontend-route` / `add-i18n-key`  |
+| `add-recurring-job`                          | P02c-5 (challenge verification + renewal) / Hub Billing (usage rollup)               | **No LearnStack mirror — Hub-originated.** The scheduler choice is an open `HUB-NNNN` ADR |
+| `add-contract-test`                          | P02c-2 (`entitlement-v1.schema.json` + the OpenAPI/SDK contract)                     | **No LearnStack mirror.** Covers the byte-identical-across-repos rule and how it is checked in a coordinated PR |
 
 ## Authoring a new skill
 
@@ -103,5 +105,5 @@ Body structure: **Purpose**, **When to use** / **When not to use**, **Inputs**, 
 ## What skills are not
 
 - **Not duplicates of standards.** A skill is a _workflow_. LearnStack's [Standards corpus](https://github.com/HodeTech/LearnStack/blob/main/docs/standards/) is the authority; skills cite it.
-- **Not decisions.** Decisions live in ADRs (LearnStack `../LearnStack/docs/decisions/` for cross-cutting; this repo's `docs/decisions/` for `HUB-NNNN`).
+- **Not decisions.** Decisions live in ADRs ([LearnStack's `docs/decisions/`](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/) for cross-cutting; this repo's `docs/decisions/` for `HUB-NNNN`).
 - **Not scratch space.** Exploratory notes go in `docs/analysis/` (gitignored).

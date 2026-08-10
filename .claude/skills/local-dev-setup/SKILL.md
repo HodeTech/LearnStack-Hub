@@ -40,7 +40,7 @@ Get the Hub stack running. Hub's compose is deliberately minimal — it runs onl
 ### Step 1 — Bootstrap (one-time)
 
 ```bash
-cd ~/Documents/Projects/learnstack-hub
+cd ~/Documents/Projects/LearnStack-Hub
 make install      # restores backend NuGet + frontend pnpm + activates .githooks/pre-commit
 ```
 
@@ -63,7 +63,12 @@ Brings up the Hub-only services: Dapr placement (50006), Dapr sidecar (3501/5000
 ### Step 4 — Hub API
 
 ```bash
-cd ../LearnStack-Hub/backend
+# The Api host does not read .env — export it the way scripts/seed.sh does,
+# or the connection string falls back to defaults and Postgres is unreachable.
+cd ../LearnStack-Hub
+set -a; . ./.env; set +a
+export POSTGRES_HOST=localhost
+cd backend
 ~/.dotnet/dotnet run --project src/Core/LearnStack.Hub.Api    # binds 0.0.0.0:5181
 ```
 

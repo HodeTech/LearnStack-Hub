@@ -79,7 +79,10 @@ public static class HubFoundationRegistration
 
         var host = configuration["POSTGRES_HOST"] ?? "localhost";
         var port = configuration["POSTGRES_PORT"] ?? "5432";
-        var database = configuration["POSTGRES_DB_HUB"] ?? "learnstack_hub";
+        // Key matches .env.example and infra/compose/dev.yml, which provision
+        // ${HUB_POSTGRES_DB}. Reading a different key worked only because both
+        // sides defaulted to the same literal.
+        var database = configuration["HUB_POSTGRES_DB"] ?? "learnstack_hub";
         var username = configuration["POSTGRES_USER"] ?? "learnstack";
         var password = configuration["POSTGRES_PASSWORD"];
 

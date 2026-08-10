@@ -59,7 +59,7 @@ Walk all five. Cite `file:line` for every finding; classify Blocker / Major / Mi
 
 - Small single-responsibility methods; descriptive names; no dead code / commented-out blocks; no undated TODO.
 - No premature abstraction (three similar lines beat a premature helper); no half-finished implementation.
-- The change mirrors the LearnStack pattern it's based on (open `../LearnStack/backend/src/...` and compare) rather than improvising a parallel shape.
+- The change mirrors the pattern it's based on. Compare against the Hub's own shipped source first (`backend/src/Core/`, `backend/src/Modules/`); for a LearnStack-only pattern read [`https://github.com/HodeTech/LearnStack/blob/main/backend/src/`](https://github.com/HodeTech/LearnStack/blob/main/backend/src/) — no sibling checkout needed.
 
 ### 5. Hub-structural (the delta lens)
 
@@ -73,7 +73,7 @@ When delegating to a second agent, compose a self-contained prompt that:
 
 - Sets Hub context + **the five Hub deltas** ([../README.md](../README.md)).
 - Names the commit / branch / file list under review (`git log --oneline`, `git show --stat`).
-- Points at the LearnStack-side authority (`../LearnStack/docs/...`) the change derives from.
+- Points at the LearnStack-side authority it derives from, by absolute URL ([`https://github.com/HodeTech/LearnStack/blob/main/docs/`](https://github.com/HodeTech/LearnStack/blob/main/docs/)).
 - Tells the agent to walk all five lenses above.
 - Defines the output: verdict + findings as Blocker / Major / Minor / Suggestion with `file:line` + recommendation.
 - Insists on reading the surrounding Hub docs (`docs/architecture/`, `docs/modules/`) — don't review in isolation.

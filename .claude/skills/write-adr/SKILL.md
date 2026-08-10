@@ -7,7 +7,8 @@ description: >
   background-job orchestration, operator-portal-specific pattern). DO NOT USE FOR:
   cross-cutting decisions that touch the Hub↔LearnStack contract, entitlement
   projection shape, custom-domain lifecycle, two-realm boundary, or deployment model
-  (those are LearnStack ADRs — file in ../LearnStack/docs/decisions/), editing an
+  (those are LearnStack ADRs — filed in the `HodeTech/LearnStack` repo under
+  `docs/decisions/`, as a coordinated pull request), editing an
   Accepted ADR's decision section (write a superseding ADR), or day-to-day choices
   (those go in code review / commit messages).
 ---
@@ -25,7 +26,7 @@ Capture a Hub-only architectural decision durably, with its drivers and the opti
 
 ## When not to use
 
-- The decision touches the Hub↔LearnStack contract / entitlement shape / custom-domain lifecycle / two-realm boundary / deployment model → it's a **LearnStack** ADR; file under `../LearnStack/docs/decisions/` (coordinated, with user permission).
+- The decision touches the Hub↔LearnStack contract / entitlement shape / custom-domain lifecycle / two-realm boundary / deployment model → it's a **LearnStack** ADR; it is filed in the `HodeTech/LearnStack` repo under `docs/decisions/` as its own pull request, which **merges before** either code PR opens (coordinated, with user permission). Template and numbering: [https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/).
 - Editing an Accepted ADR's Decision section → write a new ADR that supersedes it.
 - A routine implementation choice → commit message / code review.
 

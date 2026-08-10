@@ -1,6 +1,12 @@
 # P02c-4: Operator Portal MVP
 
-> **Status: ⏳ Not started.** Depends on [P02c-1](p02c-1-hub-domain-core.md) and [P02c-2](p02c-2-internal-api-and-contract.md). Runs in parallel with [P02c-3](p02c-3-learnstack-integration.md) — this packet touches no LearnStack code.
+> **Status: ⏳ Not started.** Depends on [P02c-1](p02c-1-hub-domain-core.md) and [P02c-2](p02c-2-internal-api-and-contract.md). Runs in parallel with [P02c-3](p02c-3-learnstack-integration.md). **Cross-repo, in one
+> narrow place:** the operator roles and the MFA-required browser flow are added to the
+> single owning realm export, which lives in the LearnStack repository at
+> `infra/keycloak/realms/learnstack-hub.json` because LearnStack's compose imports both
+> realms at first boot. That is a coordinated pull request per
+> [Coordination protocol](README.md#coordination-protocol); everything else in this
+> packet is Hub-only.
 
 ## Goal
 

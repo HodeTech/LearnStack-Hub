@@ -63,7 +63,14 @@ Feature branch `feat/phase-02c-packet-N-<slug>`. Push with `-u` only when the us
 
 ### Step 5 — Cross-repo coordination (if the packet spans both repos)
 
-Per [CLAUDE.md § Cross-repo coordination](../../../CLAUDE.md): the Hub-side PR opens first (it carries the canonical contract shape); the LearnStack-side PR references the Hub PR's commit hash; both merge in the same session. Adding/changing a contract endpoint requires a new ADR in `../LearnStack/docs/decisions/` first. **Do not** push or merge anything in `../LearnStack` without explicit user permission — another agent may be active there.
+Per [CLAUDE.md § Cross-repo coordination](../../../CLAUDE.md), in this order — the sequence is the point, not the list of artefacts:
+
+1. **Merge the LearnStack ADR PR first**, if the packet adds or reshapes a contract endpoint. The ADR lands in the `HodeTech/LearnStack` repo under `docs/decisions/` and is **merged** — not merely opened — before either code PR exists. Code written against an unmerged ADR is code written against a proposal.
+2. **Open the Hub code PR.** It carries the canonical contract shape; that is why it goes first.
+3. **Open the LearnStack code PR**, referencing the Hub PR's commit hash, written against the shape step 2 fixed.
+4. **Merge the two code PRs together**, in the same session. Either-side merge alone leaves the contract dangling.
+
+**Do not** push or merge anything in `../LearnStack` without explicit user permission — including the ADR PR in step 1 — because another agent may be active there.
 
 ## Validation
 
@@ -76,5 +83,5 @@ Per [CLAUDE.md § Cross-repo coordination](../../../CLAUDE.md): the Hub-side PR 
 
 - **Pushing without being asked.** Default is local commit.
 - **Amending / force-pushing `main`.** Forbidden — new commits only.
-- **A contract change without an ADR.** Adding or reshaping an endpoint on the contract surface needs an ADR in `../LearnStack/docs/decisions/` first — it is a cross-repository agreement (ADR-0034).
+- **A contract change without an ADR.** Adding or reshaping an endpoint on the contract surface needs an ADR in the `HodeTech/LearnStack` repo under `docs/decisions/`, merged first — it is a cross-repository agreement ([ADR-0034](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md)).
 - **Touching `../LearnStack` branch state from a Hub session.** Coordinate; don't interfere with a parallel agent.

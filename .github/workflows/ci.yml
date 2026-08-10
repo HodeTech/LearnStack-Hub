@@ -7,7 +7,7 @@
 #     `apps/operator-portal` + `packages/{config,sdk,ui}`.
 #   - `backend-integration` runs from P02c-1, which landed the first
 #     Testcontainers-backed tests (the entitlement-rebuild round trip).
-#   - `openapi-diff` job is `if: false` until P02c-2 produces the first
+#   - `openapi-diff` is gated on an unset `vars.ENABLE_OPENAPI_DIFF` until P02c-2 produces the first
 #     generated OpenAPI spec.
 #   - No `lighthouse-budget` job — operator portal is internal-only; the
 #     accessibility / performance budget review happens manually in Phase
@@ -188,13 +188,17 @@ jobs:
   openapi-diff:
     name: openapi diff (deferred to P02c-2)
     runs-on: ubuntu-latest
-    if: false  # activate when /api/v1/internal/license/verify replaces /healthz as the only documented surface
+    # Disabled by default: an unset repository variable is the empty string, so this is
+    # false until it is set to 'true'. Not `if: false` — actionlint rejects a constant
+    # condition ([if-cond]). Activates when /api/v1/internal/license/verify replaces
+    # /healthz as the only documented surface.
+    if: vars.ENABLE_OPENAPI_DIFF == 'true'
     steps:
       - run: echo "Placeholder — P02c-2 wires oasdiff against the prior main spec."
 
   # ─── Meta (commit-message format, link audit) ─────────────────────────
   meta:
-    name: meta (commit hygiene + link audit)
+    name: meta (markdown link audit)
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:

@@ -8,8 +8,9 @@ description: >
   learnstack.hub.custom-domain.activated), wiring a module to publish it via
   IOutbox.EnqueueAsync, or consuming a LearnStack-emitted event (learnstack.tenancy.*).
   DO NOT USE FOR: intra-module domain events (plain MediatR INotification, in-process),
-  the four HTTPS contract endpoints (those are request/response, not pub/sub), or
-  adding a fifth HTTPS contract endpoint (needs an ADR).
+  the HTTPS contract surface (those are request/response, not pub/sub), or adding an
+  endpoint to it (needs a LearnStack ADR — the surface is governed by ADR-0034's two
+  invariants, not by a count).
 ---
 
 # Adding a Hub integration event
@@ -29,7 +30,9 @@ Wire a cross-boundary event the right way: outbox-written in the same transactio
 ## When not to use
 
 - Intra-module notification → plain MediatR `INotification` (`IDomainEvent`), in-process, same transaction. No outbox.
-- A request/response contract → that's one of the four HTTPS endpoints (a fifth needs an ADR in `../LearnStack/docs/decisions/`).
+- A request/response contract → that belongs to the HTTPS contract surface enumerated in
+  [ADR-0034 § The endpoint set](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0034-hub-contract-surface-invariant.md);
+  adding one needs a LearnStack ADR.
 
 ## Workflow
 
@@ -80,4 +83,7 @@ For a LearnStack-emitted event Hub consumes (e.g. `learnstack.tenancy.tenant.ren
 - **An unversioned event.** Breaking changes need `V2`.
 - **Wrong topic prefix.** Hub publishes under `learnstack.hub.*`; never under bare `learnstack.*`.
 - **A consumer without the inbox guard.** Re-delivery duplicates the side effect.
-- **Reaching for a fifth HTTPS endpoint instead of an event.** If it's fire-and-forget cross-boundary state, it's an event; a new request/response endpoint needs an ADR.
+- **Reaching for a new HTTPS endpoint instead of an event.** If it's fire-and-forget
+  cross-boundary state, it's an event; a new request/response endpoint needs a LearnStack
+  ADR. ADR-0034 retired the "closed at four endpoints" framing — protecting that count is
+  what caused TLS private keys to be tunnelled through the entitlement payload.

@@ -29,14 +29,21 @@ Stand up the Hub's foundation so domain code programs against the same `Result<T
 
 ## Workflow
 
-### Step 1 — Mirror the Hub SharedKernel
+### Step 1 — The Hub SharedKernel already exists; read it before changing it
 
-Reproduce `../LearnStack/backend/src/LearnStack.SharedKernel/` into `backend/src/Core/LearnStack.Hub.SharedKernel/`, folder-for-folder, with namespace `LearnStack.Hub.SharedKernel.*` and **two substitutions**:
+`backend/src/Core/LearnStack.Hub.SharedKernel/` **shipped with P02c-1** and is on `main`.
+This step is no longer "copy it from LearnStack" — it is "understand what is there".
+Open the Hub source first; reach for LearnStack's original only when reconciling a
+specific type, and read it at
+[`https://github.com/HodeTech/LearnStack/blob/main/backend/src/LearnStack.SharedKernel/`](https://github.com/HodeTech/LearnStack/blob/main/backend/src/LearnStack.SharedKernel/)
+rather than assuming a sibling checkout.
+
+The two substitutions the Hub copy carries, which any reconciliation must preserve:
 
 - **`OperatorId`** replaces `UserId` everywhere (the Vogen ID in `Identifiers/`, the `AuditableEntity<TId>` audit columns, `CapturedContext`). There is no tenant `UserId` in Hub.
 - **`HubException`** replaces `LearnStackException` as the base exception (namespace `LearnStack.Hub.SharedKernel.Errors`); `DomainException` / `InfrastructureException` / `ProviderException` derive from it.
 
-Surface to reproduce (see [docs/architecture/cross-cutting-foundation.md § 1](../../../docs/architecture/cross-cutting-foundation.md)): `Results/`, `Localization/`, `Domain/`, `Identifiers/`, `Time/`, `Random/`, `Pagination/`, `Persistence/`, `Errors/`, `Secrets/`, `Observability/`, `Resilience/`, `Hosting/` (`DeploymentMode`), `FeatureFlags/` (`FeatureKey`/`LimitKey` — see [add-feature-key](../add-feature-key/SKILL.md)), and `LearnStackHubVogenDefaults.IdMask`. Open the live LearnStack source for the exact public API shapes — reproduce them verbatim.
+Surface to reproduce (see [docs/architecture/cross-cutting-foundation.md § 1](../../../docs/architecture/cross-cutting-foundation.md)): `Results/`, `Localization/`, `Domain/`, `Identifiers/`, `Time/`, `Random/`, `Pagination/`, `Persistence/`, `Errors/`, `Secrets/`, `Observability/`, `Resilience/`, `Hosting/` (`DeploymentMode`), `FeatureFlags/` (`FeatureKey`/`LimitKey` — see [add-feature-key](../add-feature-key/SKILL.md)), and `LearnStackHubVogenDefaults.IdMask`. For the exact public API shapes, the Hub's own shipped source is authoritative — it is what the four modules compile against. LearnStack's original is the **reconciliation** reference only, at [`https://github.com/HodeTech/LearnStack/blob/main/backend/src/LearnStack.SharedKernel/`](https://github.com/HodeTech/LearnStack/blob/main/backend/src/LearnStack.SharedKernel/).
 
 `.csproj`: `Vogen` (PrivateAssets="all"), `MediatR`, `Microsoft.EntityFrameworkCore`, `Polly`, `Microsoft.Extensions.Configuration.Abstractions` — match LearnStack's SharedKernel.csproj. Add unit tests mirroring LearnStack's (Result, LocalizedMessage prefix invariant, Entity equality, FixedClock, generation-style invariants).
 
@@ -92,4 +99,4 @@ Mirroring LearnStack's `DomainExceptionThrowAnalyzer` as `LearnStack.Hub.Analyze
 - **Leaving `UserId` in the mirror.** Substitute `OperatorId` everywhere.
 - **Registering the OTel LoggerProvider alongside Serilog.** Double-exports every log line.
 - **Reading `DeploymentMode` inside a module.** Branch once at the composition root.
-- **Improvising shapes.** Open `../LearnStack/backend/src/LearnStack.SharedKernel/` + `LearnStack.Api/Common/` + `LearnStack.Application/Pipeline/` and reproduce.
+- **Improvising shapes.** The Hub's shipped `backend/src/Core/LearnStack.Hub.SharedKernel/`, `LearnStack.Hub.Api/Common/` and `LearnStack.Hub.Application/Pipeline/` are the authority — the four modules compile against them. Reconcile against [LearnStack's originals](https://github.com/HodeTech/LearnStack/blob/main/backend/src/) only when closing a named drift.

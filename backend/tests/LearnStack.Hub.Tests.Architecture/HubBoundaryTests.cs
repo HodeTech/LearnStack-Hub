@@ -5,14 +5,14 @@ namespace LearnStack.Hub.Tests.Architecture;
 
 /// <summary>
 /// Hub-specific boundary rules. The authoritative list of Hub-side architecture
-/// tests is in `../LearnStack/docs/architecture/24-learnstack-hub.md` § 10
-/// (six tests):
+/// tests is Architecture 24 § 10, at
+/// https://github.com/HodeTech/LearnStack/blob/main/docs/architecture/24-learnstack-hub.md
+/// (seven tests — ADR-0034 added Hub_Client_Referenced_Only_By_Named_Adapters):
 ///
-///   1. `Hub_NeverStores_TenantContent` (Architecture 24 spelling; ADR-0019
-///      § Architecture tests calls the same rule `Hub_NeverStores_TenantData`)
-///      — see <see cref="Hub_NeverStores_TenantData"/> below. This repo uses
-///      the ADR-0019 name because the ADR is the Accepted decision; the
-///      drift is a corpus-side reconciliation belonging to LearnStack core.
+///   1. `Hub_NeverStores_TenantData` — see <see cref="Hub_NeverStores_TenantData"/>
+///      below. Architecture 24 once spelled this `Hub_NeverStores_TenantContent`;
+///      the 2026-08-08 restructure corrected it to the ADR-0019 name, so the two
+///      documents now agree and this repo needs no local exception.
 ///   2. `Hub_Modules_DoNotReference_LearnStack_Internals` — lands in P02c-1
 ///      once Hub modules exist.
 ///   3. `Internal_API_Endpoints_AreNot_Public` — integration test; lands in
@@ -32,14 +32,6 @@ namespace LearnStack.Hub.Tests.Architecture;
 ///   - `LicenseKey_Validation_Is_Pinned_RSA2048` (ADR-0020) — P02c-6.
 ///   - `Cert_PrivateKey_NeverLeavesVault_To_Logs` (ADR-0022) — P02c-5.
 ///   - `CustomDomain_TenantId_NeverReadFrom_RequestBody` (ADR-0022) — P02c-5.
-///
-/// KNOWN CORPUS DRIFT (not a Hub bug; flagged for the LearnStack-side
-/// reconciliation packet): ADR-0019 § Architecture tests lists only four
-/// rules and uses the name `Hub_NeverStores_TenantData`; Architecture 24
-/// § 10 lists six rules and uses `Hub_NeverStores_TenantContent`. Hub
-/// follows ADR-0019's name (the Accepted decision is authority); P02c-3
-/// or a follow-up amendment to ADR-0019 should fold all six tests into the
-/// ADR's § Architecture tests section so the two docs agree.
 /// </summary>
 public sealed class HubBoundaryTests
 {

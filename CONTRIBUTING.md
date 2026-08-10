@@ -4,12 +4,20 @@ LearnStack Hub follows the same engineering rigour as [LearnStack core](https://
 
 ## Branch protection
 
-Required status checks on `main`:
+Required status checks on `main`. These are the names GitHub **emits** — a job's `name:`
+in [`ci.yml`](.github/workflows/ci.yml), not its job id — so branch protection must be
+configured on the left-hand strings exactly. A rule configured on the bare job id (`meta`,
+`backend`) never matches and silently protects nothing:
 
-- `backend` — `dotnet build` + format verify + unit + architecture + contract tests
-- `frontend` — pnpm install + typecheck + lint + build + Vitest
-- `meta` — `make lint`-style format verification + Markdown link audit
-- `secret-scan` — Leakwatch scan (gates per LearnStack Standards 12 § Secrets Management)
+- `backend (build + unit + arch + contract)` — `dotnet build` + format verify + unit + architecture + contract tests
+- `frontend (typecheck + lint + build + test)` — pnpm install + typecheck + lint + build + Vitest
+- `meta (markdown link audit)` — Markdown link audit on changed docs. Backend format
+  verification runs in the `backend` job (`dotnet format --verify-no-changes`); frontend
+  lint runs in the `frontend` job.
+- `secret scan (leakwatch)` — Leakwatch scan (gates per LearnStack Standards 12 § Secrets Management)
+
+If a job's `name:` changes in `ci.yml`, the branch-protection entry and this list change
+with it, in the same pull request.
 
 `backend-integration` runs from **P02c-1**, which landed the first Testcontainers-backed tests (the entitlement-rebuild round trip). It was gated `if: false` from P02c-0 until then.
 

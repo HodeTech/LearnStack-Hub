@@ -100,6 +100,8 @@ flowchart TB
     p2 -- "OpenAPI + generated SDK" --> p4
     p2 -- "outbound client for host-mappings push" --> p5
     p2 -- "verify endpoint the .lic path calls" --> p6
+    p4 -- "portal shell + Operators + Audit modules" --> p5
+    p4 -- "portal shell + operator audit" --> p6
     p3 --> p7
     p4 --> p7
     p5 --> p7
@@ -130,11 +132,19 @@ Both repositories block each other in places. Neither table is a wish list — e
 | P02c-3     | [P02a-7 Resolution + isolation](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) | `IHostToTenantResolver`, `TenantResolverMiddleware`, and the `HubCorrelationMiddleware` seam that populates `ITenantContext` on `/api/internal/*` |
 | P02c-3     | [P02a-9 Audit + entitlement socket](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) | The `IEntitlementProvider` socket with `NullEntitlementProvider` as its only implementation                            |
 | P02c-3     | [Phase 02b Identity Integration + Events](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02b-events-auth.md) | The `OutboxProcessor` and its claim protocol, `IInboxGuard` and the per-module `inbox_messages` tables, and handler-scope tenant-context restoration. `IUsageReporter` dispatches through the outbox rather than inline, and the `learnstack.hub.entitlement` invalidation consumer is an ordinary `IIntegrationEventHandler<T>` behind the same inbox guard |
+| P02c-4     | [LearnStack `infra/keycloak/realms/learnstack-hub.json`](https://github.com/HodeTech/LearnStack/blob/main/infra/keycloak/realms/learnstack-hub.json) | The operator roles and the MFA-required browser flow, added to the single owning realm export — LearnStack's compose imports both realms at first boot, so the file cannot be duplicated here. A coordinated pull request; the rest of P02c-4 is Hub-only |
 | P02c-6     | [P02a-9 Audit + entitlement socket](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02a-kernel-tenancy.md) | The `IEntitlementProvider` socket the LearnStack-side `SignedLicenseKeyEntitlementProvider` skeleton plugs into, in a coordinated pull request |
 | P02c-5     | [LearnStack Phase 02c](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-02c-hub-foundation.md) | The LearnStack-side `host-mappings` handler and its `platform_host_to_tenant` mirroring — the paired half of this packet, merged in the same session |
 | P02c-5     | [LearnStack Phase 11](https://github.com/HodeTech/LearnStack/blob/main/docs/roadmap/phase-11-production-hardening.md) | The LearnStack **edge** half only: certificate installation at the gateway, demand-gated per [ADR-0035](https://github.com/HodeTech/LearnStack/blob/main/docs/decisions/0035-demand-gated-infrastructure.md). P02c-5 does **not** wait on it — host resolution works from the `platform_host_to_tenant` row alone |
 
-P02c-0 and P02c-1 have shipped. Of what remains, **P02c-2 and P02c-4 are unblocked by LearnStack** — they touch no LearnStack code and can proceed as soon as the Hub track resumes. P02c-3, P02c-5 and P02c-6 each land as two coordinated pull requests; see the tables above and [Coordination protocol](#coordination-protocol). P02c-3 is the only packet gated on the LearnStack spine reaching **Phase 02b**, not merely Phase 02a.
+P02c-0 and P02c-1 have shipped. Of what remains, **only P02c-2 is fully Hub-local** — it
+touches no LearnStack code and can proceed as soon as the Hub track resumes. **P02c-3,
+P02c-4, P02c-5 and P02c-6 each land as two coordinated pull requests**; see the tables
+above and [Coordination protocol](#coordination-protocol). P02c-4's cross-repo half is
+the smallest of the four — the operator roles and MFA browser flow in the realm export —
+but it is not zero, and calling the packet LearnStack-free is what let that edit go
+unplanned. P02c-3 is the only packet gated on the LearnStack spine reaching **Phase
+02b**, not merely Phase 02a.
 
 ### LearnStack waits on Hub
 
